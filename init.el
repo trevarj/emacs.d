@@ -35,9 +35,9 @@
 (desktop-save-mode)
 
 ;; Fonts
-(set-face-attribute 'default nil :font "Iosevka JBM" :height 150 :weight 'medium)
+(set-face-attribute 'default nil :family "Iosevka JBM" :height 150 :weight 'medium)
 (set-face-attribute 'fixed-pitch nil :font "Iosevka JBM" :height 150)
-(set-face-attribute 'variable-pitch nil :font "Noto Sans" :height 150 :weight 'regular)
+(set-face-attribute 'variable-pitch nil :family "Noto Sans" :height 150 :weight 'regular)
 (setq use-default-font-for-symbols nil)
 ;; https://github.com/ryanoasis/nerd-fonts/wiki/Glyph-Sets-and-Code-Points
 (defvar nerdfont-code-points
@@ -109,8 +109,10 @@
 (use-package diminish
   :straight t
   :config
-  (diminish 'eldoc-mode)
-  (diminish 'auto-revert-mode))
+  (diminish 'eldoc-mode))
+
+(use-package autorevert
+  :diminish auto-revert-mode) ; doesn't work in :config above
 
 ;; Keybinding help
 (use-package which-key
@@ -266,6 +268,12 @@
   :init
   (apheleia-global-mode))
 
+(use-package rainbow-mode
+  :straight t)
+(defun toggle-hl-mode nil
+  (global-hl-line-mode (if rainbow-mode -1 +1)))
+(add-hook 'rainbow-mode-hook 'toggle-hl-mode)
+
 ;; Git
 (setq epg-pinentry-mode 'loopback) ; pinentry on minibuffer
 (use-package magit
@@ -283,6 +291,23 @@
 ;; Languages & LSPs
 (setq eldoc-echo-area-use-multiline-p nil)
 
+;; Lisps
+(use-package parinfer-rust-mode
+  :straight t
+  :config
+  (setq
+   parinfer-rust-troublesome-modes '())
+  (set-face-attribute 'parinfer-rust-dim-parens nil
+                      :foreground (cadr (assoc 'base6 doom-themes--colors)))
+  :hook emacs-lisp-mode)
+(defun disable-electric-pair-mode nil
+  (electric-pair-mode nil))
+(add-hook 'parinfer-rust-mode-hook 'disable-electric-pair-mode)
+
+;; Guile
+(use-package geiser-guile
+  :straight t)
+
 ;; Rust
 (use-package rustic
   :straight t 
@@ -295,5 +320,5 @@
   ;; (add-hook 'eglot--managed-mode-hook (lambda () (flymake-mode -1)))
   (add-hook 'rust-mode-hook 'eglot-ensure))
 
-;; Language mode hooks
+;; Eglot hooks
 (add-hook 'c-mode-hook 'eglot-ensure)
