@@ -123,6 +123,11 @@
   :init
   (which-key-mode))
 
+;; Window navigation
+(use-package ace-window
+  :straight t
+  :bind (("M-o" . ace-window)))
+
 (use-package undo-fu
   :straight t)
 
