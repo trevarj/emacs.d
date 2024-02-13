@@ -95,6 +95,7 @@
   (doom-themes-org-config))
 
 ;; UI elements
+(setq-default fill-column 80)               ; 80 width pages
 (column-number-mode)                        ; Line number mode
 (global-display-line-numbers-mode t)        ; Globally display line numbers
 (global-hl-line-mode t)
@@ -104,6 +105,10 @@
       scroll-step 1                         ; vim style scrolling
       scroll-margin 8)                      ; vim style scroll off
 (setq-default indent-tabs-mode nil)         ; use spaces only
+(global-auto-revert-mode 1)                 ; auto-refresh buffers
+(setq global-auto-revert-non-file-buffers t) ; auto-refresh buffers like dired
+(setq auto-revert-verbose nil)               ; but silence it
+(setq enable-recursive-minibuffers t)        ; recursive mini-buffers
 
 ;; Diminish minor modes
 (use-package diminish
