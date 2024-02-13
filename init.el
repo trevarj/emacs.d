@@ -265,13 +265,6 @@
   :init
   (apheleia-global-mode))
 
-;; Languages & LSPs
-(setq eldoc-echo-area-use-multiline-p nil)
-
-;; Language mode hooks
-(add-hook 'rust-mode-hook 'eglot-ensure)
-(add-hook 'c-mode-hook 'eglot-ensure)
-
 ;; Git
 (setq epg-pinentry-mode 'loopback) ; pinentry on minibuffer
 (use-package magit
@@ -285,3 +278,21 @@
   (diff-hl-flydiff-mode)
   (add-hook 'magit-pre-refresh-hook 'diff-hl-magit-pre-refresh)
   (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))
+
+;; Languages & LSPs
+(setq eldoc-echo-area-use-multiline-p nil)
+
+;; Rust
+(use-package rustic
+  :straight t 
+  (rustic
+   :type git
+   :host github
+   :repo "brotzeit/rustic")
+  :config
+  (setq rustic-lsp-client 'eglot)
+  ;; (add-hook 'eglot--managed-mode-hook (lambda () (flymake-mode -1)))
+  (add-hook 'rust-mode-hook 'eglot-ensure))
+
+;; Language mode hooks
+(add-hook 'c-mode-hook 'eglot-ensure)
