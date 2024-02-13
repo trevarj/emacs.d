@@ -36,7 +36,6 @@
 
 ;; Fonts
 (set-face-attribute 'default nil :font "Iosevka JBM" :height 150 :weight 'medium)
-(set-face-attribute 'mode-line nil :font "Iosevka JBM" :height 130 :weight 'bold)
 (set-face-attribute 'fixed-pitch nil :font "Iosevka JBM" :height 150)
 (set-face-attribute 'variable-pitch nil :font "Noto Sans" :height 150 :weight 'regular)
 (setq use-default-font-for-symbols nil)
@@ -87,8 +86,10 @@
 (use-package doom-themes
   :straight (doom-themes :type git :host github :repo "doomemacs/themes")
   :config
-  (setq doom-themes-enable-bold t ; if nil, bold is universally disabled
-        doom-themes-enable-italic nil) ; if nil, italics is universally disabled
+  (setq doom-themes-enable-bold t
+        doom-themes-enable-italic nil
+        doom-nord-padded-modeline t
+        doom-nord-brighter-modeline t)
   (load-theme 'doom-nord t)
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
@@ -101,8 +102,8 @@
 (setq inhibit-startup-message t             ; no startup screen
       display-line-numbers-type 'relative   ; relative line numbers
       scroll-step 1                         ; vim style scrolling
-      scroll-margin 8) ; vim style scroll off
-(setq-default indent-tabs-mode nil) ; use spaces only
+      scroll-margin 8)                      ; vim style scroll off
+(setq-default indent-tabs-mode nil)         ; use spaces only
 
 ;; Diminish minor modes
 (use-package diminish
