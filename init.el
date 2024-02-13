@@ -1,6 +1,17 @@
 ;;; init.el --- Trev's Emacs Config -*- lexical-binding: t -*-
 
-;; Startup 
+;; Startup hacks
+(setq gc-cons-threshold (* 1024 1024 100))
+(setq file-name-handler-alist-original file-name-handler-alist)
+(setq file-name-handler-alist nil)
+
+(defun display-startup-time ()
+  (message "Emacs loaded in %s with %d garbage collections."
+           (format "%.2f seconds"
+                   (float-time
+                    (time-subtract after-init-time before-init-time)))
+           gcs-done))
+(add-hook 'emacs-startup-hook #'display-startup-time)
 
 ;; straight.el package manager
 (defvar bootstrap-version)
@@ -19,14 +30,6 @@
       (goto-char (point-max))
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
-
-(defun display-startup-time ()
-  (message "Emacs loaded in %s with %d garbage collections."
-           (format "%.2f seconds"
-                   (float-time
-                    (time-subtract after-init-time before-init-time)))
-           gcs-done))
-(add-hook 'emacs-startup-hook #'display-startup-time)
 
 ;; Global modes
 (save-place-mode)
@@ -300,6 +303,15 @@
 
 ;; Languages & LSPs
 (setq eldoc-echo-area-use-multiline-p nil)
+
+;; Snippets
+;; (use-package yasnippet
+;;   :straight t
+;;   :config
+;;   (yas-global-mode))
+;; (use-package yasnippet-snippets
+;;   :straight t
+;;   :after yasnippet)
 
 ;; Lisps
 (use-package parinfer-rust-mode
