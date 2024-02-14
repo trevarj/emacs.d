@@ -78,7 +78,14 @@
   (global-auto-revert-mode 1)                   ; Auto-refresh buffers
   (setq global-auto-revert-non-file-buffers t)  ; Auto-refresh buffers like dired
   (setq auto-revert-verbose nil)                ; But silence it
-  (setq enable-recursive-minibuffers t))        ; Recursive mini-buffers
+  (setq enable-recursive-minibuffers t)         ; Recursive mini-buffers
+  (setq-default major-mode                      ; Guess major mode from file name
+                (lambda ()
+                  (unless buffer-file-name
+                    (let ((buffer-file-name (buffer-name)))
+                      (set-auto-mode))))))
+
+
 
 ;; Ligatures
 (use-package ligature
@@ -350,8 +357,17 @@
   (define-key flymake-mode-map (kbd "C-c p") #'flymake-goto-prev-error))
 
 ;; Eglot
-(defalias 'start-lsp-server #'eglot)
-(add-hook 'c-mode-hook 'eglot-ensure)
+(use-package eglot
+  :bind
+  (:map
+   eglot-mode-map
+   ("C-c c a" . eglot-code-actions)
+   ("C-c c o" . eglot-code-actions-organize-imports)
+   ("C-c c r" . eglot-rename)
+   ("C-c c f" . eglot-format))
+  :config
+  (defalias 'start-lsp-server #'eglot)
+  (add-hook 'c-mode-hook 'eglot-ensure))
 
 ;; Lisps
 (use-package parinfer-rust-mode
@@ -381,24 +397,12 @@
   ;; (add-hook 'eglot--managed-mode-hook (lambda () (flymake-mode -1)))
   (add-hook 'rust-mode-hook 'eglot-ensure))
 
-;; Go
-(use-package go-mode
-  :straight t)
-
 ;; Haskell
 (use-package haskell-mode
   :straight t)
 
-;; JSON
-(use-package json-mode
-  :straight t)
-
 ;; Common Lisp
 (use-package sly
-  :straight t)
-
-;; YAML
-(use-package yaml-mode
   :straight t)
 
 ;; Markdown
