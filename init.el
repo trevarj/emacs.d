@@ -284,6 +284,7 @@
 ;; Editorconfig
 (use-package editorconfig
   :straight t
+  :diminish
   :config
   (editorconfig-mode))
 
@@ -291,7 +292,8 @@
 (use-package avy
   :straight t
   :config
-  (global-set-key (kbd "C-c z") #'avy-goto-word-1))
+  (global-set-key (kbd "C-c w") #'avy-goto-word-1)                
+  (global-set-key (kbd "C-c s") #'avy-goto-char))
 
 ;; Formatting
 (use-package apheleia
