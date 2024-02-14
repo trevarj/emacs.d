@@ -142,15 +142,15 @@
 (use-package undo-fu
   :straight t)
 
-;; Minibuffer 
+;; Minibuffer
 (use-package vertico ; completion
   :straight t
   :init
-  (vertico-mode)) 
+  (vertico-mode))
 (use-package marginalia ; completion definitions
   :straight t
   :init
-  (marginalia-mode)) 
+  (marginalia-mode))
 (use-package consult ; useful commands
   :straight t
   ;; https://github.com/minad/consult?tab=readme-ov-file#use-package-example
@@ -205,7 +205,7 @@
          ;; Minibuffer history
          :map minibuffer-local-map
          ("M-s" . consult-history)                 ;; orig. next-matching-history-element
-         ("M-r" . consult-history)) 
+         ("M-r" . consult-history))
   :init
   ;; https://github.com/minad/consult?tab=readme-ov-file#custom-variables
   :config
@@ -281,6 +281,13 @@
 (setq backup-directory-alist `(("." . "~/.cache/emacs/backups")))
 (electric-pair-mode)
 
+;; Whitespace handling
+(use-package ws-butler
+  :straight t
+  :diminish
+  :config
+  (ws-butler-global-mode))
+
 ;; Editorconfig
 (use-package editorconfig
   :straight t
@@ -292,7 +299,8 @@
 (use-package avy
   :straight t
   :config
-  (global-set-key (kbd "C-c w") #'avy-goto-word-1)                
+  (global-set-key (kbd "C-c c") #'avy-goto-word-0)
+  (global-set-key (kbd "C-c w") #'avy-goto-word-1)
   (global-set-key (kbd "C-c s") #'avy-goto-char))
 
 ;; Formatting
@@ -369,7 +377,7 @@
 
 ;; Rust
 (use-package rustic
-  :straight t 
+  :straight t
   (rustic
    :type git
    :host github
