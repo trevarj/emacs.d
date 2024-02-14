@@ -216,7 +216,9 @@
   (add-to-list 'corfu--frame-parameters '(internal-border-width . 2))
   (setq corfu-auto t
         corfu-popupinfo-delay 0
-        corfu-quit-no-match 'separator))
+        corfu-quit-no-match 'separator
+        corfu-preview-current nil
+        tab-always-indent 'complete))
 
 (use-package orderless
   :straight t
@@ -304,15 +306,6 @@
 ;; Languages & LSPs
 (setq eldoc-echo-area-use-multiline-p nil)
 
-;; Snippets
-;; (use-package yasnippet
-;;   :straight t
-;;   :config
-;;   (yas-global-mode))
-;; (use-package yasnippet-snippets
-;;   :straight t
-;;   :after yasnippet)
-
 ;; Lisps
 (use-package parinfer-rust-mode
   :straight t
@@ -322,6 +315,7 @@
   (set-face-attribute 'parinfer-rust-dim-parens nil
                       :foreground (cadr (assoc 'base6 doom-themes--colors)))
   :hook emacs-lisp-mode)
+
 (defun disable-electric-pair-mode nil
   (electric-pair-mode nil))
 (add-hook 'parinfer-rust-mode-hook 'disable-electric-pair-mode)
