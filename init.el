@@ -1,10 +1,5 @@
 ;;; init.el --- Trev's Emacs Config -*- lexical-binding: t -*-
 
-;; Startup hacks
-(setq gc-cons-threshold (* 1024 1024 100))
-(setq file-name-handler-alist-original file-name-handler-alist)
-(setq file-name-handler-alist nil)
-
 (defun display-startup-time ()
   (message "Emacs loaded in %s with %d garbage collections."
            (format "%.2f seconds"
@@ -31,41 +26,59 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
-;; Global modes
-(save-place-mode)
-(recentf-mode)
-;; Session saving
-(desktop-save-mode)
-
-;; Fonts
-(set-face-attribute 'default nil :family "Iosevka JBM" :height 150 :weight 'medium)
-(set-face-attribute 'fixed-pitch nil :font "Iosevka JBM" :height 150)
-(set-face-attribute 'variable-pitch nil :family "Noto Sans" :height 150 :weight 'regular)
-(setq use-default-font-for-symbols nil)
-;; https://github.com/ryanoasis/nerd-fonts/wiki/Glyph-Sets-and-Code-Points
-(defvar nerdfont-code-points
-  '((#xE6FA . #xE6B2)
-    (#xE700 . #xE7C5)
-    (#xF000 . #xF2E0)
-    (#xE200 . #xE2A9)
-    (#xF500 . #xFD46)
-    (#xE300 . #xE3EB)
-    (#xF400 . #xF532)
-    #x2665
-    #x26A1
-    #xF2A1
-    #xF27C
-    #xE0A3
-    #xE0CA
-    (#xE0B4 . #xE0C8)
-    (#xF0001 . #xF1AF0)
-    (#xE0CC . #xE0D4)
-    (#x23FB . #x23FE)
-    (#xF300 . #xF372)
-    (#xE000 . #xE00A)
-    (#xEA60 . #xEBEB)))
-(dolist (code-point nerdfont-code-points)
-  (set-fontset-font t code-point (font-spec :family "Symbols Nerd Font Mono")))
+(use-package emacs
+  :ensure nil
+  :init
+  ;; Global modes
+  (save-place-mode)
+  (recentf-mode)
+  ;; Session saving
+  (desktop-save-mode)
+  ;; Fonts
+  (set-face-attribute 'default nil :family "Iosevka JBM" :height 150 :weight 'medium)
+  (set-face-attribute 'fixed-pitch nil :font "Iosevka JBM" :height 150)
+  (set-face-attribute 'variable-pitch nil :family "Noto Sans" :height 150 :weight 'regular)
+  (setq use-default-font-for-symbols nil)
+  ;; https://github.com/ryanoasis/nerd-fonts/wiki/Glyph-Sets-and-Code-Points
+  (defvar nerdfont-code-points
+    '((#xE6FA . #xE6B2)
+      (#xE700 . #xE7C5)
+      (#xF000 . #xF2E0)
+      (#xE200 . #xE2A9)
+      (#xF500 . #xFD46)
+      (#xE300 . #xE3EB)
+      (#xF400 . #xF532)
+      #x2665
+      #x26A1
+      #xF2A1
+      #xF27C
+      #xE0A3
+      #xE0CA
+      (#xE0B4 . #xE0C8)
+      (#xF0001 . #xF1AF0)
+      (#xE0CC . #xE0D4)
+      (#x23FB . #x23FE)
+      (#xF300 . #xF372)
+      (#xE000 . #xE00A)
+      (#xEA60 . #xEBEB)))
+  (dolist (code-point nerdfont-code-points)
+    (set-fontset-font t code-point (font-spec :family "Symbols Nerd Font Mono")))
+  ;; Miscellaneous Options
+  (setq-default fill-column 80)                 ; 80 width pages
+  (column-number-mode)                          ; Line number mode
+  (global-display-line-numbers-mode t)          ; Globally display line numbers
+  (global-hl-line-mode t)                       ; Highlight cursor line
+  (setq confirm-kill-emacs #'y-or-n-p)          ; Easier yes/no...
+  (defalias 'yes-or-no #'y-or-n-p)              ; ...everywhere
+  (setq inhibit-startup-message t               ; No startup screen
+        display-line-numbers-type 'relative     ; Relative line numbers
+        scroll-step 1                           ; Vim style scrolling
+        scroll-margin 8)                        ; Vim style scroll off
+  (setq-default indent-tabs-mode nil)           ; Use spaces only
+  (global-auto-revert-mode 1)                   ; Auto-refresh buffers
+  (setq global-auto-revert-non-file-buffers t)  ; Auto-refresh buffers like dired
+  (setq auto-revert-verbose nil)                ; But silence it
+  (setq enable-recursive-minibuffers t))        ; Recursive mini-buffers
 
 ;; Ligatures
 (use-package ligature
@@ -96,25 +109,6 @@
   (load-theme 'doom-nord t)
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
-
-;; Options
-(setq-default fill-column 80)               ; 80 width pages
-(column-number-mode)                        ; Line number mode
-(global-display-line-numbers-mode t)        ; Globally display line numbers
-(global-hl-line-mode t)
-(setq confirm-kill-emacs #'y-or-n-p)
-(defalias 'yes-or-no #'y-or-n-p)
-(setq window-resize-pixelwise t)
-(setq frame-resize-pixelwise t)
-(setq inhibit-startup-message t             ; no startup screen
-      display-line-numbers-type 'relative   ; relative line numbers
-      scroll-step 1                         ; vim style scrolling
-      scroll-margin 8)                      ; vim style scroll off
-(setq-default indent-tabs-mode nil)         ; use spaces only
-(global-auto-revert-mode 1)                 ; auto-refresh buffers
-(setq global-auto-revert-non-file-buffers t) ; auto-refresh buffers like dired
-(setq auto-revert-verbose nil)               ; but silence it
-(setq enable-recursive-minibuffers t)        ; recursive mini-buffers
 
 ;; Diminish minor modes
 (use-package diminish
@@ -410,3 +404,7 @@
 ;; Markdown
 (use-package markdown-mode
   :straight t)
+
+(provide 'init)
+
+;;; init.el ends here
