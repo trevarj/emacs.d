@@ -97,12 +97,15 @@
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
 
-;; UI elements
+;; Options
 (setq-default fill-column 80)               ; 80 width pages
 (column-number-mode)                        ; Line number mode
 (global-display-line-numbers-mode t)        ; Globally display line numbers
 (global-hl-line-mode t)
 (setq confirm-kill-emacs #'y-or-n-p)
+(defalias 'yes-or-no #'y-or-n-p)
+(setq window-resize-pixelwise t)
+(setq frame-resize-pixelwise t)
 (setq inhibit-startup-message t             ; no startup screen
       display-line-numbers-type 'relative   ; relative line numbers
       scroll-step 1                         ; vim style scrolling
@@ -204,8 +207,11 @@
          ("M-s" . consult-history)                 ;; orig. next-matching-history-element
          ("M-r" . consult-history)) 
   :init
-  ;; TODO: https://github.com/minad/consult?tab=readme-ov-file#custom-variables
-  :config)
+  ;; https://github.com/minad/consult?tab=readme-ov-file#custom-variables
+  :config
+  (setq read-buffer-completion-ignore-case t
+        read-file-name-completion-ignore-case t
+        completion-ignore-case t))
 
 ;; Completion
 (use-package corfu
@@ -275,6 +281,18 @@
 (setq backup-directory-alist `(("." . "~/.cache/emacs/backups")))
 (electric-pair-mode)
 
+;; Editorconfig
+(use-package editorconfig
+  :straight t
+  :config
+  (editorconfig-mode))
+
+;; Avy navigation
+(use-package avy
+  :straight t
+  :config
+  (global-set-key (kbd "C-c z") #'avy-goto-word-1))
+
 ;; Formatting
 (use-package apheleia
   :straight t
@@ -294,7 +312,8 @@
 (use-package magit
   :straight t
   :config
-  (setq magit-define-global-key-bindings 'recommended))
+  (setq magit-define-global-key-bindings 'recommended
+        magit-diff-refine-hunk t))
 (use-package diff-hl
   :straight t
   :config
@@ -303,8 +322,32 @@
   (add-hook 'magit-pre-refresh-hook 'diff-hl-magit-pre-refresh)
   (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))
 
+;; Terminal
+(use-package eat
+  :straight t
+  :config
+  (setq eat-kill-buffer-on-exit t
+        eat-enable-mouse t))
+
 ;; Languages & LSPs
 (setq eldoc-echo-area-use-multiline-p nil)
+
+(defun disable-electric-pair-mode nil
+  "Turn off `electric-pair-mode' since it conflicts with `parinfer-rust-mode'."
+  (electric-pair-mode nil))
+(add-hook 'parinfer-rust-mode-hook 'disable-electric-pair-mode)
+
+;; Flymake
+(add-hook 'prog-mode-hook #'flymake-mode)
+(setq help-at-pt-display-when-idle t) ; display help when hovering
+;; Flymake navigation bindings
+(with-eval-after-load 'flymake
+  (define-key flymake-mode-map (kbd "C-c n") #'flymake-goto-next-error)
+  (define-key flymake-mode-map (kbd "C-c p") #'flymake-goto-prev-error))
+
+;; Eglot
+(defalias 'start-lsp-server #'eglot)
+(add-hook 'c-mode-hook 'eglot-ensure)
 
 ;; Lisps
 (use-package parinfer-rust-mode
@@ -314,11 +357,9 @@
    parinfer-rust-troublesome-modes '())
   (set-face-attribute 'parinfer-rust-dim-parens nil
                       :foreground (cadr (assoc 'base6 doom-themes--colors)))
-  :hook emacs-lisp-mode)
-
-(defun disable-electric-pair-mode nil
-  (electric-pair-mode nil))
-(add-hook 'parinfer-rust-mode-hook 'disable-electric-pair-mode)
+  :hook '(emacs-lisp-mode
+          sly-mode
+          geiser-mode))
 
 ;; Guile
 (use-package geiser-guile
@@ -336,5 +377,26 @@
   ;; (add-hook 'eglot--managed-mode-hook (lambda () (flymake-mode -1)))
   (add-hook 'rust-mode-hook 'eglot-ensure))
 
-;; Eglot hooks
-(add-hook 'c-mode-hook 'eglot-ensure)
+;; Go
+(use-package go-mode
+  :straight t)
+
+;; Haskell
+(use-package haskell-mode
+  :straight t)
+
+;; JSON
+(use-package json-mode
+  :straight t)
+
+;; Common Lisp
+(use-package sly
+  :straight t)
+
+;; YAML
+(use-package yaml-mode
+  :straight t)
+
+;; Markdown
+(use-package markdown-mode
+  :straight t)
