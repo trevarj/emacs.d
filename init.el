@@ -261,6 +261,12 @@
     (corfu-mode)))
 (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
 
+;; Completion-at-point helper
+(use-package cape
+  :straight t
+  :init
+  (add-to-list 'completion-at-point-functions #'cape-file))
+
 ;; Treesitter
 (use-package treesit-auto
   :straight t
@@ -359,6 +365,9 @@
    ("C-c c r" . eglot-rename)
    ("C-c c f" . eglot-format))
   :config
+  ;; Sometimes you need to tell Eglot where to find the language server
+  ;; (add-to-list 'eglot-server-programs
+  ;;              '(haskell-mode . ("haskell-language-server-wrapper" "--lsp")))
   (defalias 'start-lsp-server #'eglot)
   (add-hook 'c-mode-hook 'eglot-ensure))
 
