@@ -329,8 +329,8 @@
   (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))
 
 ;; Terminal
-(use-package vterm
-  :straight t)
+;; (use-package vterm
+;;   :straight t)
 
 ;; Languages & LSPs
 (setq eldoc-echo-area-use-multiline-p nil)
