@@ -282,6 +282,7 @@
 ;; Editing
 (setq backup-directory-alist `(("." . "~/.cache/emacs/backups")))
 (electric-pair-mode)
+(global-set-key (kbd "M-f") #'forward-to-word) ; be like vim w
 
 ;; Whitespace handling
 (use-package ws-butler
