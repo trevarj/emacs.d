@@ -364,7 +364,10 @@
    ("C-c c a" . eglot-code-actions)
    ("C-c c o" . eglot-code-actions-organize-imports)
    ("C-c c r" . eglot-rename)
-   ("C-c c f" . eglot-format))
+   ("C-c c f" . eglot-format)
+   ("C-c c d" . eglot-find-declaration)
+   ("C-c c r" . eglot-find-implementation)
+   ("C-c c t" . eglot-find-typeDefinition))
   :config
   ;; Sometimes you need to tell Eglot where to find the language server
   ;; (add-to-list 'eglot-server-programs
