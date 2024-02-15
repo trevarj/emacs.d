@@ -65,7 +65,7 @@
     (set-fontset-font t code-point (font-spec :family "Symbols Nerd Font Mono")))
   ;; Miscellaneous Options
   (setq-default fill-column 80)                 ; 80 width pages
-  (column-number-mode)                          ; Line number mode
+  (column-number-mode)                          ; Column number mode
   (global-display-line-numbers-mode t)          ; Globally display line numbers
   (global-hl-line-mode t)                       ; Highlight cursor line
   (setq confirm-kill-emacs #'y-or-n-p)          ; Easier yes/no...
@@ -266,17 +266,16 @@
 (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
 
 ;; Treesitter
-;; (use-package treesit-auto
-;;   :straight t
-;;   :custom
-;;   (treesit-auto-install 'prompt)
-;;   :config
-;;   (treesit-auto-add-to-auto-mode-alist 'all)
-;;   (global-treesit-auto-mode))
+(use-package treesit-auto
+  :straight t
+  :custom
+  (treesit-auto-install 'prompt)
+  :config
+  (treesit-auto-add-to-auto-mode-alist 'all)
+  (global-treesit-auto-mode))
 
-;; (add-to-list 'major-mode-remap-alist
-;;              '(rust-mode . rust-ts-mode)
-;;              '(c-mode . c-ts-mode))
+(add-to-list 'major-mode-remap-alist '(rust-mode . rust-ts-mode))
+(add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
 
 ;; Editing
 (setq backup-directory-alist `(("." . "~/.cache/emacs/backups")))
@@ -334,11 +333,8 @@
   (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))
 
 ;; Terminal
-(use-package eat
-  :straight t
-  :config
-  (setq eat-kill-buffer-on-exit t
-        eat-enable-mouse t))
+(use-package vterm
+  :straight t)
 
 ;; Languages & LSPs
 (setq eldoc-echo-area-use-multiline-p nil)
@@ -358,6 +354,7 @@
 
 ;; Eglot
 (use-package eglot
+  :ensure nil
   :bind
   (:map
    eglot-mode-map
