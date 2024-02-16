@@ -347,12 +347,14 @@
 (setq eldoc-echo-area-use-multiline-p nil)
 
 ;; Flymake
-(add-hook 'prog-mode-hook #'flymake-mode)
-(setq help-at-pt-display-when-idle t) ; display help when hovering
-;; Flymake navigation bindings
-(with-eval-after-load 'flymake
+(use-package flymake
+  :straight t
+  :config
   (define-key flymake-mode-map (kbd "C-c n") #'flymake-goto-next-error)
-  (define-key flymake-mode-map (kbd "C-c p") #'flymake-goto-prev-error))
+  (define-key flymake-mode-map (kbd "C-c p") #'flymake-goto-prev-error)
+  (setq help-at-pt-display-when-idle t
+        flymake-fringe-indicator-position 'right-fringe) ; display help when hovering
+  :hook (prog-mode . flymake-mode))
 
 ;; Eglot
 (use-package eglot
