@@ -6,7 +6,6 @@
                    (float-time
                     (time-subtract after-init-time before-init-time)))
            gcs-done))
-(add-hook 'emacs-startup-hook #'display-startup-time)
 
 ;; straight.el package manager
 (defvar bootstrap-version)
@@ -28,6 +27,7 @@
 
 (use-package emacs
   :ensure nil
+  :hook '(emacs-startup . display-startup-time)
   :init
   ;; Global modes
   (save-place-mode)
@@ -122,12 +122,13 @@
 (use-package autorevert
   :diminish auto-revert-mode) ; doesn't work in :config above
 
-;; Keybinding help
+;; Keybinding
 (use-package which-key
   :straight t
   :diminish which-key-mode
   :config
-  (setq which-key-popup-type 'minibuffer)
+  (which-key-setup-side-window-bottom)
+  (setq which-key-sort-order 'which-key-description-order)
   :init
   (which-key-mode))
 
@@ -302,7 +303,6 @@
 (use-package avy
   :straight t
   :config
-  (global-set-key (kbd "C-c c") #'avy-goto-word-0)
   (global-set-key (kbd "C-c w") #'avy-goto-word-1)
   (global-set-key (kbd "C-c s") #'avy-goto-char))
 
@@ -315,10 +315,12 @@
 
 ;; Colorize hex color codes
 (use-package rainbow-mode
-  :straight t)
+  :straight t
+  :hook '(rainbow-mode . toggle-hl-mode))
+
 (defun toggle-hl-mode nil
+  "Toggle `hl-line-mode' since it interferes with `rainbow-mode'."
   (global-hl-line-mode (if rainbow-mode -1 +1)))
-(add-hook 'rainbow-mode-hook 'toggle-hl-mode)
 
 ;; Git
 (setq epg-pinentry-mode 'loopback) ; pinentry on minibuffer
@@ -327,13 +329,15 @@
   :config
   (setq magit-define-global-key-bindings 'recommended
         magit-diff-refine-hunk t))
+
 (use-package diff-hl
   :straight t
+  :after magit
   :config
   (global-diff-hl-mode)
   (diff-hl-flydiff-mode)
-  (add-hook 'magit-pre-refresh-hook 'diff-hl-magit-pre-refresh)
-  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))
+  :hook '((magit-pre-refresh . diff-hl-magit-pre-refresh)
+          (magit-post-refresh . diff-hl-magit-post-refresh)))
 
 ;; Terminal
 ;; (use-package vterm
@@ -341,11 +345,6 @@
 
 ;; Languages & LSPs
 (setq eldoc-echo-area-use-multiline-p nil)
-
-(defun disable-electric-pair-mode nil
-  "Turn off `electric-pair-mode' since it conflicts with `parinfer-rust-mode'."
-  (electric-pair-mode nil))
-(add-hook 'parinfer-rust-mode-hook 'disable-electric-pair-mode)
 
 ;; Flymake
 (add-hook 'prog-mode-hook #'flymake-mode)
@@ -357,7 +356,7 @@
 
 ;; Eglot
 (use-package eglot
-  :ensure nil
+  :straight t
   :bind
   (:map
    eglot-mode-map
@@ -373,9 +372,14 @@
   ;; (add-to-list 'eglot-server-programs
   ;;              '(haskell-mode . ("haskell-language-server-wrapper" "--lsp")))
   (defalias 'start-lsp-server #'eglot)
-  (add-hook 'c-mode-hook 'eglot-ensure))
+  :hook (c-ts-mode . eglot-ensure))
 
 ;; Lisps
+
+(defun disable-electric-pair-mode nil
+  "Turn off `electric-pair-mode' since it conflicts with `parinfer-rust-mode'."
+  (electric-pair-mode nil))
+
 (use-package parinfer-rust-mode
   :straight t
   :config
@@ -383,9 +387,10 @@
    parinfer-rust-troublesome-modes '())
   (set-face-attribute 'parinfer-rust-dim-parens nil
                       :foreground (cadr (assoc 'base6 doom-themes--colors)))
-  :hook '(emacs-lisp-mode
-          sly-mode
-          geiser-mode))
+  :hook '((emacs-lisp-mode
+           sly-mode
+           geiser-mode)
+          . disable-electric-pair-mode))
 
 ;; Guile
 (use-package geiser-guile
@@ -399,9 +404,7 @@
    :host github
    :repo "brotzeit/rustic")
   :config
-  (setq rustic-lsp-client 'eglot)
-  ;; (add-hook 'eglot--managed-mode-hook (lambda () (flymake-mode -1)))
-  (add-hook 'rust-mode-hook 'eglot-ensure))
+  (setq rustic-lsp-client 'eglot))
 
 ;; Haskell
 (use-package haskell-mode
