@@ -338,8 +338,7 @@
   :config
   (global-diff-hl-mode)
   (diff-hl-flydiff-mode)
-  :hook '((magit-pre-refresh . diff-hl-magit-pre-refresh)
-          (magit-post-refresh . diff-hl-magit-post-refresh)))
+  (advice-add 'vc-refresh-state :after #'diff-hl-update))
 
 ;; Terminal
 ;; (use-package vterm
