@@ -335,10 +335,13 @@
 (use-package diff-hl
   :straight t
   :after magit
+  :demand ; need this to load immediately for the hooks to work
+  :hook
+  '((magit-post-refresh . diff-hl-magit-post-refresh)
+    (magit-pre-refresh . diff-hl-magit-pre-refresh))
   :config
   (global-diff-hl-mode)
-  (diff-hl-flydiff-mode)
-  (advice-add 'vc-refresh-state :after #'diff-hl-update))
+  (diff-hl-flydiff-mode))
 
 ;; Terminal
 ;; (use-package vterm
