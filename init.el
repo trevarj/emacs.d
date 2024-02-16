@@ -358,7 +358,7 @@
         ("p" . #'flymake-goto-prev-error))
   :config
   (setq help-at-pt-display-when-idle t
-	flymake-fringe-indicator-position 'right-fringe) ; display help when hovering
+        flymake-fringe-indicator-position 'right-fringe) ; display help when hovering
   :hook (prog-mode . flymake-mode))
 
 ;; Eglot
