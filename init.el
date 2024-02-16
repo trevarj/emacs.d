@@ -1,4 +1,7 @@
 ;;; init.el --- Trev's Emacs Config -*- lexical-binding: t -*-
+;;;
+;;; Commentary:
+;;; A minimalistic development environment
 
 (defun display-startup-time ()
   (message "Emacs loaded in %s with %d garbage collections."
@@ -85,20 +88,19 @@
                     (let ((buffer-file-name (buffer-name)))
                       (set-auto-mode))))))
 
-
-
 ;; Ligatures
 (use-package ligature
   :straight t
   :config
-  (ligature-set-ligatures 'prog-mode
-                          '(
-                            "-<<" "-<" "-<-" "<--" "<---" "<<-" "<-" "->" "->>" "-->" "--->" "->-" ">-" ">>-"
-                            "=<<" "=<" "=<=" "<==" "<===" "<<=" "<=" "=>" "=>>" "==>" "===>" "=>=" ">=" ">>="
-                            "<->" "<-->" "<--->" "<---->" "<=>" "<==>" "<===>" "<====>" "::" ":::" "__"
-                            "<~~" "</" "</>" "/>" "~~>" "==" "!=" "/=" "~=" "<>" "===" "!==" "!===" "=/=" "=!="
-                            "<:" ":=" "*=" "*+" "<*" "<*>" "*>" "<|" "<|>" "|>" "<." "<.>" ".>" "+*" "=*" "=:" ":>"
-                            "(*" "*)" "/*" "*/" "[|" "|]" "{|" "|}" "++" "+++" "\\/" "/\\" "|-" "-|" "<!--" "<!---"))
+  (ligature-set-ligatures
+   'prog-mode
+   '(
+     "-<<" "-<" "-<-" "<--" "<---" "<<-" "<-" "->" "->>" "-->" "--->" "->-" ">-" ">>-"
+     "=<<" "=<" "=<=" "<==" "<===" "<<=" "<=" "=>" "=>>" "==>" "===>" "=>=" ">=" ">>="
+     "<->" "<-->" "<--->" "<---->" "<=>" "<==>" "<===>" "<====>" "::" ":::" "__"
+     "<~~" "</" "</>" "/>" "~~>" "==" "!=" "/=" "~=" "<>" "===" "!==" "!===" "=/=" "=!="
+     "<:" ":=" "*=" "*+" "<*" "<*>" "*>" "<|" "<|>" "|>" "<." "<.>" ".>" "+*" "=*" "=:" ":>"
+     "(*" "*)" "/*" "*/" "[|" "|]" "{|" "|}" "++" "+++" "\\/" "/\\" "|-" "-|" "<!--" "<!---"))
   (global-ligature-mode))
 
 ;; Colorscheme
@@ -302,9 +304,9 @@
 ;; Avy navigation
 (use-package avy
   :straight t
-  :config
-  (global-set-key (kbd "C-c w") #'avy-goto-word-1)
-  (global-set-key (kbd "C-c s") #'avy-goto-char))
+  :bind
+  (("C-c w" . #'avy-goto-word-1)
+   ("C-c s" . #'avy-goto-char)))
 
 ;; Formatting
 (use-package apheleia
@@ -349,26 +351,31 @@
 ;; Flymake
 (use-package flymake
   :straight t
+  :bind
+  (:map flymake-mode-map
+        :prefix-map global-map
+        :prefix "C-c"
+        ("n" . #'flymake-goto-next-error)
+        ("p" . #'flymake-goto-prev-error))
   :config
-  (define-key flymake-mode-map (kbd "C-c n") #'flymake-goto-next-error)
-  (define-key flymake-mode-map (kbd "C-c p") #'flymake-goto-prev-error)
   (setq help-at-pt-display-when-idle t
-        flymake-fringe-indicator-position 'right-fringe) ; display help when hovering
+	flymake-fringe-indicator-position 'right-fringe) ; display help when hovering
   :hook (prog-mode . flymake-mode))
 
 ;; Eglot
 (use-package eglot
   :straight t
   :bind
-  (:map
-   eglot-mode-map
-   ("C-c c a" . eglot-code-actions)
-   ("C-c c o" . eglot-code-actions-organize-imports)
-   ("C-c c r" . eglot-rename)
-   ("C-c c f" . eglot-format)
-   ("C-c c d" . eglot-find-declaration)
-   ("C-c c r" . eglot-find-implementation)
-   ("C-c c t" . eglot-find-typeDefinition))
+  (:map eglot-mode-map
+        :prefix-map eglot-prefix-keymap
+        :prefix "C-c c"
+        ("a" . eglot-code-actions)
+        ("o" . eglot-code-actions-organize-imports)
+        ("r" . eglot-rename)
+        ("f" . eglot-format)
+        ("d" . eglot-find-declaration)
+        ("r" . eglot-find-implementation)
+        ("t" . eglot-find-typeDefinition))
   :config
   ;; Sometimes you need to tell Eglot where to find the language server
   ;; (add-to-list 'eglot-server-programs
@@ -377,7 +384,6 @@
   :hook (c-ts-mode . eglot-ensure))
 
 ;; Lisps
-
 (use-package parinfer-rust-mode
   :straight t
   :config
