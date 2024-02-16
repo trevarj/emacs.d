@@ -378,10 +378,6 @@
 
 ;; Lisps
 
-(defun disable-electric-pair-mode nil
-  "Turn off `electric-pair-mode' since it conflicts with `parinfer-rust-mode'."
-  (electric-pair-mode nil))
-
 (use-package parinfer-rust-mode
   :straight t
   :config
@@ -392,7 +388,12 @@
   :hook '((emacs-lisp-mode
            sly-mode
            geiser-mode)
-          . disable-electric-pair-mode))
+          . safe-parinfer-rust-mode))
+
+(defun safe-parinfer-rust-mode nil
+  "Safely turn on `parinfer-rust-mode'."
+  (electric-pair-mode nil) ; conflicts with parinfer
+  (parinfer-rust-mode))
 
 ;; Guile
 (use-package geiser-guile
