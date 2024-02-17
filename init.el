@@ -28,9 +28,16 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
+(defun header-line-file-path ()
+  "Set `header-line-format' if symbol `buffer-file-name' is not nil."
+  (when buffer-file-name
+    (setq header-line-format '("%f"))))
+
 (use-package emacs
   :ensure nil
-  :hook '(emacs-startup . display-startup-time)
+  :hook
+  ((emacs-startup . display-startup-time)
+   (buffer-list-update . header-line-file-path))
   :init
   ;; Global modes
   (save-place-mode)
@@ -318,7 +325,7 @@
 ;; Colorize hex color codes
 (use-package rainbow-mode
   :straight t
-  :hook '(rainbow-mode . toggle-hl-mode))
+  :hook (rainbow-mode . toggle-hl-mode))
 
 (defun toggle-hl-mode nil
   "Toggle `hl-line-mode' since it interferes with `rainbow-mode'."
@@ -335,10 +342,9 @@
 (use-package diff-hl
   :straight t
   :after magit
-  :demand ; need this to load immediately for the hooks to work
   :hook
-  '((magit-post-refresh . diff-hl-magit-post-refresh)
-    (magit-pre-refresh . diff-hl-magit-pre-refresh))
+  ((magit-post-refresh . diff-hl-magit-post-refresh)
+   (magit-pre-refresh . diff-hl-magit-pre-refresh))
   :config
   (global-diff-hl-mode)
   (diff-hl-flydiff-mode))
@@ -393,10 +399,10 @@
    parinfer-rust-troublesome-modes '())
   (set-face-attribute 'parinfer-rust-dim-parens nil
                       :foreground (cadr (assoc 'base6 doom-themes--colors)))
-  :hook '((emacs-lisp-mode
-           sly-mode
-           geiser-mode)
-          . safe-parinfer-rust-mode))
+  :hook ((emacs-lisp-mode
+          sly-mode
+          geiser-mode)
+         . safe-parinfer-rust-mode))
 
 (defun safe-parinfer-rust-mode nil
   "Safely turn on `parinfer-rust-mode'."
