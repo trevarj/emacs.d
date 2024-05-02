@@ -350,7 +350,14 @@
 
 ;; Terminal
 (use-package vterm
-  :straight t)
+  :straight t
+  :hook
+  (vterm-mode . (lambda ()
+                  (display-line-numbers-mode 0)
+                  (hl-line-mode 0)))
+  :config
+  (custom-set-faces
+   '(term-color-bright-black ((t (:foreground "#4C566A"))))))
 
 ;; Languages & LSPs
 (setq eldoc-echo-area-use-multiline-p nil)
