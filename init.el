@@ -78,10 +78,9 @@
   (column-number-mode)                          ; Column number mode
   (global-display-line-numbers-mode t)          ; Globally display line numbers
   (global-hl-line-mode t)                       ; Highlight cursor line
-  (setq confirm-kill-emacs #'y-or-n-p)          ; Easier yes/no...
-  (defalias 'yes-or-no #'y-or-n-p)              ; ...everywhere
+  (setq confirm-kill-emacs nil)                 ; Bye
+  (defalias 'yes-or-no #'y-or-n-p)              ; Easier question
   (setq inhibit-startup-message t               ; No startup screen
-        display-line-numbers-type 'relative     ; Relative line numbers
         scroll-step 1                           ; Vim style scrolling
         scroll-margin 8)                        ; Vim style scroll off
   (setq-default indent-tabs-mode nil)           ; Use spaces only
