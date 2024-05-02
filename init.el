@@ -349,8 +349,8 @@
   (diff-hl-flydiff-mode))
 
 ;; Terminal
-;; (use-package vterm
-;;   :straight t)
+(use-package vterm
+  :straight t)
 
 ;; Languages & LSPs
 (setq eldoc-echo-area-use-multiline-p nil)
