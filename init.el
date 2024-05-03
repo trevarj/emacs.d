@@ -85,6 +85,11 @@
   (setq inhibit-startup-message t               ; No startup screen
         scroll-step 1                           ; Vim style scrolling
         scroll-margin 10                        ; Vim style scroll off
+        mouse-wheel-progressive-speed nil
+        mouse-wheel-scroll-amount
+        '(3
+          ((shift) . 1)
+          ((control) . nil))                    ; Mouse wheel scrolling
         scroll-preserve-screen-position 1)      ; PgUp/PgDown hold
   (setq-default indent-tabs-mode nil)           ; Use spaces only
   (global-auto-revert-mode 1)                   ; Auto-refresh buffers
