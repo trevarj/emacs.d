@@ -82,7 +82,8 @@
   (defalias 'yes-or-no #'y-or-n-p)              ; Easier question
   (setq inhibit-startup-message t               ; No startup screen
         scroll-step 1                           ; Vim style scrolling
-        scroll-margin 8)                        ; Vim style scroll off
+        scroll-margin 10                        ; Vim style scroll off
+        scroll-preserve-screen-position 1)      ; PgUp/PgDown hold
   (setq-default indent-tabs-mode nil)           ; Use spaces only
   (global-auto-revert-mode 1)                   ; Auto-refresh buffers
   (setq global-auto-revert-non-file-buffers t)  ; Auto-refresh buffers like dired
