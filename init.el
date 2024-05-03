@@ -78,6 +78,8 @@
   (column-number-mode)                          ; Column number mode
   (global-display-line-numbers-mode t)          ; Globally display line numbers
   (global-hl-line-mode t)                       ; Highlight cursor line
+  (setq display-line-numbers-grow-only t        ; Never shrink the linum width
+        display-line-numbers-width-start t)     ; Calculate linum width at start
   (setq confirm-kill-emacs nil)                 ; Bye
   (defalias 'yes-or-no #'y-or-n-p)              ; Easier question
   (setq inhibit-startup-message t               ; No startup screen
