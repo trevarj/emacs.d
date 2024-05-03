@@ -290,6 +290,8 @@
 
 ;; Editing
 (setq backup-directory-alist `(("." . "~/.cache/emacs/backups")))
+(setq auto-save-file-name-transforms
+      `((".*" "~/.cache/emacs/saves/" t)))
 (electric-pair-mode)
 (global-set-key (kbd "M-f") #'forward-to-word) ; be like vim w
 
