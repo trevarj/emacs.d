@@ -183,7 +183,7 @@
          ("M-y" . consult-yank-pop)                ;; orig. yank-pop
          ;; M-g bindings in `goto-map'
          ("M-g e" . consult-compile-error)
-         ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
+         ("M-g f" . consult-flycheck)              ;; Alternative: consult-flymake
          ("M-g g" . consult-goto-line)             ;; orig. goto-line
          ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
          ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
@@ -365,18 +365,29 @@
 (setq eldoc-echo-area-use-multiline-p nil)
 
 ;; Flymake
-(use-package flymake
-  :straight t
-  :bind
-  (:map flymake-mode-map
-        :prefix-map global-map
-        :prefix "C-c"
-        ("n" . #'flymake-goto-next-error)
-        ("p" . #'flymake-goto-prev-error))
+;; (use-package flymake
+;;   :straight t
+;;   :bind
+;;   (:map flymake-mode-map
+;;         :prefix-map global-map
+;;         :prefix "C-c"
+;;         ("n" . #'flymake-goto-next-error)
+;;         ("p" . #'flymake-goto-prev-error))
+;;   :config
+;;   (setq help-at-pt-display-when-idle t
+;;         flymake-fringe-indicator-position 'right-fringe) ; display help when hovering
+;;   :hook (prog-mode . flymake-mode))
+
+;; Flycheck
+(use-package flycheck
+  :ensure t
+  :init
+  (global-flycheck-mode)
+  (flymake-mode 0)
   :config
-  (setq help-at-pt-display-when-idle t
-        flymake-fringe-indicator-position 'right-fringe) ; display help when hovering
-  :hook (prog-mode . flymake-mode))
+  (setq flycheck-indication-mode `left-margin))
+(use-package consult-flycheck
+  :straight t)
 
 ;; Eglot
 (use-package eglot

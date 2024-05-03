@@ -15,6 +15,11 @@
 (tooltip-mode -1)                           ; Disable tooltips
 (modify-all-frames-parameters
  '((internal-border-width . 40)))           ; Frame padding
+(setq-default left-fringe-width 4
+              left-margin-width 1
+              right-fringe-width 4
+              right-margin-width 1)
+
 
 ;; Resizing the Emacs frame can be a terribly expensive part of changing the
 ;; font. By inhibiting this, we easily halve startup times with fonts that are
