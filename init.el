@@ -80,7 +80,8 @@
   (global-hl-line-mode t)                       ; Highlight cursor line
   (setq display-line-numbers-grow-only t        ; Never shrink the linum width
         display-line-numbers-width-start t)     ; Calculate linum width at start
-  (setq confirm-kill-emacs nil)                 ; Bye
+  (setq confirm-kill-emacs nil
+        use-dialog-box nil)                     ; Bye
   (defalias 'yes-or-no #'y-or-n-p)              ; Easier question
   (setq inhibit-startup-message t               ; No startup screen
         scroll-step 1                           ; Vim style scrolling
@@ -329,7 +330,10 @@
   :straight t
   :diminish apheleia-mode
   :init
-  (apheleia-global-mode))
+  (apheleia-global-mode)
+  :config
+  (setf (alist-get 'shfmt apheleia-formatters)
+        '("shfmt" "-i" "2" "-")))
 
 ;; Colorize hex color codes
 (use-package rainbow-mode
@@ -413,10 +417,13 @@
         ("t" . eglot-find-typeDefinition))
   :config
   ;; Sometimes you need to tell Eglot where to find the language server
-  ;; (add-to-list 'eglot-server-programs
-  ;;              '(haskell-mode . ("haskell-language-server-wrapper" "--lsp")))
+  (add-to-list 'eglot-server-programs
+               '(bash-ts-mode . ("bash-language-server" "start"))
+               '(haskell-mode . ("haskell-language-server-wrapper" "--lsp")))
   (defalias 'start-lsp-server #'eglot)
-  :hook (c-ts-mode . eglot-ensure))
+  :hook
+  (c-ts-mode . eglot-ensure)
+  (bash-ts-mode . eglot-ensure))
 
 ;; Lisps
 (use-package parinfer-rust-mode
@@ -451,8 +458,8 @@
   (setq rustic-lsp-client 'eglot))
 
 ;; Haskell
-(use-package haskell-mode
-  :straight t)
+;; (use-package haskell-mode
+;;   :straight t)
 
 ;; Common Lisp
 (use-package sly
