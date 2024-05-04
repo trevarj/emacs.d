@@ -100,7 +100,9 @@
         '(3
           ((shift) . 1)
           ((control) . nil))                    ; Mouse wheel scrolling
-        scroll-preserve-screen-position 1)      ; PgUp/PgDown hold
+        scroll-preserve-screen-position 1       ; PgUp/PgDown hold
+        send-mail-function
+        'message-send-mail-with-sendmail)       ; Use sendmail
   (defalias 'yes-or-no #'y-or-n-p))             ; Easier question
 
 ;; Ligatures
