@@ -74,16 +74,25 @@
   (dolist (code-point nerdfont-code-points)
     (set-fontset-font t code-point (font-spec :family "Symbols Nerd Font Mono")))
   ;; Miscellaneous Options
-  (setq-default fill-column 80)                 ; 80 width pages
+  (setq-default fill-column 80                 ; 80 width pages
+                indent-tabs-mode nil           ; Use spaces only
+                major-mode                      ; Guess major mode from file name
+                (lambda ()
+                  (unless buffer-file-name
+                    (let ((buffer-file-name (buffer-name)))
+                      (set-auto-mode)))))
   (column-number-mode)                          ; Column number mode
   (global-display-line-numbers-mode t)          ; Globally display line numbers
   (global-hl-line-mode t)                       ; Highlight cursor line
+  (global-auto-revert-mode 1)                   ; Auto-refresh buffers
   (setq display-line-numbers-grow-only t        ; Never shrink the linum width
-        display-line-numbers-width-start t)     ; Calculate linum width at start
-  (setq confirm-kill-emacs nil
-        use-dialog-box nil)                     ; Bye
-  (defalias 'yes-or-no #'y-or-n-p)              ; Easier question
-  (setq inhibit-startup-message t               ; No startup screen
+        display-line-numbers-width-start t      ; Calculate linum width at start
+        confirm-kill-emacs nil
+        use-dialog-box nil                      ; Bye
+        global-auto-revert-non-file-buffers t   ; Auto-refresh buffers like dired
+        auto-revert-verbose nil                 ; But silence it
+        enable-recursive-minibuffers t          ; Recursive mini-buffers
+        inhibit-startup-message t               ; No startup screen
         scroll-step 1                           ; Vim style scrolling
         scroll-margin 10                        ; Vim style scroll off
         mouse-wheel-progressive-speed nil
@@ -92,16 +101,7 @@
           ((shift) . 1)
           ((control) . nil))                    ; Mouse wheel scrolling
         scroll-preserve-screen-position 1)      ; PgUp/PgDown hold
-  (setq-default indent-tabs-mode nil)           ; Use spaces only
-  (global-auto-revert-mode 1)                   ; Auto-refresh buffers
-  (setq global-auto-revert-non-file-buffers t)  ; Auto-refresh buffers like dired
-  (setq auto-revert-verbose nil)                ; But silence it
-  (setq enable-recursive-minibuffers t)         ; Recursive mini-buffers
-  (setq-default major-mode                      ; Guess major mode from file name
-                (lambda ()
-                  (unless buffer-file-name
-                    (let ((buffer-file-name (buffer-name)))
-                      (set-auto-mode))))))
+  (defalias 'yes-or-no #'y-or-n-p))             ; Easier question
 
 ;; Ligatures
 (use-package ligature
