@@ -175,7 +175,7 @@
   ;; https://github.com/minad/consult?tab=readme-ov-file#use-package-example
   :bind (("C-M-#" . consult-register)
          ("C-c /" . consult-ripgrep)
-         ("C-c <space>" . consult-fd)
+         ("C-c <SPC>" . consult-fd)
          ("C-c M-x" . consult-mode-command)
          ("C-c h" . consult-history)
          ("C-c i" . consult-info)
