@@ -64,3 +64,6 @@ places
 transient/
 parinfer-rust/
 projects
+
+# eww urls
+url/

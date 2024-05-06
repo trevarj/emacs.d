@@ -103,7 +103,9 @@
         scroll-preserve-screen-position 1       ; PgUp/PgDown hold
         send-mail-function
         'message-send-mail-with-sendmail)       ; Use sendmail
-  (defalias 'yes-or-no #'y-or-n-p))             ; Easier question
+  (defalias 'yes-or-no #'y-or-n-p)              ; Easier question
+  :bind                                         ; Generic keybindings
+  ("C-c b" . ibuffer))
 
 ;; Ligatures
 (use-package ligature
@@ -171,58 +173,54 @@
 (use-package consult ; useful commands
   :straight t
   ;; https://github.com/minad/consult?tab=readme-ov-file#use-package-example
-  :bind (("C-c M-x" . consult-mode-command)
+  :bind (("C-M-#" . consult-register)
+         ("C-c /" . consult-ripgrep)
+         ("C-c <space>" . consult-fd)
+         ("C-c M-x" . consult-mode-command)
          ("C-c h" . consult-history)
+         ("C-c i" . consult-info)
          ("C-c k" . consult-kmacro)
          ("C-c m" . consult-man)
-         ("C-c i" . consult-info)
          ("C-c r" . consult-recent-file)
-         ([remap Info-search] . consult-info)
-         ;; C-x bindings in `ctl-x-map'
-         ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
-         ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
          ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
          ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
-         ("C-x t b" . consult-buffer-other-tab)    ;; orig. switch-to-buffer-other-tab
-         ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
+         ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
+         ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
          ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
-         ;; Custom M-# bindings for fast register access
+         ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
+         ("C-x t b" . consult-buffer-other-tab)    ;; orig. switch-to-buffer-other-tab
          ("M-#" . consult-register-load)
          ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
-         ("C-M-#" . consult-register)
-         ;; Other custom bindings
-         ("M-y" . consult-yank-pop)                ;; orig. yank-pop
-         ;; M-g bindings in `goto-map'
+         ("M-g I" . consult-imenu-multi)
+         ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
          ("M-g e" . consult-compile-error)
          ("M-g f" . consult-flycheck)              ;; Alternative: consult-flymake
          ("M-g g" . consult-goto-line)             ;; orig. goto-line
-         ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
-         ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
-         ("M-g m" . consult-mark)
-         ("M-g k" . consult-global-mark)
          ("M-g i" . consult-imenu)
-         ("M-g I" . consult-imenu-multi)
-         ;; M-s bindings in `search-map'
-         ("M-s d" . consult-fd)                  ;; Alternative: consult-find
-         ("M-s c" . consult-locate)
-         ("M-s g" . consult-grep)
+         ("M-g k" . consult-global-mark)
+         ("M-g m" . consult-mark)
+         ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
          ("M-s G" . consult-git-grep)
-         ("M-s r" . consult-ripgrep)
-         ("M-s l" . consult-line)
          ("M-s L" . consult-line-multi)
-         ("M-s k" . consult-keep-lines)
-         ("M-s u" . consult-focus-lines)
-         ;; Isearch integration
+         ("M-s c" . consult-locate)
+         ("M-s d" . consult-fd)                    ;; Alternative: consult-find
          ("M-s e" . consult-isearch-history)
+         ("M-s g" . consult-grep)
+         ("M-s k" . consult-keep-lines)
+         ("M-s l" . consult-line)
+         ("M-s r" . consult-ripgrep)
+         ("M-s u" . consult-focus-lines)
+         ("M-y" . consult-yank-pop)                ;; orig. yank-pop
+         ([remap Info-search] . consult-info)
          :map isearch-mode-map
          ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
+         ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
          ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
          ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
-         ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
          ;; Minibuffer history
          :map minibuffer-local-map
-         ("M-s" . consult-history)                 ;; orig. next-matching-history-element
-         ("M-r" . consult-history))
+         ("M-r" . consult-history)
+         ("M-s" . consult-history))                 ;; orig. next-matching-history-element
   :init
   ;; https://github.com/minad/consult?tab=readme-ov-file#custom-variables
   :config
