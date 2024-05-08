@@ -43,7 +43,7 @@
   (save-place-mode)
   (recentf-mode)
   ;; Session saving
-  (desktop-save-mode)
+  ;; (desktop-save-mode)
   ;; Fonts
   (set-face-attribute 'default nil :family "Iosevka JBM" :height 150 :weight 'medium)
   (set-face-attribute 'fixed-pitch nil :font "Iosevka JBM" :height 150)
@@ -142,6 +142,24 @@
 
 (use-package autorevert
   :diminish auto-revert-mode) ; doesn't work in :config above
+
+;; Workspaces
+(use-package activities
+  :straight t
+  :init
+  (activities-mode)
+  ;; Prevent `edebug' default bindings from interfering.
+  (setq edebug-inhibit-emacs-lisp-mode-bindings t)
+  :bind
+  (("C-x C-a C-n" . activities-new)
+   ("C-x C-a C-d" . activities-define)
+   ("C-x C-a C-a" . activities-resume)
+   ("C-x C-a C-s" . activities-suspend)
+   ("C-x C-a C-k" . activities-kill)
+   ("C-x C-a RET" . activities-switch)
+   ("C-x C-a b" . activities-switch-buffer)
+   ("C-x C-a g" . activities-revert)
+   ("C-x C-a l" . activities-list)))
 
 ;; Keybinding
 (use-package which-key
