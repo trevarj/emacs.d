@@ -51,7 +51,11 @@ flycheck_*.el
 eln-cache/
 
 # straight.el
-straight/
+!straight/versions/
+straight/build/
+straight/repos/
+straight/modified/
+straight/build-cache.el
 
 # treesitter
 tree-sitter/
@@ -67,3 +71,6 @@ projects
 
 # eww urls
 url/
+
+# activities.el
+persist/
