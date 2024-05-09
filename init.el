@@ -85,7 +85,8 @@
   (global-display-line-numbers-mode t)          ; Globally display line numbers
   (global-hl-line-mode t)                       ; Highlight cursor line
   (global-auto-revert-mode 1)                   ; Auto-refresh buffers
-  (setq display-line-numbers-grow-only t        ; Never shrink the linum width
+  (setq use-package-always-defer t
+        display-line-numbers-grow-only t        ; Never shrink the linum width
         display-line-numbers-width-start t      ; Calculate linum width at start
         confirm-kill-emacs nil
         use-dialog-box nil                      ; Bye
@@ -105,7 +106,8 @@
         'message-send-mail-with-sendmail)       ; Use sendmail
   (defalias 'yes-or-no #'y-or-n-p)              ; Easier question
   :bind                                         ; Generic keybindings
-  ("C-c b" . ibuffer))
+  ("C-c b" . ibuffer)
+  ("C-o" . pop-global-mark))
 
 ;; Ligatures
 (use-package ligature
@@ -125,6 +127,7 @@
 ;; Colorscheme
 (use-package doom-themes
   :straight (doom-themes :type git :host github :repo "doomemacs/themes")
+  :demand
   :config
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic nil
@@ -354,7 +357,6 @@
 
 (use-package diff-hl
   :straight t
-  :after magit
   :hook
   ((magit-post-refresh . diff-hl-magit-post-refresh)
    (magit-pre-refresh . diff-hl-magit-pre-refresh))
@@ -459,10 +461,6 @@
 
 ;; Guile
 (use-package geiser-guile
-  :straight t)
-
-;; Common Lisp
-(use-package sly
   :straight t)
 
 ;; Markdown
