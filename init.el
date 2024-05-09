@@ -143,24 +143,6 @@
 (use-package autorevert
   :diminish auto-revert-mode) ; doesn't work in :config above
 
-;; Workspaces
-(use-package activities
-  :straight t
-  :init
-  (activities-mode)
-  ;; Prevent `edebug' default bindings from interfering.
-  (setq edebug-inhibit-emacs-lisp-mode-bindings t)
-  :bind
-  (("C-x C-a C-n" . activities-new)
-   ("C-x C-a C-d" . activities-define)
-   ("C-x C-a C-a" . activities-resume)
-   ("C-x C-a C-s" . activities-suspend)
-   ("C-x C-a C-k" . activities-kill)
-   ("C-x C-a RET" . activities-switch)
-   ("C-x C-a b" . activities-switch-buffer)
-   ("C-x C-a g" . activities-revert)
-   ("C-x C-a l" . activities-list)))
-
 ;; Keybinding
 (use-package which-key
   :straight t
@@ -178,6 +160,20 @@
 
 (use-package undo-fu
   :straight t)
+
+;; Projects
+(use-package projectile
+  :straight t
+  :diminish
+  :init (projectile-mode)
+  :bind ("M-p" . 'projectile-command-map))
+
+(use-package perspective
+  :straight t
+  :init (persp-mode)
+  :hook (kill-emacs . persp-state-save)
+  :custom (persp-mode-prefix-key (kbd "C-x p"))
+  :config (setq persp-state-default-file "~/.emacs.d/persist/persp-state"))
 
 ;; Minibuffer
 (use-package vertico ; completion
@@ -244,7 +240,10 @@
   :config
   (setq read-buffer-completion-ignore-case t
         read-file-name-completion-ignore-case t
-        completion-ignore-case t))
+        completion-ignore-case t)
+  ;; perspective source
+  (consult-customize consult--source-buffer :hidden t :default nil)
+  (add-to-list 'consult-buffer-sources persp-consult-source))
 
 ;; Completion
 (use-package corfu
@@ -378,7 +377,8 @@
    (magit-pre-refresh . diff-hl-magit-pre-refresh))
   :config
   (global-diff-hl-mode)
-  (diff-hl-flydiff-mode))
+  (diff-hl-flydiff-mode)
+  (diff-hl-dir-mode))
 
 ;; Terminal
 (use-package vterm
@@ -437,11 +437,16 @@
   ;; Sometimes you need to tell Eglot where to find the language server
   (add-to-list 'eglot-server-programs
                '(bash-ts-mode . ("bash-language-server" "start"))
-               '(haskell-mode . ("haskell-language-server-wrapper" "--lsp")))
+               '(rust-ts-mode . ("rust-analyzer" :initializationOptions
+                                 (:check
+                                  (:command "clippy")
+                                  :procMacro
+                                  (:enable :json-false)))))
   (defalias 'start-lsp-server #'eglot)
   :hook
   (c-ts-mode . eglot-ensure)
-  (bash-ts-mode . eglot-ensure))
+  (bash-ts-mode . eglot-ensure)
+  (rust-ts-mode . eglot-ensure))
 
 ;; Lisps
 (use-package parinfer-rust-mode
@@ -461,23 +466,18 @@
   (electric-pair-mode nil) ; conflicts with parinfer
   (parinfer-rust-mode))
 
+;; Rust
+(use-package rust-mode
+  :straight t
+  :init
+  (setq rust-mode-treesitter-derive t)
+  :config
+  (setq rust-format-on-save t)
+  (add-to-list 'tramp-remote-path 'tramp-own-remote-path))
+
 ;; Guile
 (use-package geiser-guile
   :straight t)
-
-;; Rust
-(use-package rustic
-  :straight t
-  (rustic
-   :type git
-   :host github
-   :repo "brotzeit/rustic")
-  :config
-  (setq rustic-lsp-client 'eglot))
-
-;; Haskell
-;; (use-package haskell-mode
-;;   :straight t)
 
 ;; Common Lisp
 (use-package sly

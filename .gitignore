@@ -74,3 +74,6 @@ url/
 
 # activities.el
 persist/
+
+# projectile
+projectile-bookmarks.eld
