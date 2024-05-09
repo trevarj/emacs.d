@@ -47,7 +47,7 @@
   ;; Fonts
   (set-face-attribute 'default nil :family "Iosevka JBM" :height 150 :weight 'medium)
   (set-face-attribute 'fixed-pitch nil :font "Iosevka JBM" :height 150)
-  (set-face-attribute 'variable-pitch nil :family "Noto Sans" :height 150 :weight 'regular)
+  (set-face-attribute 'variable-pitch nil :family "Noto Sans" :height 120 :weight 'regular)
   (setq use-default-font-for-symbols nil)
   ;; https://github.com/ryanoasis/nerd-fonts/wiki/Glyph-Sets-and-Code-Points
   (defvar nerdfont-code-points
@@ -173,7 +173,7 @@
   :init (persp-mode)
   :hook (kill-emacs . persp-state-save)
   :custom (persp-mode-prefix-key (kbd "C-x p"))
-  :config (setq persp-state-default-file "~/.emacs.d/persist/persp-state"))
+  :config (setq persp-state-default-file "~/.emacs.d/persp-state"))
 
 ;; Minibuffer
 (use-package vertico ; completion
