@@ -43,7 +43,7 @@
   (save-place-mode)
   (recentf-mode)
   ;; Session saving
-  ;; (desktop-save-mode)
+  (desktop-save-mode)
   ;; Fonts
   (set-face-attribute 'default nil :family "Iosevka JBM" :height 150 :weight 'medium)
   (set-face-attribute 'fixed-pitch nil :font "Iosevka JBM" :height 150)
@@ -161,21 +161,6 @@
 (use-package undo-fu
   :straight t)
 
-;; Projects
-(use-package projectile
-  :straight t
-  :diminish
-  :init (projectile-mode)
-  :bind ("M-p" . 'projectile-command-map))
-
-(use-package perspective
-  :straight t
-  :init (persp-mode)
-  :hook (kill-emacs . persp-state-save)
-  :custom (persp-mode-prefix-key (kbd "C-x p"))
-  :config (setq persp-state-default-file
-                (concat user-emacs-directory "persp-state")))
-
 ;; Minibuffer
 (use-package vertico ; completion
   :straight t
@@ -241,10 +226,7 @@
   :config
   (setq read-buffer-completion-ignore-case t
         read-file-name-completion-ignore-case t
-        completion-ignore-case t)
-  ;; perspective source
-  (consult-customize consult--source-buffer :hidden t :default nil)
-  (add-to-list 'consult-buffer-sources persp-consult-source))
+        completion-ignore-case t))
 
 ;; Completion
 (use-package corfu
