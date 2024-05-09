@@ -173,7 +173,8 @@
   :init (persp-mode)
   :hook (kill-emacs . persp-state-save)
   :custom (persp-mode-prefix-key (kbd "C-x p"))
-  :config (setq persp-state-default-file "~/.emacs.d/persp-state"))
+  :config (setq persp-state-default-file
+                (concat user-emacs-directory "persp-state")))
 
 ;; Minibuffer
 (use-package vertico ; completion
@@ -377,8 +378,7 @@
    (magit-pre-refresh . diff-hl-magit-pre-refresh))
   :config
   (global-diff-hl-mode)
-  (diff-hl-flydiff-mode)
-  (diff-hl-dir-mode))
+  (diff-hl-flydiff-mode))
 
 ;; Terminal
 (use-package vterm
