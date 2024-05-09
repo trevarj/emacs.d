@@ -77,3 +77,6 @@ persist/
 
 # projectile
 projectile-bookmarks.eld
+
+# perspective
+persp-state
