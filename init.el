@@ -85,7 +85,8 @@
   (global-display-line-numbers-mode t)          ; Globally display line numbers
   (global-hl-line-mode t)                       ; Highlight cursor line
   (global-auto-revert-mode 1)                   ; Auto-refresh buffers
-  (setq use-package-always-defer t
+  (setq use-package-always-defer t              ; always defer packages, use :demand instead
+        custom-file "/tmp/custom.el"            ; customization file
         display-line-numbers-grow-only t        ; Never shrink the linum width
         display-line-numbers-width-start t      ; Calculate linum width at start
         confirm-kill-emacs nil
@@ -111,7 +112,6 @@
 
 ;; Ligatures
 (use-package ligature
-  :straight t
   :config
   (ligature-set-ligatures
    'prog-mode
@@ -139,7 +139,6 @@
 
 ;; Diminish minor modes
 (use-package diminish
-  :straight t
   :config
   (diminish 'eldoc-mode))
 
@@ -148,7 +147,6 @@
 
 ;; Keybinding
 (use-package which-key
-  :straight t
   :diminish which-key-mode
   :config
   (which-key-setup-side-window-bottom)
@@ -158,23 +156,19 @@
 
 ;; Window navigation
 (use-package ace-window
-  :straight t
   :bind (("M-o" . ace-window)))
 
-(use-package undo-fu
-  :straight t)
+(use-package undo-fu)
 
 ;; Minibuffer
 (use-package vertico ; completion
-  :straight t
   :init
   (vertico-mode))
+
 (use-package marginalia ; completion definitions
-  :straight t
   :init
   (marginalia-mode))
 (use-package consult ; useful commands
-  :straight t
   ;; https://github.com/minad/consult?tab=readme-ov-file#use-package-example
   :bind (("C-M-#" . consult-register)
          ("C-c /" . consult-ripgrep)
@@ -233,7 +227,6 @@
 
 ;; Completion
 (use-package corfu
-  :straight t
   :init (global-corfu-mode)
   :config
   (corfu-popupinfo-mode)
@@ -245,7 +238,6 @@
         tab-always-indent 'complete))
 
 (use-package orderless
-  :straight t
   :custom
   (completion-styles '(orderless basic))
   (completion-category-overrides '((file (styles basic partial-completion)))))
@@ -284,13 +276,11 @@
 
 ;; Completion-at-point helper
 (use-package cape
-  :straight t
   :init
   (add-to-list 'completion-at-point-functions #'cape-file))
 
 ;; Treesitter
 (use-package treesit-auto
-  :straight t
   :custom
   (treesit-auto-install 'prompt)
   :config
@@ -309,28 +299,24 @@
 
 ;; Whitespace handling
 (use-package ws-butler
-  :straight t
   :diminish
   :config
   (ws-butler-global-mode))
 
 ;; Editorconfig
 (use-package editorconfig
-  :straight t
   :diminish
   :config
   (editorconfig-mode))
 
 ;; Avy navigation
 (use-package avy
-  :straight t
   :bind
   (("C-c w" . #'avy-goto-word-1)
    ("C-c s" . #'avy-goto-char)))
 
 ;; Formatting
 (use-package apheleia
-  :straight t
   :diminish apheleia-mode
   :init
   (apheleia-global-mode)
@@ -340,7 +326,6 @@
 
 ;; Colorize hex color codes
 (use-package rainbow-mode
-  :straight t
   :hook (rainbow-mode . toggle-hl-mode))
 
 (defun toggle-hl-mode nil
@@ -350,13 +335,11 @@
 ;; Git
 (setq epg-pinentry-mode 'loopback) ; pinentry on minibuffer
 (use-package magit
-  :straight t
   :config
   (setq magit-define-global-key-bindings 'recommended
         magit-diff-refine-hunk t))
 
 (use-package diff-hl
-  :straight t
   :hook
   ((magit-post-refresh . diff-hl-magit-post-refresh)
    (magit-pre-refresh . diff-hl-magit-pre-refresh))
@@ -366,7 +349,6 @@
 
 ;; Terminal
 (use-package vterm
-  :straight t
   :hook
   (vterm-mode . (lambda ()
                   (display-line-numbers-mode 0)
@@ -378,20 +360,6 @@
 ;; Languages & LSPs
 (setq eldoc-echo-area-use-multiline-p nil)
 
-;; Flymake
-;; (use-package flymake
-;;   :straight t
-;;   :bind
-;;   (:map flymake-mode-map
-;;         :prefix-map global-map
-;;         :prefix "C-c"
-;;         ("n" . #'flymake-goto-next-error)
-;;         ("p" . #'flymake-goto-prev-error))
-;;   :config
-;;   (setq help-at-pt-display-when-idle t
-;;         flymake-fringe-indicator-position 'right-fringe) ; display help when hovering
-;;   :hook (prog-mode . flymake-mode))
-
 ;; Flycheck
 (use-package flycheck
   :ensure t
@@ -400,12 +368,11 @@
   (flymake-mode 0)
   :config
   (setq flycheck-indication-mode `left-margin))
-(use-package consult-flycheck
-  :straight t)
+(use-package consult-flycheck)
+
 
 ;; Eglot
 (use-package eglot
-  :straight t
   :bind
   (:map eglot-mode-map
         :prefix-map eglot-prefix-keymap
@@ -434,7 +401,6 @@
 
 ;; Lisps
 (use-package parinfer-rust-mode
-  :straight t
   :config
   (setq
    parinfer-rust-troublesome-modes '())
@@ -452,7 +418,6 @@
 
 ;; Rust
 (use-package rust-mode
-  :straight t
   :init
   (setq rust-mode-treesitter-derive t)
   :config
@@ -460,12 +425,10 @@
   (add-to-list 'tramp-remote-path 'tramp-own-remote-path))
 
 ;; Guile
-(use-package geiser-guile
-  :straight t)
+(use-package geiser-guile)
 
 ;; Markdown
-(use-package markdown-mode
-  :straight t)
+(use-package markdown-mode)
 
 (provide 'init)
 

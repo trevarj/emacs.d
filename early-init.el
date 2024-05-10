@@ -5,9 +5,6 @@
 (setq file-name-handler-alist-original file-name-handler-alist)
 (setq file-name-handler-alist nil)
 
-;; Write any customizations to a temp file so they are discarded.
-(setq custom-file (make-temp-file "custom-" nil ".el"))
-
 (setq package-enable-at-startup nil)        ; Disable emacs package manager
 (scroll-bar-mode -1)                        ; Disable visible scrollbar
 (tool-bar-mode -1)                          ; Disable the toolbar
