@@ -322,7 +322,9 @@
   (apheleia-global-mode)
   :config
   (setf (alist-get 'shfmt apheleia-formatters)
-        '("shfmt" "-i" "2" "-")))
+        '("shfmt" "-i" "2" "-"))
+  (setf (alist-get 'sh-mode apheleia-mode-alist)
+        '(shfmt)))
 
 ;; Colorize hex color codes
 (use-package rainbow-mode
@@ -385,9 +387,9 @@
         ("r" . eglot-find-implementation)
         ("t" . eglot-find-typeDefinition))
   :config
-  ;; Sometimes you need to tell Eglot where to find the language server
+  ;; Server customization
   (add-to-list 'eglot-server-programs
-               '(bash-ts-mode . ("bash-language-server" "start"))
+               '('(bash-ts-mode sh-mode) . ("bash-language-server" "start"))
                '(rust-ts-mode . ("rust-analyzer" :initializationOptions
                                  (:check
                                   (:command "clippy")
@@ -397,6 +399,7 @@
   :hook
   (c-ts-mode . eglot-ensure)
   (bash-ts-mode . eglot-ensure)
+  (sh-mode . eglot-ensure)
   (rust-ts-mode . eglot-ensure))
 
 ;; Lisps
