@@ -85,6 +85,7 @@
   (global-display-line-numbers-mode t)          ; Globally display line numbers
   (global-hl-line-mode t)                       ; Highlight cursor line
   (global-auto-revert-mode 1)                   ; Auto-refresh buffers
+  (auto-fill-mode t)
   (setq use-package-always-defer t              ; always defer packages, use :demand instead
         custom-file "/tmp/custom.el"            ; customization file
         display-line-numbers-grow-only t        ; Never shrink the linum width
@@ -97,6 +98,7 @@
         inhibit-startup-message t               ; No startup screen
         scroll-step 1                           ; Vim style scrolling
         scroll-margin 10                        ; Vim style scroll off
+        fill-column 80                          ; Line width 80 chars
         mouse-wheel-progressive-speed nil
         mouse-wheel-scroll-amount
         '(3
@@ -302,6 +304,10 @@
   :diminish
   :config
   (ws-butler-global-mode))
+
+;; Rainbow delimiters
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode))
 
 ;; Editorconfig
 (use-package editorconfig
