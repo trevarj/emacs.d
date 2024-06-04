@@ -318,6 +318,11 @@
   :config
   (editorconfig-mode))
 
+;; Buffer specific direnv
+(use-package envrc
+  :diminish
+  :config (envrc-global-mode))
+
 ;; Avy navigation
 (use-package avy
   :bind
