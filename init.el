@@ -74,9 +74,10 @@
   (dolist (code-point nerdfont-code-points)
     (set-fontset-font t code-point (font-spec :family "Symbols Nerd Font Mono")))
   ;; Miscellaneous Options
-  (setq-default fill-column 80                 ; 80 width pages
-                indent-tabs-mode nil           ; Use spaces only
-                major-mode                      ; Guess major mode from file name
+  (setq-default fill-column 80                   ; 80 width pages
+                auto-fill-function 'do-auto-fill ; always autofill
+                indent-tabs-mode nil             ; Use spaces only
+                major-mode                       ; Guess major mode from file name
                 (lambda ()
                   (unless buffer-file-name
                     (let ((buffer-file-name (buffer-name)))
@@ -85,7 +86,6 @@
   (global-display-line-numbers-mode t)          ; Globally display line numbers
   (global-hl-line-mode t)                       ; Highlight cursor line
   (global-auto-revert-mode 1)                   ; Auto-refresh buffers
-  (auto-fill-mode t)
   (setq use-package-always-defer t              ; always defer packages, use :demand instead
         custom-file "/tmp/custom.el"            ; customization file
         display-line-numbers-grow-only t        ; Never shrink the linum width
@@ -437,7 +437,12 @@
   (add-to-list 'tramp-remote-path 'tramp-own-remote-path))
 
 ;; Guile
-(use-package geiser-guile)
+(use-package geiser-guile
+  :config
+  (add-to-list 'geiser-guile-load-path "~/Workspace/guix"))
+
+;; Guix (emacs-guix)
+(use-package guix)
 
 ;; Markdown
 (use-package markdown-mode)

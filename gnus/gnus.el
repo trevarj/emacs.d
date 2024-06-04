@@ -2,6 +2,8 @@
 
 (setq ;; You need to replace this email address with your own!
  user-mail-address "tmarjeski@gmail.com"
+ user-full-name "Trevor Arjeski"
+ 
  ;; You need to replace this key ID with your own key ID!
  mml-secure-openpgp-signers '("A52D68794EBED758")
  ;; This tells Gnus to get email from Gmail via IMAP.
