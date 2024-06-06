@@ -381,8 +381,8 @@
   :ensure t
   :init
   (global-flycheck-mode)
-  (flymake-mode 0)
   :config
+  (flymake-mode -1)
   (setq flycheck-indication-mode `left-margin))
 (use-package consult-flycheck)
 
