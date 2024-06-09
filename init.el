@@ -289,6 +289,7 @@
   :custom
   (treesit-auto-install 'prompt)
   :config
+  (treesit-font-lock-level 4)
   (treesit-auto-add-to-auto-mode-alist 'all)
   (global-treesit-auto-mode))
 
