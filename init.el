@@ -378,14 +378,14 @@
 (setq eldoc-echo-area-use-multiline-p nil)
 
 ;; Flycheck
-(use-package flycheck
-  :ensure t
-  :init
-  (global-flycheck-mode)
-  :config
-  (flymake-mode -1)
-  (setq flycheck-indication-mode `left-margin))
-(use-package consult-flycheck)
+;; (use-package flycheck
+;;   :ensure t
+;;   :init
+;;   (global-flycheck-mode)
+;;   :config
+;;   (flymake-mode -1)
+;;   (setq flycheck-indication-mode `left-margin))
+;; (use-package consult-flycheck)
 
 
 ;; Eglot
