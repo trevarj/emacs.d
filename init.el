@@ -112,8 +112,7 @@
         'message-send-mail-with-sendmail)       ; Use sendmail
   (defalias 'yes-or-no #'y-or-n-p)              ; Easier question
   :bind                                         ; Generic keybindings
-  ("C-c b" . ibuffer)
-  ("C-o" . pop-global-mark))
+  ("C-c b" . ibuffer))
 
 ;; Ligatures
 (use-package ligature
