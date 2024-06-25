@@ -195,7 +195,7 @@
          ("M-g I" . consult-imenu-multi)
          ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
          ("M-g e" . consult-compile-error)
-         ("M-g f" . consult-flycheck)              ;; Alternative: consult-flymake
+         ("M-g f" . consult-flymake)               ;; Alternative: consult-flymake
          ("M-g g" . consult-goto-line)             ;; orig. goto-line
          ("M-g i" . consult-imenu)
          ("M-g k" . consult-global-mark)
@@ -300,7 +300,6 @@
 (setq auto-save-file-name-transforms
       `((".*" "~/.cache/emacs/saves/" t)))
 (electric-pair-mode)
-(global-set-key (kbd "M-f") #'forward-to-word) ; be like vim w
 
 ;; Whitespace handling
 (use-package ws-butler
@@ -375,17 +374,6 @@
 
 ;; Languages & LSPs
 (setq eldoc-echo-area-use-multiline-p nil)
-
-;; Flycheck
-;; (use-package flycheck
-;;   :ensure t
-;;   :init
-;;   (global-flycheck-mode)
-;;   :config
-;;   (flymake-mode -1)
-;;   (setq flycheck-indication-mode `left-margin))
-;; (use-package consult-flycheck)
-
 
 ;; Eglot
 (use-package eglot
