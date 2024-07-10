@@ -99,7 +99,6 @@
         scroll-step 1                           ; Vim style scrolling
         scroll-margin 10                        ; Vim style scroll off
         fill-column 80                          ; Line width 80 chars
-        undo-limit
         undo-limit 67108864                     ; Undo limit of 64mb.
         undo-strong-limit 100663296             ;               96mb.
         undo-outer-limit 1006632960             ;               960mb.
@@ -301,7 +300,6 @@
   :custom
   (treesit-auto-install 'prompt)
   :config
-  (treesit-font-lock-level 4)
   (treesit-auto-add-to-auto-mode-alist 'all)
   (global-treesit-auto-mode))
 
