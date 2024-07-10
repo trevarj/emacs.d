@@ -285,6 +285,7 @@
 
 ;; Treesitter
 (use-package treesit-auto
+  :demand t
   :custom
   (treesit-auto-install 'prompt)
   :config
