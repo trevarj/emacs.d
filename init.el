@@ -391,13 +391,14 @@
         ("t" . eglot-find-typeDefinition))
   :config
   ;; Server customization
-  (add-to-list 'eglot-server-programs
-               '('(bash-ts-mode sh-mode) . ("bash-language-server" "start"))
-               '(rust-ts-mode . ("rust-analyzer" :initializationOptions
-                                 (:check
-                                  (:command "clippy")
-                                  :procMacro
-                                  (:enable :json-false)))))
+  (setf eglot-server-programs
+        '(((bash-ts-mode sh-mode) . ("bash-language-server" "start"))
+          (rust-ts-mode . ("rust-analyzer"
+                           :initializationOptions
+                           (:check
+                            (:command "clippy")
+                            :procMacro
+                            (:enable :json-false))))))
   (defalias 'start-lsp-server #'eglot)
   :hook
   (c-ts-mode . eglot-ensure)
