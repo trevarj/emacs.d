@@ -84,7 +84,6 @@
                       (set-auto-mode)))))
   (column-number-mode)                          ; Column number mode
   (global-display-line-numbers-mode t)          ; Globally display line numbers
-  (global-hl-line-mode t)                       ; Highlight cursor line
   (global-auto-revert-mode 1)                   ; Auto-refresh buffers
   (setq use-package-always-defer t              ; always defer packages, use :demand instead
         custom-file "/tmp/custom.el"            ; customization file
@@ -169,7 +168,7 @@
   :bind (("M-o" . ace-window)))
 
 (use-package undo-fu
-  :config
+  :init
   (global-unset-key (kbd "C-z"))
   :bind
   (("C-z" . 'undo-fu-only-undo)
