@@ -99,6 +99,10 @@
         scroll-step 1                           ; Vim style scrolling
         scroll-margin 10                        ; Vim style scroll off
         fill-column 80                          ; Line width 80 chars
+        undo-limit
+        undo-limit 67108864                     ; Undo limit of 64mb.
+        undo-strong-limit 100663296             ;               96mb.
+        undo-outer-limit 1006632960             ;               960mb.
         mouse-wheel-progressive-speed nil
         mouse-wheel-scroll-amount
         '(3
@@ -116,6 +120,7 @@
 
 ;; Ligatures
 (use-package ligature
+  :demand
   :config
   (ligature-set-ligatures
    'prog-mode
@@ -143,10 +148,12 @@
 
 ;; Diminish minor modes
 (use-package diminish
+  :demand
   :config
   (diminish 'eldoc-mode))
 
 (use-package autorevert
+  :demand
   :diminish auto-revert-mode) ; doesn't work in :config above
 
 ;; Keybinding
@@ -162,7 +169,12 @@
 (use-package ace-window
   :bind (("M-o" . ace-window)))
 
-(use-package undo-fu)
+(use-package undo-fu
+  :config
+  (global-unset-key (kbd "C-z"))
+  :bind
+  (("C-z" . 'undo-fu-only-undo)
+   ("C-S-z" . 'undo-fu-only-redo)))
 
 ;; Minibuffer
 (use-package vertico ; completion
@@ -285,7 +297,7 @@
 
 ;; Treesitter
 (use-package treesit-auto
-  :demand t
+  :demand
   :custom
   (treesit-auto-install 'prompt)
   :config
@@ -411,12 +423,11 @@
   :config
   (setq
    parinfer-rust-troublesome-modes '())
-  (set-face-attribute 'parinfer-rust-dim-parens nil
-                      :foreground (cadr (assoc 'base6 doom-themes--colors)))
-  :hook ((emacs-lisp-mode
-          sly-mode
-          geiser-mode)
-         . safe-parinfer-rust-mode))
+  (set-face-attribute
+   'parinfer-rust-dim-parens nil
+   :foreground (cadr (assoc 'base6 doom-themes--colors)))
+  :hook
+  ((emacs-lisp-mode sly-mode geiser-mode) . safe-parinfer-rust-mode))
 
 (defun safe-parinfer-rust-mode nil
   "Safely turn on `parinfer-rust-mode'."
