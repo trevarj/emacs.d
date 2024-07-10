@@ -436,7 +436,8 @@
   (add-to-list 'geiser-guile-load-path "~/Workspace/guix"))
 
 ;; Guix (emacs-guix)
-(use-package guix)
+(use-package guix
+  :if (executable-find "guix"))
 
 ;; Markdown
 (use-package markdown-mode)
