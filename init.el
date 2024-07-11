@@ -116,6 +116,9 @@
   :bind                                         ; Generic keybindings
   ("C-c b" . ibuffer))
 
+(use-package eldoc
+  :diminish)
+
 ;; Ligatures
 (use-package ligature
   :demand
@@ -146,9 +149,7 @@
 
 ;; Diminish minor modes
 (use-package diminish
-  :demand
-  :config
-  (diminish 'eldoc-mode))
+  :demand)
 
 (use-package autorevert
   :demand
