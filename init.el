@@ -39,11 +39,13 @@
   ((emacs-startup . display-startup-time)
    (buffer-list-update . header-line-file-path))
   :init
-  ;; Global modes
   (save-place-mode)
   (recentf-mode)
-  ;; Session saving
-  (desktop-save-mode)
+  (desktop-save-mode)                           ; Session saving
+  (column-number-mode)                          ; Column number mode
+  (global-display-line-numbers-mode)            ; Globally display line numbers
+  (global-hl-line-mode)                         ; Highlight cursor line
+  (global-auto-revert-mode)                     ; Auto-refresh buffers
   ;; Fonts
   (set-face-attribute 'default nil :family "Iosevka JBM" :height 150 :weight 'medium)
   (set-face-attribute 'fixed-pitch nil :font "Iosevka JBM" :height 150)
@@ -72,7 +74,9 @@
       (#xE000 . #xE00A)
       (#xEA60 . #xEBEB)))
   (dolist (code-point nerdfont-code-points)
-    (set-fontset-font t code-point (font-spec :family "Symbols Nerd Font Mono")))
+    (set-fontset-font t code-point (font-spec :family "Symbols Nerd Font
+  Mono")))
+
   ;; Miscellaneous Options
   (setq-default fill-column 80                   ; 80 width pages
                 auto-fill-function 'do-auto-fill ; always autofill
@@ -82,38 +86,45 @@
                   (unless buffer-file-name
                     (let ((buffer-file-name (buffer-name)))
                       (set-auto-mode)))))
-  (column-number-mode)                          ; Column number mode
-  (global-display-line-numbers-mode t)          ; Globally display line numbers
-  (global-auto-revert-mode 1)                   ; Auto-refresh buffers
-  (setq use-package-always-defer t              ; always defer packages, use :demand instead
-        custom-file "/tmp/custom.el"            ; customization file
-        display-line-numbers-grow-only t        ; Never shrink the linum width
-        display-line-numbers-width-start t      ; Calculate linum width at start
-        confirm-kill-emacs nil
-        use-dialog-box nil                      ; Bye
-        global-auto-revert-non-file-buffers t   ; Auto-refresh buffers like dired
-        auto-revert-verbose nil                 ; But silence it
-        enable-recursive-minibuffers t          ; Recursive mini-buffers
-        inhibit-startup-message t               ; No startup screen
-        scroll-step 1                           ; Vim style scrolling
-        scroll-margin 10                        ; Vim style scroll off
-        fill-column 80                          ; Line width 80 chars
-        undo-limit 67108864                     ; Undo limit of 64mb.
-        undo-strong-limit 100663296             ;               96mb.
-        undo-outer-limit 1006632960             ;               960mb.
-        mouse-wheel-progressive-speed nil
-        mouse-wheel-scroll-amount
-        '(3
-          ((shift) . 1)
-          ((control) . nil))                    ; Mouse wheel scrolling
-        scroll-preserve-screen-position 1       ; PgUp/PgDown hold
-        gnus-init-file (expand-file-name
-                        "gnus/gnus.el"
-                        user-emacs-directory)
-        send-mail-function
-        'message-send-mail-with-sendmail)       ; Use sendmail
+  (setq
+   use-package-always-defer t              ; always defer packages, use :demand instead
+   custom-file "/tmp/custom.el"            ; customization file
+   display-line-numbers-grow-only t        ; Never shrink the linum width
+   display-line-numbers-width-start t      ; Calculate linum width at start
+   confirm-kill-emacs nil
+   use-dialog-box nil                      ; Bye
+   global-auto-revert-non-file-buffers t   ; Auto-refresh buffers like dired
+   auto-revert-verbose nil                 ; But silence it
+   enable-recursive-minibuffers t          ; Recursive mini-buffers
+   inhibit-startup-message t               ; No startup screen
+   scroll-step 1                           ; Vim style scrolling
+   scroll-margin 10                        ; Vim style scroll off
+   fill-column 80                          ; Line width 80 chars
+   backup-directory-alist '(("." . "~/.cache/emacs/backups"))
+   auto-save-file-name-transforms '((".*" "~/.cache/emacs/saves/" t))
+   undo-limit 67108864                     ; Undo limit of 64mb.
+   undo-strong-limit 100663296             ;               96mb.
+   undo-outer-limit 1006632960             ;               960mb.
+   eldoc-echo-area-use-multiline-p nil
+   mouse-wheel-progressive-speed nil
+   mouse-wheel-scroll-amount
+   '(3
+     ((shift) . 1)
+     ((control) . nil))                    ; Mouse wheel scrolling
+   scroll-preserve-screen-position 1       ; PgUp/PgDown hold
+   gnus-init-file (expand-file-name
+                   "gnus/gnus.el"
+                   user-emacs-directory)
+   send-mail-function
+   'message-send-mail-with-sendmail)       ; Use sendmail
   (defalias 'yes-or-no #'y-or-n-p)              ; Easier question
-  :bind                                         ; Generic keybindings
+
+  ;; Mode maps
+  (add-to-list 'major-mode-remap-alist '(rust-mode . rust-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
+
+  ;; Generic keybindings
+  :bind
   ("C-c b" . ibuffer))
 
 (use-package eldoc
@@ -243,6 +254,8 @@
 ;; Completion
 (use-package corfu
   :init (global-corfu-mode)
+  :hook
+  ('minibuffer-setup . #'corfu-enable-always-in-minibuffer)
   :config
   (corfu-popupinfo-mode)
   (add-to-list 'corfu--frame-parameters '(internal-border-width . 2))
@@ -287,7 +300,6 @@
     (setq-local corfu-echo-delay nil ;; Disable automatic echo and popup
                 corfu-popupinfo-delay nil)
     (corfu-mode)))
-(add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
 
 ;; Completion-at-point helper
 (use-package cape
@@ -302,15 +314,6 @@
   :config
   (treesit-auto-add-to-auto-mode-alist 'all)
   (global-treesit-auto-mode))
-
-(add-to-list 'major-mode-remap-alist '(rust-mode . rust-ts-mode))
-(add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
-
-;; Editing
-(setq backup-directory-alist `(("." . "~/.cache/emacs/backups")))
-(setq auto-save-file-name-transforms
-      `((".*" "~/.cache/emacs/saves/" t)))
-(electric-pair-mode)
 
 ;; Whitespace handling
 (use-package ws-butler
@@ -383,10 +386,7 @@
   (custom-set-faces
    '(term-color-bright-black ((t (:foreground "#4C566A"))))))
 
-;; Languages & LSPs
-(setq eldoc-echo-area-use-multiline-p nil)
-
-;; Eglot
+;; Eglot LSP
 (use-package eglot
   :bind
   (:map eglot-mode-map
