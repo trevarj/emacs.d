@@ -158,7 +158,8 @@
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config)
   (custom-set-faces
-   `(cursor ((t (:background "#d08770"))))))
+   `(cursor ((t (:background "#d08770"))))
+   `(font-lock-function-name-face ((t (:foreground "#d08770" :weight extra-bold))))))
 
 ;; Diminish minor modes
 (use-package diminish
