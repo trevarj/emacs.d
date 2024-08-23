@@ -345,6 +345,29 @@
   (("C-c w" . #'avy-goto-word-1)
    ("C-c s" . #'avy-goto-char)))
 
+;; Casual / Transient UIs
+(use-package casual-dired
+  :ensure t
+  :bind (:map dired-mode-map
+              ("C-o" . #'casual-dired-tmenu)
+              ("s" . #'casual-dired-sort-by-tmenu)
+              ("/" . #'casual-dired-search-replace-tmenu)))
+
+(use-package casual-avy
+  :ensure t
+  :bind ("C-c a" . casual-avy-tmenu))
+
+(use-package ibuffer
+  :hook (ibuffer-mode . ibuffer-auto-mode))
+(use-package casual-ibuffer
+  :ensure t
+  :bind (:map
+         ibuffer-mode-map
+         ("C-o" . casual-ibuffer-tmenu)
+         ("F" . casual-ibuffer-filter-tmenu)
+         ("s" . casual-ibuffer-sortby-tmenu))
+  :after (ibuffer))
+
 ;; Formatting
 (use-package apheleia
   :diminish apheleia-mode
