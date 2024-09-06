@@ -402,6 +402,10 @@
   (global-diff-hl-mode)
   (diff-hl-flydiff-mode))
 
+(use-package nerd-icons-dired
+  :hook
+  (dired-mode . nerd-icons-dired-mode))
+
 ;; Terminal
 (use-package vterm
   :hook
