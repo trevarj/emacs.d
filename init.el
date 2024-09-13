@@ -46,6 +46,7 @@
   (global-display-line-numbers-mode)            ; Globally display line numbers
   (global-hl-line-mode)                         ; Highlight cursor line
   (global-auto-revert-mode)                     ; Auto-refresh buffers
+  (auto-fill-mode)                              ; Autofill mode
   ;; Fonts
   (set-face-attribute 'default nil :family "Iosevka JBM" :height 150 :weight 'medium)
   (set-face-attribute 'fixed-pitch nil :font "Iosevka JBM" :height 150)
@@ -100,6 +101,7 @@
    scroll-step 1                           ; Vim style scrolling
    scroll-margin 10                        ; Vim style scroll off
    fill-column 80                          ; Line width 80 chars
+   comment-auto-fill-only-comments t       ; Autofill comments only
    backup-directory-alist '(("." . "~/.cache/emacs/backups"))
    auto-save-file-name-transforms '((".*" "~/.cache/emacs/saves/" t))
    undo-limit 67108864                     ; Undo limit of 64mb.
@@ -125,7 +127,8 @@
 
   ;; Generic keybindings
   :bind
-  ("C-c b" . ibuffer))
+  (("C-c b" . ibuffer)
+   ("C-c c" . (lambda () (interactive) (find-file user-init-file)))))
 
 (use-package eldoc
   :diminish)
