@@ -487,4 +487,9 @@
 
 (provide 'init)
 
+;; ERC
+(let ((erc-conf "./erc-conf.el"))
+  (when (file-exists-p erc-conf)
+    (load-file erc-conf)))
+
 ;;; init.el ends here

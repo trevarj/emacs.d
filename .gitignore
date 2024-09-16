@@ -80,3 +80,6 @@ projectile-bookmarks.eld
 
 # perspective
 persp-state
+
+# erc config
+erc-conf.el
