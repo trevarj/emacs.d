@@ -250,7 +250,6 @@
          :map minibuffer-local-map
          ("M-r" . consult-history)
          ("M-s" . consult-history))                 ;; orig. next-matching-history-element
-  :init
   ;; https://github.com/minad/consult?tab=readme-ov-file#custom-variables
   :config
   (setq read-buffer-completion-ignore-case t
@@ -350,7 +349,6 @@
 
 ;; Casual / Transient UIs
 (use-package casual-dired
-  :ensure t
   :bind (:map dired-mode-map
               ("C-o" . #'casual-dired-tmenu)
               ("s" . #'casual-dired-sort-by-tmenu)
@@ -478,12 +476,9 @@
   :config
   (add-to-list 'geiser-guile-load-path "~/Workspace/guix"))
 
-;; Guix (emacs-guix)
-(use-package guix
-  :if (executable-find "guix"))
-
 ;; Markdown
-(use-package markdown-mode)
+(use-package markdown-mode
+  :defer 2)
 
 (provide 'init)
 
