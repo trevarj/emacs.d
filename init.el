@@ -44,7 +44,6 @@
   (desktop-save-mode)                           ; Session saving
   (column-number-mode)                          ; Column number mode
   (global-display-line-numbers-mode)            ; Globally display line numbers
-  (global-hl-line-mode)                         ; Highlight cursor line
   (global-auto-revert-mode)                     ; Auto-refresh buffers
   (auto-fill-mode)                              ; Autofill mode
   ;; Fonts
@@ -381,12 +380,7 @@
         '(shfmt)))
 
 ;; Colorize hex color codes
-(use-package rainbow-mode
-  :hook (rainbow-mode . toggle-hl-mode))
-
-(defun toggle-hl-mode nil
-  "Toggle `hl-line-mode' since it interferes with `rainbow-mode'."
-  (global-hl-line-mode (if rainbow-mode -1 +1)))
+(use-package rainbow-mode)
 
 ;; Git
 (setq epg-pinentry-mode 'loopback) ; pinentry on minibuffer
@@ -411,8 +405,7 @@
 (use-package vterm
   :hook
   (vterm-mode . (lambda ()
-                  (display-line-numbers-mode 0)
-                  (hl-line-mode 0)))
+                  (display-line-numbers-mode 0)))
   :config
   (custom-set-faces
    '(term-color-bright-black ((t (:foreground "#4C566A"))))))
@@ -480,11 +473,11 @@
 (use-package markdown-mode
   :defer 2)
 
-(provide 'init)
+;; IRC/ERC
+(let ((erc-init (expand-file-name "erc-init.el" user-emacs-directory)))
+  (when (file-exists-p erc-init)
+    (load-file erc-init)))
 
-;; ERC
-(let ((erc-conf "./erc-conf.el"))
-  (when (file-exists-p erc-conf)
-    (load-file erc-conf)))
+(provide 'init)
 
 ;;; init.el ends here

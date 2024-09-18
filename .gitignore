@@ -82,4 +82,4 @@ projectile-bookmarks.eld
 persp-state
 
 # erc config
-erc-conf.el
+erc-init.el
