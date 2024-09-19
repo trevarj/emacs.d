@@ -3,6 +3,13 @@
 ;;; Commentary:
 ;;; A minimalistic development environment
 
+(defun display-startup-time ()
+  (message "Emacs loaded in %s with %d garbage collections."
+           (format "%.2f seconds"
+                   (float-time
+                    (time-subtract after-init-time before-init-time)))
+           gcs-done))
+
 ;; straight.el package manager
 (defvar bootstrap-version)
 (setq straight-use-package-by-default t)
@@ -21,18 +28,12 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
+(defun header-line-file-path ()
+  "Set `header-line-format' if symbol `buffer-file-name' is not nil."
+  (when buffer-file-name
+    (setq header-line-format '("%f"))))
+
 (use-package emacs
-  :preface
-  (defun display-startup-time ()
-    (message "Emacs loaded in %s with %d garbage collections."
-             (format "%.2f seconds"
-                     (float-time
-                      (time-subtract after-init-time before-init-time)))
-             gcs-done))
-  (defun header-line-file-path ()
-    "Set `header-line-format' if symbol `buffer-file-name' is not nil."
-    (when buffer-file-name
-      (setq header-line-format '("%f"))))
   :ensure nil
   :hook
   ((emacs-startup . display-startup-time)
@@ -256,15 +257,6 @@
 
 ;; Completion
 (use-package corfu
-  :preface
-  (defun corfu-enable-always-in-minibuffer ()
-    "Enable Corfu in the minibuffer if Vertico is not active."
-    (unless (or (bound-and-true-p vertico--input)
-                (eq (current-local-map) read-passwd-map))
-      ;; (setq-local corfu-auto nil) ;; Enable/disable auto completion
-      (setq-local corfu-echo-delay nil ;; Disable automatic echo and popup
-                  corfu-popupinfo-delay nil)
-      (corfu-mode)))
   :init (global-corfu-mode)
   :hook
   ('minibuffer-setup . #'corfu-enable-always-in-minibuffer)
@@ -303,6 +295,15 @@
   :init
   (unless (display-graphic-p)
     (corfu-doc-terminal-mode)))
+
+(defun corfu-enable-always-in-minibuffer ()
+  "Enable Corfu in the minibuffer if Vertico is not active."
+  (unless (or (bound-and-true-p vertico--input)
+              (eq (current-local-map) read-passwd-map))
+    ;; (setq-local corfu-auto nil) ;; Enable/disable auto completion
+    (setq-local corfu-echo-delay nil ;; Disable automatic echo and popup
+                corfu-popupinfo-delay nil)
+    (corfu-mode)))
 
 ;; Completion-at-point helper
 (use-package cape
@@ -441,11 +442,6 @@
 
 ;; Lisps
 (use-package parinfer-rust-mode
-  :preface
-  (defun safe-parinfer-rust-mode nil
-    "Safely turn on `parinfer-rust-mode'."
-    (electric-pair-mode nil) ; conflicts with parinfer
-    (parinfer-rust-mode))
   :config
   (setq
    parinfer-rust-troublesome-modes '())
@@ -454,6 +450,11 @@
    :foreground (cadr (assoc 'base6 doom-themes--colors)))
   :hook
   ((emacs-lisp-mode sly-mode geiser-mode) . safe-parinfer-rust-mode))
+
+(defun safe-parinfer-rust-mode nil
+  "Safely turn on `parinfer-rust-mode'."
+  (electric-pair-mode nil) ; conflicts with parinfer
+  (parinfer-rust-mode))
 
 ;; Rust
 (use-package rust-mode
