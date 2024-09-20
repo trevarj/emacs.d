@@ -164,7 +164,8 @@
   (custom-set-faces
    `(cursor ((t (:background "#d08770"))))
    `(font-lock-function-name-face ((t (:foreground "#d08770" :weight extra-bold))))
-   `(erc-pal-face ((t (:foreground "#ebcb8b" :weight bold))))))
+   `(erc-pal-face ((t (:foreground "#d08770" :weight bold))))
+   `(corfu-border ((t (:background "#d08770"))))))
 
 ;; Diminish minor modes
 (use-package diminish
