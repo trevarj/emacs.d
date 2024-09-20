@@ -37,7 +37,6 @@
    erc-fill-function 'erc-fill-static
    erc-fill-static-center 16)
   (add-to-list 'erc-modules 'nicks)
-  (add-to-list 'erc-modules 'button)
   (add-to-list 'erc-modules 'spelling)
   (add-to-list 'erc-modules 'scrolltobottom)
   ;; (add-to-list 'erc-modules 'notifications)
@@ -47,6 +46,7 @@
   ((erc-mode . (lambda ()
                  (display-line-numbers-mode 0)
                  (auto-fill-mode -1)
+                 (apheleia-mode -1)
                  (setq-local scroll-margin 0)))
    (erc-text-matched . erc-hide-fools))
   :bind
