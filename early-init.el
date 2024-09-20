@@ -2,8 +2,8 @@
 
 ;; Startup hacks
 (setq gc-cons-threshold (* 1024 1024 100))
-(setq file-name-handler-alist-original file-name-handler-alist)
-(setq file-name-handler-alist nil)
+;; (setq file-name-handler-alist-original file-name-handler-alist)
+;; (setq file-name-handler-alist nil)
 
 (setq package-enable-at-startup nil)        ; Disable emacs package manager
 (scroll-bar-mode -1)                        ; Disable visible scrollbar

@@ -83,3 +83,6 @@ persp-state
 
 # erc config
 erc-init.el
+
+# secrets file
+secrets.el
