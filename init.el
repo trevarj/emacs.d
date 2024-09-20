@@ -3,38 +3,39 @@
 ;;; Commentary:
 ;;; A minimalistic development environment
 
-(defun display-startup-time ()
-  (message "Emacs loaded in %s with %d garbage collections."
-           (format "%.2f seconds"
-                   (float-time
-                    (time-subtract after-init-time before-init-time)))
-           gcs-done))
-
-;; straight.el package manager
-(defvar bootstrap-version)
-(setq straight-use-package-by-default t)
-(let ((bootstrap-file
-       (expand-file-name
-        "straight/repos/straight.el/bootstrap.el"
-        (or (bound-and-true-p straight-base-dir)
-            user-emacs-directory)))
-      (bootstrap-version 7))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
-
-(defun header-line-file-path ()
-  "Set `header-line-format' if symbol `buffer-file-name' is not nil."
-  (when buffer-file-name
-    (setq header-line-format '("%f"))))
-
 (use-package emacs
-  :ensure nil
+  :demand t
+  :preface
+  (defun display-startup-time ()
+    (message "Emacs loaded in %s with %d garbage collections."
+             (format "%.2f seconds"
+                     (float-time
+                      (time-subtract after-init-time before-init-time)))
+             gcs-done))
+
+  ;; straight.el package manager
+  (defvar bootstrap-version)
+  (setq straight-use-package-by-default t)
+  (let ((bootstrap-file
+         (expand-file-name
+          "straight/repos/straight.el/bootstrap.el"
+          (or (bound-and-true-p straight-base-dir)
+              user-emacs-directory)))
+        (bootstrap-version 7))
+    (unless (file-exists-p bootstrap-file)
+      (with-current-buffer
+          (url-retrieve-synchronously
+           "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+           'silent 'inhibit-cookies)
+        (goto-char (point-max))
+        (eval-print-last-sexp)))
+    (load bootstrap-file nil 'nomessage))
+
+  (defun header-line-file-path ()
+    "Set `header-line-format' if symbol `buffer-file-name' is not nil."
+    (when buffer-file-name
+      (setq header-line-format '("%f"))))
+
   :hook
   ((emacs-startup . display-startup-time)
    (buffer-list-update . header-line-file-path))
@@ -107,6 +108,7 @@
    undo-strong-limit 100663296             ;               96mb.
    undo-outer-limit 1006632960             ;               960mb.
    eldoc-echo-area-use-multiline-p nil
+   epg-pinentry-mode 'loopback             ; pinentry on minibuffer
    mouse-wheel-progressive-speed nil
    mouse-wheel-scroll-amount
    '(3
@@ -118,7 +120,7 @@
                    user-emacs-directory)
    send-mail-function
    'message-send-mail-with-sendmail)       ; Use sendmail
-  (defalias 'yes-or-no #'y-or-n-p)              ; Easier question
+  (defalias 'yes-or-no #'y-or-n-p)         ; Easier question
 
   ;; Mode maps
   (add-to-list 'major-mode-remap-alist '(rust-mode . rust-ts-mode))
@@ -258,7 +260,17 @@
 
 ;; Completion
 (use-package corfu
-  :init (global-corfu-mode)
+  :init
+  (global-corfu-mode)
+  (defun corfu-enable-always-in-minibuffer ())
+  "Enable Corfu in the minibuffer if Vertico is not active."
+  (unless (or (bound-and-true-p vertico--input)
+              (eq (current-local-map) read-passwd-map))
+    ;; (setq-local corfu-auto nil) ;; Enable/disable auto completion
+    (setq-local corfu-echo-delay nil ;; Disable automatic echo and popup
+                corfu-popupinfo-delay nil)
+    (corfu-mode))
+
   :hook
   ('minibuffer-setup . #'corfu-enable-always-in-minibuffer)
   :config
@@ -296,15 +308,6 @@
   :init
   (unless (display-graphic-p)
     (corfu-doc-terminal-mode)))
-
-(defun corfu-enable-always-in-minibuffer ()
-  "Enable Corfu in the minibuffer if Vertico is not active."
-  (unless (or (bound-and-true-p vertico--input)
-              (eq (current-local-map) read-passwd-map))
-    ;; (setq-local corfu-auto nil) ;; Enable/disable auto completion
-    (setq-local corfu-echo-delay nil ;; Disable automatic echo and popup
-                corfu-popupinfo-delay nil)
-    (corfu-mode)))
 
 ;; Completion-at-point helper
 (use-package cape
@@ -384,7 +387,6 @@
 (use-package rainbow-mode)
 
 ;; Git
-(setq epg-pinentry-mode 'loopback) ; pinentry on minibuffer
 (use-package magit
   :config
   (setq magit-define-global-key-bindings 'recommended
@@ -443,6 +445,11 @@
 
 ;; Lisps
 (use-package parinfer-rust-mode
+  :preface
+  (defun safe-parinfer-rust-mode nil
+    "Safely turn on `parinfer-rust-mode'."
+    (electric-pair-mode nil) ; conflicts with parinfer
+    (parinfer-rust-mode))
   :config
   (setq
    parinfer-rust-troublesome-modes '())
@@ -451,11 +458,6 @@
    :foreground (cadr (assoc 'base6 doom-themes--colors)))
   :hook
   ((emacs-lisp-mode sly-mode geiser-mode) . safe-parinfer-rust-mode))
-
-(defun safe-parinfer-rust-mode nil
-  "Safely turn on `parinfer-rust-mode'."
-  (electric-pair-mode nil) ; conflicts with parinfer
-  (parinfer-rust-mode))
 
 ;; Rust
 (use-package rust-mode
