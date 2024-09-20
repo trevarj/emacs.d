@@ -37,8 +37,10 @@
   (add-to-list 'erc-modules 'nicks)
   (add-to-list 'erc-modules 'button)
   (add-to-list 'erc-modules 'spelling)
+  (add-to-list 'erc-modules 'scrolltobottom)
   ;; (add-to-list 'erc-modules 'notifications)
   (erc-spelling-mode t)
+  (erc-scrolltobottom-mode)
   :hook
   ((erc-mode . (lambda ()
                  (display-line-numbers-mode 0)
