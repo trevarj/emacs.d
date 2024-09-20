@@ -40,7 +40,8 @@
   (add-to-list 'erc-modules 'spelling)
   (add-to-list 'erc-modules 'scrolltobottom)
   ;; (add-to-list 'erc-modules 'notifications)
-  (erc-spelling-mode t)
+  (erc-track-mode)
+  (erc-spelling-mode)
   (erc-scrolltobottom-mode)
   :hook
   ((erc-mode . (lambda ()
