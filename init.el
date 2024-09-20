@@ -161,7 +161,8 @@
   (doom-themes-org-config)
   (custom-set-faces
    `(cursor ((t (:background "#d08770"))))
-   `(font-lock-function-name-face ((t (:foreground "#d08770" :weight extra-bold))))))
+   `(font-lock-function-name-face ((t (:foreground "#d08770" :weight extra-bold))))
+   `(erc-pal-face ((t (:foreground "#ebcb8b" :weight bold))))))
 
 ;; Diminish minor modes
 (use-package diminish
