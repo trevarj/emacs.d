@@ -1,9 +1,7 @@
 ;;; -*- lexical-binding: t -*-
 
 (use-package erc
-  :functions erc/toggle-fools
   :preface
-  (load-library (expand-file-name "secrets.el.gpg" user-emacs-directory))
   (defun erc/connect ()
     (interactive)
     (erc :server "orangepi"
@@ -20,6 +18,7 @@
   (defun erc-match-directed-at-fools-p (msg)
     nil)
   :config
+  (load-library (expand-file-name "secrets.el.gpg" user-emacs-directory))
   (setq
    erc-server "orangepi"
    erc-port "7777"
