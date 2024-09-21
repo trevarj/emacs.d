@@ -2,14 +2,14 @@
 
 (use-package erc
   :preface
-  (defun erc/connect ()
+  (defun erc-connect ()
     (interactive)
     (erc :server "orangepi"
          :port 7777
          :user "trev"
          :password my/erc-password))
   (let ((hidden-fools t))
-    (defun erc/toggle-fools ()
+    (defun erc-toggle-fools ()
       (interactive)
       (setq hidden-fools (not hidden-fools))
       (erc-match-toggle-hidden-fools hidden-fools)
@@ -50,8 +50,8 @@
                  (setq-local scroll-margin 0)))
    (erc-text-matched . erc-hide-fools))
   :bind
-  (("C-c e" . 'erc/connect)
+  (("C-c e" . 'erc-connect)
    :map erc-mode-map
-   ("C-c -" . 'erc/toggle-fools)))
+   ("C-c -" . 'erc-toggle-fools)))
 
 (provide 'erc-init)
