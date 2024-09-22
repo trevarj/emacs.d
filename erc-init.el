@@ -15,7 +15,7 @@
       (erc-match-toggle-hidden-fools hidden-fools)
       (message "hidden fools: %s" (if hidden-fools "on" "off"))
       (set-buffer-modified-p t)))
-  (defun erc-match-directed-at-fools-p (msg)
+  (defun erc-match-directed-at-fool-p (msg)
     nil)
   :config
   (load-library (expand-file-name "secrets.el.gpg" user-emacs-directory))
