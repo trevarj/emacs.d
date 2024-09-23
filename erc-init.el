@@ -31,6 +31,8 @@
    erc-fools my/erc-fools
    erc-fool-highlight-type 'all
    erc-keywords '("linux" "rust")
+   erc-insert-timestamp-function 'erc-insert-timestamp-left
+   erc-timestamp-format "[%H:%M]"
    erc-fill-function 'erc-fill-static
    erc-fill-static-center 16)
   (add-to-list 'erc-modules 'nicks)
