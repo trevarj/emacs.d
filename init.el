@@ -135,6 +135,7 @@
   ;; Generic keybindings
   :bind
   (("C-c b" . ibuffer)
+   ("C-x C-z" . nil) ; disable suspend-frame
    ("C-c c" . (lambda () (interactive) (find-file user-init-file)))))
 
 (use-package eldoc
@@ -170,6 +171,8 @@
   (custom-set-faces
    `(cursor ((t (:background "#d08770"))))
    `(font-lock-function-name-face ((t (:foreground "#d08770" :weight extra-bold))))
+   '(erc-current-nick-face ((t (:foreground "#bf616a" :weight bold))))
+   `(erc-nick-default-face ((t (:foreground "#ebcb8b" :weight bold))))
    `(erc-pal-face ((t (:foreground "#d08770" :weight bold))))
    `(corfu-border ((t (:background "#d08770"))))))
 

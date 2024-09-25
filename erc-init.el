@@ -30,16 +30,14 @@
    erc-pals my/erc-pals
    erc-fools my/erc-fools
    erc-fool-highlight-type 'all
+   erc-current-nick-highlight-type 'nick-or-keyword
    erc-keywords '("linux" "rust")
    erc-insert-timestamp-function 'erc-insert-timestamp-left
-   erc-timestamp-format "[%H:%M]"
+   erc-timestamp-format "%H:%M"
    erc-fill-function 'erc-fill-static
    erc-fill-static-center 16)
-  (add-to-list 'erc-modules 'nicks)
-  (add-to-list 'erc-modules 'spelling)
-  (add-to-list 'erc-modules 'scrolltobottom)
-  ;; (add-to-list 'erc-modules 'notifications)
-  (erc-track-mode)
+  (setopt erc-modules
+          (seq-union '(nicks scrolltobottom spelling) erc-modules))
   (erc-spelling-mode)
   (erc-scrolltobottom-mode)
   (defun erc-match-directed-at-fool-p (msg) nil)
@@ -48,6 +46,7 @@
                  (display-line-numbers-mode 0)
                  (auto-fill-mode -1)
                  (apheleia-mode -1)
+                 (corfu-mode -1)
                  (setq-local scroll-margin 0)))
    (erc-text-matched . erc-hide-fools))
   :bind
