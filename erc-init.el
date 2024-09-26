@@ -24,8 +24,9 @@
    erc-user-full-name "trev"
    erc-prompt 'erc-prompt-format
    erc-prompt-format (propertize "%n:" 'font-lock-face 'erc-input-face)
-   erc-track-exclude-types '("JOIN" "NICK" "QUIT" "MODE" "AWAY" "PART")
-   erc-hide-list '("JOIN" "NICK" "QUIT" "MODE" "AWAY" "PART")
+   erc-track-exclude-types '("JOIN" "NICK" "QUIT" "MODE" "AWAY" "PART"
+                             "353" "324" "332" "329" "333" "477")
+   erc-hide-list '("JOIN" "NICK" "QUIT" "MODE" "AWAY" "PART" "353")
    erc-track-exclude-server-buffer t
    erc-pals my/erc-pals
    erc-fools my/erc-fools
