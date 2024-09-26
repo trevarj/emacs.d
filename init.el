@@ -138,9 +138,6 @@
    ("C-x C-z" . nil) ; disable suspend-frame
    ("C-c c" . (lambda () (interactive) (find-file user-init-file)))))
 
-(use-package eldoc
-  :diminish)
-
 ;; Ligatures
 (use-package ligature
   :demand
@@ -326,7 +323,6 @@
 
 ;; Treesitter
 (use-package treesit-auto
-  :demand
   :custom
   (treesit-auto-install 'prompt)
   :config
@@ -360,6 +356,9 @@
   (("C-c w" . #'avy-goto-word-1)
    ("C-c s" . #'avy-goto-char)))
 
+(use-package casual-avy
+  :bind ("C-c a" . casual-avy-tmenu))
+
 ;; Casual / Transient UIs
 (use-package casual-dired
   :bind (:map dired-mode-map
@@ -367,14 +366,10 @@
               ("s" . #'casual-dired-sort-by-tmenu)
               ("/" . #'casual-dired-search-replace-tmenu)))
 
-(use-package casual-avy
-  :ensure t
-  :bind ("C-c a" . casual-avy-tmenu))
-
 (use-package ibuffer
   :hook (ibuffer-mode . ibuffer-auto-mode))
+
 (use-package casual-ibuffer
-  :ensure t
   :bind (:map
          ibuffer-mode-map
          ("C-o" . casual-ibuffer-tmenu)
@@ -483,8 +478,7 @@
   (add-to-list 'geiser-guile-load-path "~/Workspace/guix"))
 
 ;; Markdown
-(use-package markdown-mode
-  :defer 2)
+(use-package markdown-mode)
 
 ;; IRC/ERC
 (let ((erc-init (expand-file-name "erc-init.el" user-emacs-directory)))
