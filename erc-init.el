@@ -8,6 +8,9 @@
          :port 7777
          :user "trev"
          :password my/erc-password))
+  (defun erc-clear-query-buffer ()
+    (when (erc-query-buffer-p)
+      (erc-send-input-line "*status" (format "clearbuffer %s" (erc-target)))))
   (let ((hidden-fools t))
     (defun erc-toggle-fools ()
       (interactive)
@@ -17,6 +20,13 @@
       (set-buffer-modified-p t)))
   :config
   (load-library (expand-file-name "secrets.el.gpg" user-emacs-directory))
+  ;; Fix for restoring query buffers with self-messages
+  (advice-add #'erc-login
+              :before (lambda ()
+                        (erc-server-send "CAP REQ :znc.in/self-message")
+                        (erc-server-send "CAP END")))
+  ;; Clear out query bufs when using using `AutoClearQueryBuffer = false`
+  (add-to-list 'erc-kill-buffer-hook 'erc-clear-query-buffer)
   (setq
    erc-server "orangepi"
    erc-port "7777"
@@ -28,6 +38,7 @@
                              "353" "324" "332" "329" "333" "477")
    erc-hide-list '("JOIN" "NICK" "QUIT" "MODE" "AWAY" "PART" "353")
    erc-track-exclude-server-buffer t
+   erc-track-exclude '("#emacs")
    erc-pals my/erc-pals
    erc-fools my/erc-fools
    erc-fool-highlight-type 'all
