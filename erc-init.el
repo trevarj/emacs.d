@@ -46,6 +46,7 @@
    erc-keywords '("linux" "rust")
    erc-insert-timestamp-function 'erc-insert-timestamp-left
    erc-timestamp-format "%H:%M"
+   erc-receive-query-display 'bury
    erc-fill-function 'erc-fill-static
    erc-fill-static-center 16)
   (setopt erc-modules
