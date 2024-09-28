@@ -38,7 +38,7 @@
                              "353" "324" "332" "329" "333" "477")
    erc-hide-list '("JOIN" "NICK" "QUIT" "MODE" "AWAY" "PART" "353")
    erc-track-exclude-server-buffer t
-   erc-track-exclude '("#emacs" "#systemcrafters-live")
+   erc-track-exclude '("#emacs" "#systemcrafters-live" "*status")
    erc-pals my/erc-pals
    erc-fools my/erc-fools
    erc-fool-highlight-type 'all
