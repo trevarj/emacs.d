@@ -96,6 +96,7 @@
   (setq
    use-package-always-defer t              ; always defer packages, use :demand instead
    custom-file "/tmp/custom.el"            ; customization file
+   desktop-load-locked-desktop 'check-pid  ; load if lock pid doesn't exist
    display-line-numbers-grow-only t        ; Never shrink the linum width
    display-line-numbers-width-start t      ; Calculate linum width at start
    confirm-kill-emacs nil
