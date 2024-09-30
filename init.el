@@ -182,6 +182,11 @@
   :demand
   :diminish auto-revert-mode) ; doesn't work in :config above
 
+(use-package xref
+  :custom
+  (xref-auto-jump-to-first-definition 'show)
+  (xref-search-program 'ripgrep))
+
 ;; Keybinding
 (use-package which-key
   :diminish which-key-mode
