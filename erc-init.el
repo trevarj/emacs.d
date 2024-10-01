@@ -48,7 +48,6 @@
    erc-fools my/erc-fools
    erc-fool-highlight-type 'all
    erc-current-nick-highlight-type 'nick-or-keyword
-   erc-keywords '("linux" "rust")
    erc-insert-timestamp-function 'erc-insert-timestamp-left
    erc-timestamp-format "%H:%M"
    erc-nicks-colors erc-custom-nick-colors
