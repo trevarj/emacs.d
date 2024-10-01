@@ -1,9 +1,6 @@
 ;;; https://github.com/kensanata/ggg
 
-(setq ;; You need to replace this email address with your own!
- user-mail-address "tmarjeski@gmail.com"
- user-full-name "Trevor Arjeski"
- 
+(setq
  ;; You need to replace this key ID with your own key ID!
  mml-secure-openpgp-signers '("A52D68794EBED758")
  ;; This tells Gnus to get email from Gmail via IMAP.
@@ -27,6 +24,8 @@
  gnus-agent nil
  ;; We don't want local, unencrypted copies of emails we write.
  gnus-message-archive-group nil
+ ;; Group by subject
+ gnus-summary-thread-gathering-function 'gnus-gather-threads-by-subject
  ;; We want to be able to read the emails we wrote.
  mml-secure-openpgp-encrypt-to-self t)
 
