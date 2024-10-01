@@ -18,6 +18,8 @@
       (erc-match-toggle-hidden-fools hidden-fools)
       (message "hidden fools: %s" (if hidden-fools "on" "off"))
       (set-buffer-modified-p t)))
+  (defun get-doom-theme-color (name)
+    (car (alist-get name doom-themes--colors)))
   :config
   (load-library (expand-file-name "secrets.el.gpg" user-emacs-directory))
   ;; Fix for restoring query buffers with self-messages
@@ -27,6 +29,9 @@
                         (erc-server-send "CAP END")))
   ;; Clear out query bufs when using using `AutoClearQueryBuffer = false`
   (add-to-list 'erc-kill-buffer-hook 'erc-clear-query-buffer)
+  (setq erc-custom-nick-colors
+        (mapcar 'get-doom-theme-color
+                '(orange yellow teal blue dark-blue cyan violet)))
   (setq
    erc-server "orangepi"
    erc-port "7777"
@@ -46,9 +51,18 @@
    erc-keywords '("linux" "rust")
    erc-insert-timestamp-function 'erc-insert-timestamp-left
    erc-timestamp-format "%H:%M"
+   erc-nicks-colors erc-custom-nick-colors
+   erc-nicks--create-pool-function 'erc-nicks--create-culled-pool ; for above to work
    erc-receive-query-display 'bury
    erc-fill-function 'erc-fill-static
    erc-fill-static-center 16)
+  (custom-set-faces
+   `(erc-current-nick-face ((t (:foreground
+                                ,(get-doom-theme-color 'red)
+                                :weight heavy))))
+   `(erc-pal-face ((t (:foreground
+                       ,(get-doom-theme-color 'green)
+                       :weight heavy)))))
   (setopt erc-modules
           (seq-union '(nicks scrolltobottom spelling) erc-modules))
   (erc-spelling-mode)

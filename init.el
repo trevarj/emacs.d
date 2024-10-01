@@ -94,6 +94,8 @@
                     (let ((buffer-file-name (buffer-name)))
                       (set-auto-mode)))))
   (setq
+   user-full-name "Trevor Arjeski"
+   user-mail-address "tmarjeski@gmail.com"
    use-package-always-defer t              ; always defer packages, use :demand instead
    custom-file "/tmp/custom.el"            ; customization file
    desktop-load-locked-desktop 'check-pid  ; load if lock pid doesn't exist
@@ -169,9 +171,6 @@
   (custom-set-faces
    `(cursor ((t (:background "#d08770"))))
    `(font-lock-function-name-face ((t (:foreground "#d08770" :weight extra-bold))))
-   '(erc-current-nick-face ((t (:foreground "#bf616a" :weight bold))))
-   `(erc-nick-default-face ((t (:foreground "#ebcb8b" :weight bold))))
-   `(erc-pal-face ((t (:foreground "#d08770" :weight bold))))
    `(corfu-border ((t (:background "#d08770"))))))
 
 ;; Diminish minor modes
