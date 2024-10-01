@@ -59,6 +59,7 @@
   (custom-set-faces
    `(erc-current-nick-face ((t (:foreground
                                 ,(get-doom-theme-color 'red)
+                                :slant italic
                                 :weight heavy))))
    `(erc-pal-face ((t (:foreground
                        ,(get-doom-theme-color 'green)
