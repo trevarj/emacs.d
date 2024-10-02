@@ -528,7 +528,6 @@
    erc-hide-list '("JOIN" "NICK" "QUIT" "MODE" "AWAY" "PART" "353")
    erc-track-exclude-server-buffer t
    erc-track-exclude '("#emacs" "#systemcrafters-live" "*status")
-   erc-pals my/erc-pals
    erc-fools my/erc-fools
    erc-fool-highlight-type 'all
    erc-current-nick-highlight-type 'nick-or-keyword
@@ -544,10 +543,7 @@
    `(erc-current-nick-face ((t (:foreground
                                 ,(get-doom-theme-color 'red)
                                 :slant italic
-                                :weight heavy))))
-   `(erc-pal-face ((t (:foreground
-                       ,(get-doom-theme-color 'green)
-                       :weight heavy)))))
+                                :weight heavy)))))
   (setopt erc-modules
           (seq-union '(nicks scrolltobottom spelling) erc-modules))
   (erc-spelling-mode)
