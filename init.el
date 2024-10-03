@@ -103,6 +103,7 @@
    display-line-numbers-width-start t      ; Calculate linum width at start
    confirm-kill-emacs nil
    use-dialog-box nil                      ; Bye
+   use-short-answers t                     ; y/n
    global-auto-revert-non-file-buffers t   ; Auto-refresh buffers like dired
    auto-revert-verbose nil                 ; But silence it
    enable-recursive-minibuffers t          ; Recursive mini-buffers
@@ -127,9 +128,7 @@
    gnus-init-file (expand-file-name
                    "gnus/gnus.el"
                    user-emacs-directory)
-   send-mail-function
-   'message-send-mail-with-sendmail)       ; Use sendmail
-  (defalias 'yes-or-no #'y-or-n-p)         ; Easier question
+   send-mail-function 'message-send-mail-with-sendmail) ; Use sendmail
 
   ;; Mode maps
   (add-to-list 'major-mode-remap-alist '(rust-mode . rust-ts-mode))
