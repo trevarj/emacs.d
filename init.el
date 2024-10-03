@@ -214,6 +214,11 @@
   :init
   (vertico-mode))
 
+;; Save minibuffer history between restarts
+(use-package savehist
+  :init
+  (savehist-mode))
+
 (use-package marginalia ; completion definitions
   :init
   (marginalia-mode))
@@ -530,7 +535,7 @@
    erc-track-exclude '("#emacs" "#systemcrafters-live" "*status")
    erc-fools my/erc-fools
    erc-fool-highlight-type 'all
-   erc-current-nick-highlight-type 'nick-or-keyword
+   erc-current-nick-highlight-type 'all
    erc-insert-timestamp-function 'erc-insert-timestamp-left
    erc-timestamp-format "%H:%M"
    erc-nicks-colors (mapcar 'get-doom-theme-color
