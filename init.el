@@ -532,6 +532,8 @@
    erc-hide-list '("JOIN" "NICK" "QUIT" "MODE" "AWAY" "PART" "353")
    erc-track-exclude-server-buffer t
    erc-track-exclude '("#emacs" "#systemcrafters-live" "*status")
+   ;; works with bug#67767 v2 patch
+   erc-nicks-track-faces t
    erc-fools my/erc-fools
    erc-fool-highlight-type 'all
    erc-current-nick-highlight-type 'all
@@ -539,10 +541,13 @@
    erc-timestamp-format "%H:%M"
    erc-nicks-colors (mapcar 'get-doom-theme-color
                             '(orange yellow teal blue dark-blue cyan violet))
-   erc-nicks--create-pool-function 'erc-nicks--create-culled-pool ; for above to work
+   ;; for above to work
+   erc-nicks--create-pool-function 'erc-nicks--create-culled-pool
    erc-receive-query-display 'bury
    erc-fill-function 'erc-fill-static
    erc-fill-static-center 16)
+  ;; keep erc-track faces uniform, ex. when someone sends a url
+  (delete '(erc-button erc-default-face) erc-track-faces-priority-list)
   (custom-set-faces
    `(erc-current-nick-face ((t (:foreground
                                 ,(get-doom-theme-color 'red)
