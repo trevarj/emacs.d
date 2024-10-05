@@ -546,8 +546,6 @@
    erc-receive-query-display 'bury
    erc-fill-function 'erc-fill-static
    erc-fill-static-center 16)
-  ;; keep erc-track faces uniform, ex. when someone sends a url
-  (delete '(erc-button erc-default-face) erc-track-faces-priority-list)
   (custom-set-faces
    `(erc-current-nick-face ((t (:foreground
                                 ,(get-doom-theme-color 'red)
@@ -555,6 +553,8 @@
                                 :weight heavy)))))
   (setopt erc-modules
           (seq-union '(nicks scrolltobottom spelling) erc-modules))
+  ;; keep erc-track faces uniform, ex. when someone sends a url
+  (delete '(erc-button erc-default-face) erc-track-faces-priority-list)
   (erc-spelling-mode)
   (erc-scrolltobottom-mode)
   (defun erc-match-directed-at-fool-p (msg) nil)
