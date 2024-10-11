@@ -138,7 +138,7 @@
   :bind
   (("C-c b" . ibuffer)
    ("C-x C-z" . nil) ; disable suspend-frame
-   ("C-c c" . (lambda () (interactive) (find-file user-init-file)))))
+   ("C-c !" . (lambda () (interactive) (find-file user-init-file)))))
 
 ;; Ligatures
 (use-package ligature
