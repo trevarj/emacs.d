@@ -221,6 +221,7 @@
 (use-package marginalia ; completion definitions
   :init
   (marginalia-mode))
+
 (use-package consult ; useful commands
   ;; https://github.com/minad/consult?tab=readme-ov-file#use-package-example
   :bind (("C-M-#" . consult-register)
@@ -276,6 +277,15 @@
   (setq read-buffer-completion-ignore-case t
         read-file-name-completion-ignore-case t
         completion-ignore-case t))
+
+(use-package helpful
+  :bind
+  (("C-h f" . #'helpful-callable)
+   ("C-h v" . #'helpful-variable)
+   ("C-h k" . #'helpful-key)
+   ("C-h x" . #'helpful-command)
+   ("C-h o" . #'helpful-symbol)
+   ("C-c C-d" . #'helpful-at-point)))
 
 ;; Completion
 (use-package corfu
