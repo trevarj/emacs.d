@@ -581,6 +581,16 @@
    :map erc-mode-map
    ("C-c -" . 'erc-toggle-fools)))
 
+(use-package elfeed
+  :config
+  (setq elfeed-feeds my/elfeed-feeds)
+  :bind
+  (("C-c @" . #'elfeed))
+  :hook
+  ((elfeed-new-entry . (lambda ()
+                         (elfeed-make-tagger :before "1 month ago"
+                                             :remove 'unread)))))
+
 (provide 'init)
 
 ;;; init.el ends here
