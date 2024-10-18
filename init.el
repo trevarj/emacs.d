@@ -131,11 +131,6 @@
                    "gnus/gnus.el"
                    user-emacs-directory)
    send-mail-function 'message-send-mail-with-sendmail) ; Use sendmail
-
-  ;; Mode maps
-  (add-to-list 'major-mode-remap-alist '(rust-mode . rust-ts-mode))
-  (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
-
   ;; Generic keybindings
   :bind
   (("C-c b" . ibuffer)
@@ -347,6 +342,7 @@
 
 ;; Treesitter
 (use-package treesit-auto
+  :demand
   :custom
   (treesit-auto-install 'prompt)
   :config
