@@ -112,6 +112,8 @@
    scroll-margin 10                        ; Vim style scroll off
    fill-column 80                          ; Line width 80 chars
    comment-auto-fill-only-comments t       ; Autofill comments only
+   mode-line-front-space nil               ; Nicer -nw mode line
+   mode-line-end-spaces nil                ; ^
    backup-directory-alist '(("." . "~/.cache/emacs/backups"))
    auto-save-file-name-transforms '((".*" "~/.cache/emacs/saves/" t))
    undo-limit 67108864                     ; Undo limit of 64mb.

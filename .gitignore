@@ -67,6 +67,8 @@ recentf
 # last place in files
 places
 
+history
+
 transient/
 parinfer-rust/
 projects
