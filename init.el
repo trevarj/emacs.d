@@ -583,13 +583,10 @@
 
 (use-package elfeed
   :config
+  (load-library (expand-file-name "secrets.el.gpg" user-emacs-directory))
   (setq elfeed-feeds my/elfeed-feeds)
   :bind
-  (("C-c @" . #'elfeed))
-  :hook
-  ((elfeed-new-entry . (lambda ()
-                         (elfeed-make-tagger :before "1 month ago"
-                                             :remove 'unread)))))
+  (("C-c @" . #'elfeed)))
 
 (provide 'init)
 
