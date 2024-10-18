@@ -306,7 +306,10 @@
         corfu-popupinfo-delay 0
         corfu-quit-no-match 'separator
         corfu-preview-current nil
-        tab-always-indent 'complete))
+        tab-always-indent 'complete)
+  :bind
+  (:map corfu-map
+        ("RET" . nil)))
 
 (use-package orderless
   :custom
@@ -571,7 +574,6 @@
                  (display-line-numbers-mode 0)
                  (auto-fill-mode -1)
                  (apheleia-mode -1)
-                 (corfu-mode -1)
                  (setq-local scroll-margin 0)))
    (erc-text-matched . erc-hide-fools))
   :bind
