@@ -137,7 +137,7 @@
    send-mail-function 'message-send-mail-with-sendmail) ; Use sendmail
   ;; Generic keybindings
   :bind
-  (("C-c b" . ibuffer)
+  (("C-x b" . ibuffer)
    ("C-x C-z" . nil) ; disable suspend-frame
    ("C-c !" . 'open-user-config)))
 
@@ -226,45 +226,39 @@
   :init
   (marginalia-mode))
 
-(use-package consult ; useful commands
+(use-package consult
   ;; https://github.com/minad/consult?tab=readme-ov-file#use-package-example
-  :bind (("C-M-#" . consult-register)
+  :bind (("C-c c r" . consult-register)
          ("C-c /" . consult-ripgrep)
          ("C-c <SPC>" . consult-fd)
-         ("C-c M-x" . consult-mode-command)
-         ("C-c h" . consult-history)
-         ("C-c i" . consult-info)
-         ("C-c k" . consult-kmacro)
-         ("C-c m" . consult-man)
-         ("C-c r" . consult-recent-file)
+         ("C-c c M-x" . consult-mode-command)
+         ("C-c c h" . consult-history)
+         ("C-c c i" . consult-info)
+         ("C-c c k" . consult-kmacro)
+         ("C-c c m" . consult-man)
+         ("C-c c r" . consult-recent-file)
          ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
          ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
-         ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
-         ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
-         ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
-         ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
-         ("C-x t b" . consult-buffer-other-tab)    ;; orig. switch-to-buffer-other-tab
-         ("M-#" . consult-register-load)
-         ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+         ("C-c c M-:" . consult-complex-command)     ;; orig. repeat-complex-command
+         ("C-c b" . consult-buffer)                ;; orig. switch-to-buffer
+         ("C-c c p" . consult-project-buffer)      ;; orig. project-switch-to-buffer
+         ("C-c c b" . consult-bookmark)            ;; orig. bookmark-jump
+         ("M-g i" . consult-imenu)
          ("M-g I" . consult-imenu-multi)
          ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
          ("M-g e" . consult-compile-error)
          ("M-g f" . consult-flymake)               ;; Alternative: consult-flymake
          ("M-g g" . consult-goto-line)             ;; orig. goto-line
-         ("M-g i" . consult-imenu)
          ("M-g k" . consult-global-mark)
          ("M-g m" . consult-mark)
          ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
          ("M-s G" . consult-git-grep)
          ("M-s L" . consult-line-multi)
          ("M-s c" . consult-locate)
-         ("M-s d" . consult-fd)                    ;; Alternative: consult-find
          ("M-s e" . consult-isearch-history)
-         ("M-s g" . consult-grep)
          ("M-s k" . consult-keep-lines)
-         ("C-s" . consult-line)
-         ("M-s r" . consult-ripgrep)
          ("M-s u" . consult-focus-lines)
+         ("C-s" . consult-line)
          ("M-y" . consult-yank-pop)                ;; orig. yank-pop
          ([remap Info-search] . consult-info)
          :map isearch-mode-map
@@ -432,7 +426,7 @@
   :bind
   (:map eglot-mode-map
         :prefix-map eglot-prefix-keymap
-        :prefix "C-c c"
+        :prefix "C-c l"
         ("a" . eglot-code-actions)
         ("o" . eglot-code-actions-organize-imports)
         ("r" . eglot-rename)
