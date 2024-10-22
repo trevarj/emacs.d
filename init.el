@@ -42,6 +42,10 @@
         (write-file (concat "/sudo:root@localhost:" (ido-read-file-name "File:")))
       (write-file (concat "/sudo:root@localhost:" buffer-file-name))))
 
+  (defun open-user-config ()
+    "Opens user's config file"
+    (interactive) (find-file user-init-file))
+
   :hook
   ((emacs-startup . display-startup-time)
    (buffer-list-update . header-line-file-path)
@@ -135,7 +139,7 @@
   :bind
   (("C-c b" . ibuffer)
    ("C-x C-z" . nil) ; disable suspend-frame
-   ("C-c !" . (lambda () (interactive) (find-file user-init-file)))))
+   ("C-c !" . 'open-user-config)))
 
 ;; Ligatures
 (use-package ligature
