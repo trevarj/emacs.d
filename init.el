@@ -199,7 +199,7 @@
   :init
   (which-key-mode)
   :bind
-  (("C-c C-c ?" . 'which-key-show-major-mode)))
+  (("C-c K" . 'which-key-show-major-mode)))
 
 ;; Window navigation
 (use-package ace-window
