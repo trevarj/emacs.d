@@ -236,7 +236,7 @@
          ("C-c c i" . consult-info)
          ("C-c c k" . consult-kmacro)
          ("C-c c m" . consult-man)
-         ("C-c c r" . consult-recent-file)
+         ("C-c r" . consult-recent-file)
          ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
          ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
          ("C-c c M-:" . consult-complex-command)     ;; orig. repeat-complex-command
