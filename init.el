@@ -461,7 +461,8 @@
                            (:check
                             (:command "clippy")
                             :procMacro
-                            (:enable :json-false))))))
+                            (:enable :json-false))))
+          ((c-ts-mode c++-ts-mode) . ("clangd"))))
   (defalias 'start-lsp-server #'eglot)
   :hook
   (c-ts-mode . eglot-ensure)
@@ -584,6 +585,18 @@
   (setq elfeed-feeds my/elfeed-feeds)
   :bind
   (("C-c @" . #'elfeed)))
+
+(use-package leetcode
+  :straight
+  (:host github :type git
+         :repo "trevarj/leetcode.el"
+         :branch "local-cookie")
+  :config
+  (load-library (expand-file-name "secrets.el.gpg" user-emacs-directory))
+  (setq leetcode-session-cookie my/leetcode-session-cookie
+        leetcode-prefer-language "cpp"
+        leetcode-save-solutions t
+        leetcode-directory "~/Workspace/leetcode/"))
 
 (provide 'init)
 
