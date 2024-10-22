@@ -193,7 +193,9 @@
   (which-key-setup-side-window-bottom)
   (setq which-key-sort-order 'which-key-description-order)
   :init
-  (which-key-mode))
+  (which-key-mode)
+  :bind
+  (("C-c C-c ?" . 'which-key-show-major-mode)))
 
 ;; Window navigation
 (use-package ace-window
@@ -380,26 +382,8 @@
   (("C-c w" . #'avy-goto-word-1)
    ("C-c s" . #'avy-goto-char)))
 
-(use-package casual-avy
-  :bind ("C-c a" . casual-avy-tmenu))
-
-;; Casual / Transient UIs
-(use-package casual-dired
-  :bind (:map dired-mode-map
-              ("C-o" . #'casual-dired-tmenu)
-              ("s" . #'casual-dired-sort-by-tmenu)
-              ("/" . #'casual-dired-search-replace-tmenu)))
-
 (use-package ibuffer
   :hook (ibuffer-mode . ibuffer-auto-mode))
-
-(use-package casual-ibuffer
-  :bind (:map
-         ibuffer-mode-map
-         ("C-o" . casual-ibuffer-tmenu)
-         ("F" . casual-ibuffer-filter-tmenu)
-         ("s" . casual-ibuffer-sortby-tmenu))
-  :after (ibuffer))
 
 ;; Formatting
 (use-package apheleia
