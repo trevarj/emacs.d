@@ -44,13 +44,13 @@
 
   :hook
   ((emacs-startup . display-startup-time)
-   (buffer-list-update . header-line-file-path))
+   (buffer-list-update . header-line-file-path)
+   (prog-mode . display-line-numbers-mode))
   :init
   (save-place-mode)
   (recentf-mode)
   (desktop-save-mode)                           ; Session saving
   (column-number-mode)                          ; Column number mode
-  (global-display-line-numbers-mode)            ; Globally display line numbers
   (global-auto-revert-mode)                     ; Auto-refresh buffers
   (auto-fill-mode)                              ; Autofill mode
   ;; Fonts
@@ -434,9 +434,6 @@
 
 ;; Terminal
 (use-package vterm
-  :hook
-  (vterm-mode . (lambda ()
-                  (display-line-numbers-mode 0)))
   :config
   (custom-set-faces
    '(term-color-bright-black ((t (:foreground "#4C566A"))))))
@@ -571,7 +568,6 @@
   (defun erc-match-directed-at-fool-p (msg) nil)
   :hook
   ((erc-mode . (lambda ()
-                 (display-line-numbers-mode 0)
                  (auto-fill-mode -1)
                  (apheleia-mode -1)
                  (setq-local scroll-margin 0)))
