@@ -170,7 +170,8 @@
   (custom-set-faces
    `(cursor ((t (:background ,(get-doom-theme-color 'orange)))))
    `(font-lock-function-name-face ((t (:foreground ,(get-doom-theme-color 'orange) :weight extra-bold))))
-   `(corfu-border ((t (:background ,(get-doom-theme-color 'orange)))))))
+   `(corfu-border ((t (:background ,(get-doom-theme-color 'orange)))))
+   `(vertical-border ((t (:foreground ,(get-doom-theme-color 'orange)))))))
 
 ;; Diminish minor modes
 (use-package diminish
