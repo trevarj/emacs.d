@@ -480,6 +480,11 @@
   :config
   (add-to-list 'geiser-guile-load-path "~/Workspace/guix"))
 
+;; Common Lisp
+(use-package sly
+  :config
+  (setq inferior-lisp-program (executable-find "sbcl")))
+
 ;; Markdown
 (use-package markdown-mode)
 
