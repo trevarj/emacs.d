@@ -118,6 +118,8 @@
    comment-auto-fill-only-comments t       ; Autofill comments only
    mode-line-front-space nil               ; Nicer -nw mode line
    mode-line-end-spaces nil                ; ^
+   window-divider-default-right-width 16   ; Padding between splits
+   window-divider-mode t                   ; Enable above
    backup-directory-alist '(("." . "~/.cache/emacs/backups"))
    auto-save-file-name-transforms '((".*" "~/.cache/emacs/saves/" t))
    undo-limit 67108864                     ; Undo limit of 64mb.
@@ -158,7 +160,6 @@
 
 ;; Colorscheme
 (use-package doom-themes
-  :straight (doom-themes :type git :host github :repo "doomemacs/themes")
   :demand
   :preface
   (defun get-doom-theme-color (name)
@@ -171,11 +172,9 @@
   (load-theme 'doom-nord t)
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config)
-  (custom-set-faces
-   `(cursor ((t (:background ,(get-doom-theme-color 'orange)))))
-   `(font-lock-function-name-face ((t (:foreground ,(get-doom-theme-color 'orange) :weight extra-bold))))
-   `(corfu-border ((t (:background ,(get-doom-theme-color 'orange)))))
-   `(vertical-border ((t (:foreground ,(get-doom-theme-color 'orange)))))))
+  (set-face-background 'cursor (get-doom-theme-color 'orange))
+  (set-face-foreground 'font-lock-function-name-face (get-doom-theme-color 'orange))
+  (set-face-attribute 'window-divider nil :inherit 'ansi-color-black))
 
 ;; Diminish minor modes
 (use-package diminish
@@ -308,6 +307,7 @@
         corfu-quit-no-match 'separator
         corfu-preview-current nil
         tab-always-indent 'complete)
+  (set-face-background 'corfu-border (get-doom-theme-color 'orange))
   :bind
   (:map corfu-map
         ("RET" . nil)))
@@ -418,8 +418,7 @@
 ;; Terminal
 (use-package vterm
   :config
-  (custom-set-faces
-   '(term-color-bright-black ((t (:foreground "#4C566A"))))))
+  (set-face-foreground 'term-color-bright-black "#4C566A"))
 
 ;; Eglot LSP
 (use-package eglot
@@ -538,11 +537,6 @@
    erc-receive-query-display 'bury
    erc-fill-function 'erc-fill-static
    erc-fill-static-center 16)
-  (custom-set-faces
-   `(erc-current-nick-face ((t (:foreground
-                                ,(get-doom-theme-color 'red)
-                                :slant italic
-                                :weight heavy)))))
   (setopt erc-modules
           (seq-union '(nicks scrolltobottom spelling) erc-modules))
   ;; keep erc-track faces uniform, ex. when someone sends a url
@@ -555,7 +549,11 @@
                  (auto-fill-mode -1)
                  (apheleia-mode -1)
                  (setq-local scroll-margin 0)))
-   (erc-text-matched . erc-hide-fools))
+   (erc-text-matched . erc-hide-fools)
+   (erc-match-mode . (lambda ()
+                       (set-face-attribute 'erc-current-nick-face nil
+                                           :foreground (get-doom-theme-color 'red)
+                                           :slant 'italic :weight 'heavy))))
   :bind
   (("C-c e" . 'erc-connect)
    :map erc-mode-map
