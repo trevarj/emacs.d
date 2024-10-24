@@ -79,6 +79,9 @@ url/
 # activities.el
 persist/
 
+#undo-fu-session
+undo-fu-session/
+
 # projectile
 projectile-bookmarks.eld
 

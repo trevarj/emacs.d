@@ -211,6 +211,11 @@
   (("C-z" . 'undo-fu-only-undo)
    ("C-S-z" . 'undo-fu-only-redo)))
 
+(use-package undo-fu-session
+  :demand
+  :config
+  (undo-fu-session-global-mode))
+
 ;; Minibuffer
 (use-package vertico ; completion
   :init
