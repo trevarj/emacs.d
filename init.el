@@ -179,7 +179,8 @@
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config)
   (set-face-background 'cursor (get-doom-theme-color 'orange))
-  (set-face-foreground 'font-lock-function-name-face (get-doom-theme-color 'orange))
+  (set-face-attribute 'font-lock-function-name-face nil :weight 'bold)
+  (set-face-attribute 'font-lock-keyword-face nil :foreground (get-doom-theme-color 'orange) :weight 'bold)
   (set-face-attribute 'window-divider nil :inherit 'ansi-color-black))
 
 ;; Diminish minor modes
@@ -356,6 +357,11 @@
   (add-to-list 'completion-at-point-functions #'cape-file))
 
 ;; Treesitter
+(use-package treesit
+  :straight nil
+  :config
+  (setq treesit-font-lock-level 4))
+
 (use-package treesit-auto
   :demand
   :custom
