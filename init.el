@@ -15,7 +15,8 @@
 
   ;; straight.el package manager
   (defvar bootstrap-version)
-  (setq straight-use-package-by-default t)
+  (setq straight-use-package-by-default t
+        straight-check-for-modifications '(check-on-save find-when-checking))
   (let ((bootstrap-file
          (expand-file-name
           "straight/repos/straight.el/bootstrap.el"
