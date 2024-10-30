@@ -420,6 +420,9 @@
   (setq magit-define-global-key-bindings 'recommended
         magit-diff-refine-hunk t))
 
+;; Git modes
+(use-package git-modes)
+
 (use-package diff-hl
   :hook
   ((magit-post-refresh . diff-hl-magit-post-refresh)
