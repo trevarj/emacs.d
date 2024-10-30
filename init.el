@@ -46,6 +46,10 @@
     "Opens user's config file"
     (interactive) (find-file user-init-file))
 
+  (defun switch-to-buffer-last ()
+    "Toggles back to previously visited buffer"
+    (interactive) (switch-to-buffer nil))
+
   :hook
   ((emacs-startup . display-startup-time)
    (buffer-list-update . header-line-file-path)
@@ -140,6 +144,7 @@
   ;; Generic keybindings
   :bind
   (("C-x b" . ibuffer)
+   ("C-'" . 'switch-to-buffer-last)
    ("C-x C-z" . nil) ; disable suspend-frame
    ("C-c !" . 'open-user-config)))
 
@@ -573,8 +578,15 @@
   :config
   (load-library (expand-file-name "secrets.el.gpg" user-emacs-directory))
   (setq elfeed-feeds my/elfeed-feeds)
+
+  (defun elfeed-show-visit-eww ()
+    (interactive)
+    (let ((browse-url-browser-function #'eww-browse-url))
+      (elfeed-show-visit)))
   :bind
-  (("C-c @" . #'elfeed)))
+  (("C-c @" . #'elfeed)
+   :map elfeed-show-mode-map
+   ("e" . 'elfeed-show-visit-eww)))
 
 (use-package leetcode
   :straight
