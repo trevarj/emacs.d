@@ -329,28 +329,6 @@
   (completion-styles '(orderless basic))
   (completion-category-overrides '((file (styles basic partial-completion)))))
 
-(use-package corfu-terminal
-  :straight
-  (corfu-terminal
-   :type git
-   :host codeberg
-   :repo "akib/emacs-corfu-terminal")
-  :after corfu
-  :init
-  (unless (display-graphic-p)
-    (corfu-terminal-mode)))
-
-(use-package corfu-doc-terminal
-  :straight
-  (corfu-doc-terminal
-   :type git
-   :host codeberg
-   :repo "akib/emacs-corfu-doc-terminal")
-  :after corfu-terminal
-  :init
-  (unless (display-graphic-p)
-    (corfu-doc-terminal-mode)))
-
 ;; Completion-at-point helper
 (use-package cape
   :init

@@ -19,12 +19,6 @@
 | cape    | Sources for autocompletion results   |
 | corfu   | Autocompletion (completion-at-point) |
 
-### TUI Emacs
-| Package            | Description                      |
-|--------------------|----------------------------------|
-| corfu-terminal     | Completion support in terminal   |
-| corfu-doc-terminal | Completion doc popup in terminal |
-
 ## Minibuffer
 | Package    | Description                             |
 |------------|-----------------------------------------|
