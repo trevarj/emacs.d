@@ -15,16 +15,16 @@
 - cape  - Sources for autocompletion results
 - corfu - Autocompletion (completion-at-point)
 
+### TUI Emacs
+- corfu-terminal     - Completion support in terminal
+- corfu-doc-terminal - Completion doc popup in terminal 
+
 ## Minibuffer
 - consult    - Helpful minibuffer "queries"
 - marginalia - Annotations/docs for minibuffer entries
 - orderless  - Fuzzy finding on completions
 - savehist   - Save minibuffer history 
 - vertico    - Minibuffer completion
-
-### TUI Emacs
-- corfu-terminal     - Completion support in terminal
-- corfu-doc-terminal - Completion doc popup in terminal 
 
 ## Programming / Editing
 - apheleia            - Automatically run formatters
