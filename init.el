@@ -62,6 +62,7 @@
   (column-number-mode)                          ; Column number mode
   (global-auto-revert-mode)                     ; Auto-refresh buffers
   (auto-fill-mode)                              ; Autofill mode
+  (window-divider-mode)                         ; Gap between splits
   ;; Fonts
   (set-face-attribute 'default nil :family "Iosevka JBM" :height 150 :weight 'medium)
   (set-face-attribute 'fixed-pitch nil :font "Iosevka JBM" :height 150)
@@ -124,7 +125,6 @@
    mode-line-front-space nil               ; Nicer -nw mode line
    mode-line-end-spaces nil                ; ^
    window-divider-default-right-width 16   ; Padding between splits
-   window-divider-mode t                   ; Enable above
    backup-directory-alist '(("." . "~/.cache/emacs/backups"))
    auto-save-file-name-transforms '((".*" "~/.cache/emacs/saves/" t))
    undo-limit 67108864                     ; Undo limit of 64mb.
