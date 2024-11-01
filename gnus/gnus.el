@@ -36,8 +36,7 @@ This moves them into the Spam folder."
             (nnimap-address "imap.gmail.com")
             (nnimap-server-port 993)
             (nnimap-stream ssl))
-   gnus-secondary-select-methods '((nntp "news.gmane.io")
-                                   (nntp "news.gwene.org"))
+   gnus-secondary-select-methods '((nntp "news.gmane.io"))
    ;; This tells Gnus to use the Gmail SMTP server. This
    ;; automatically leaves a copy in the Gmail Sent folder.
    smtpmail-smtp-server "smtp.gmail.com"
