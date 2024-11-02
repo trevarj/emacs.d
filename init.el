@@ -530,11 +530,13 @@
   (erc-fill-function 'erc-fill-static)
   (erc-fill-static-center 16)
   (erc-track-faces-priority-list
-   '(erc-nick-msg-face erc-direct-msg-face
-                       (erc-button-nick-default-face erc-nick-default-face)
-                       (erc-button-nick-default-face erc-default-face)
-                       erc-default-face erc-action-face erc-fool-face
-                       erc-notice-face erc-input-face erc-prompt-face))
+   '(erc-error-face erc-current-nick-face erc-keyword-face erc-pal-face
+                    erc-nick-msg-face erc-direct-msg-face
+                    erc-dangerous-host-face erc-nick-default-face
+                    (erc-button-nick-default-face erc-nick-default-face)
+                    (erc-button-nick-default-face erc-default-face) erc-default-face
+                    erc-action-face erc-fool-face erc-notice-face erc-input-face
+                    erc-prompt-face))
   :hook
   ((erc-mode . (lambda ()
                  (auto-fill-mode -1)
