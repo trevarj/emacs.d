@@ -127,10 +127,6 @@
   (eldoc-echo-area-use-multiline-p nil)
   (epg-pinentry-mode 'loopback)             ; pinentry on minibuffer
   (mouse-wheel-progressive-speed nil)
-  (mouse-wheel-scroll-amount
-   '(3
-     ((shift) . 1)
-     ((control) . nil)))                    ; Mouse wheel scrolling
   (scroll-preserve-screen-position 1)       ; PgUp/PgDown hold
   (gnus-init-file (expand-file-name
                    "gnus/gnus.el"
