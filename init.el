@@ -132,10 +132,10 @@
                    "gnus/gnus.el"
                    user-emacs-directory))
   (send-mail-function 'message-send-mail-with-sendmail) ; Use sendmail
-  (fill-column 80)                   ; 80 width pages
-  (auto-fill-function 'do-auto-fill) ; always autofill
-  (indent-tabs-mode nil)             ; Use spaces only
-  (major-mode                       ; Guess major mode from file name
+  (fill-column 80)                                      ; 80 width pages
+  (auto-fill-function 'do-auto-fill)                    ; always autofill
+  (indent-tabs-mode nil)                                ; Use spaces only
+  (major-mode                                           ; Guess major mode from file name
    (lambda ()
      (unless buffer-file-name
        (let ((buffer-file-name (buffer-name)))
@@ -241,45 +241,31 @@
   :bind (("C-c c r" . consult-register)
          ("C-c /" . consult-ripgrep)
          ("C-c <SPC>" . consult-fd)
-         ("C-c c M-x" . consult-mode-command)
-         ("C-c c h" . consult-history)
          ("C-c c i" . consult-info)
-         ("C-c c k" . consult-kmacro)
          ("C-c c m" . consult-man)
          ("C-c r" . consult-recent-file)
-         ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
-         ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
-         ("C-c c M-:" . consult-complex-command)     ;; orig. repeat-complex-command
-         ("C-c b" . consult-buffer)                ;; orig. switch-to-buffer
-         ("C-c c p" . consult-project-buffer)      ;; orig. project-switch-to-buffer
-         ("C-c c b" . consult-bookmark)            ;; orig. bookmark-jump
-         ("M-g i" . consult-imenu)
-         ("M-g I" . consult-imenu-multi)
-         ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
+         ("C-c b" . consult-buffer)                ; orig. switch-to-buffer
+         ("C-c c p" . consult-project-buffer)      ; orig. project-switch-to-buffer
+         ("C-c c b" . consult-bookmark)            ; orig. bookmark-jump
+         ("M-g M-g" . consult-goto-line)           ; orig. goto-line
          ("M-g e" . consult-compile-error)
-         ("M-g f" . consult-flymake)               ;; Alternative: consult-flymake
-         ("M-g g" . consult-goto-line)             ;; orig. goto-line
+         ("M-g f" . consult-flymake)               ; Alternative: consult-flymake
+         ("M-g g" . consult-goto-line)             ; orig. goto-line
          ("M-g k" . consult-global-mark)
          ("M-g m" . consult-mark)
-         ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
-         ("M-s G" . consult-git-grep)
-         ("M-s L" . consult-line-multi)
-         ("M-s c" . consult-locate)
-         ("M-s e" . consult-isearch-history)
-         ("M-s k" . consult-keep-lines)
-         ("M-s u" . consult-focus-lines)
          ("C-s" . consult-line)
-         ("M-y" . consult-yank-pop)                ;; orig. yank-pop
+         ("C-c c s" . isearch-forward)
+         ("M-y" . consult-yank-pop)                ; orig. yank-pop
          ([remap Info-search] . consult-info)
          :map isearch-mode-map
-         ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
-         ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
-         ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
-         ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
+         ("M-e" . consult-isearch-history)         ; orig. isearch-edit-string
+         ("M-s L" . consult-line-multi)            ; needed by consult-line to detect isearch
+         ("M-s e" . consult-isearch-history)       ; orig. isearch-edit-string
+         ("M-s l" . consult-line)                  ; needed by consult-line to detect isearch
          ;; Minibuffer history
          :map minibuffer-local-map
          ("M-r" . consult-history)
-         ("M-s" . consult-history))                 ;; orig. next-matching-history-element
+         ("M-s" . consult-history))                 ; orig. next-matching-history-element
   ;; https://github.com/minad/consult?tab=readme-ov-file#custom-variables
   :config
   (setq read-buffer-completion-ignore-case t
