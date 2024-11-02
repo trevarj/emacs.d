@@ -2,6 +2,8 @@
 ;;;
 ;;; Commentary:
 ;;; A minimalistic development environment
+;;;
+;;; Code:
 
 (use-package emacs
   :demand t
