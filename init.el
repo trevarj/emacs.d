@@ -586,7 +586,9 @@
          :local-repo "~/Workspace/advent-of-code")
   :config
   (load-library (expand-file-name "secrets.el.gpg" user-emacs-directory))
-  (setopt aoc-session-cookie my/aoc-session-cookie))
+  (setopt aoc-session-cookie my/aoc-session-cookie
+          savehist-additional-variables
+          (append savehist-additional-variables '(aoc-year aoc-day-level))))
 
 (provide 'init)
 
