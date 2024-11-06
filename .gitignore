@@ -90,3 +90,6 @@ persp-state
 
 # secrets file
 secrets.el
+
+# emacs-request
+request/

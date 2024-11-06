@@ -18,7 +18,8 @@
   ;; straight.el package manager
   (defvar bootstrap-version)
   (setq straight-use-package-by-default t
-        straight-check-for-modifications '(check-on-save find-when-checking))
+        straight-check-for-modifications '(check-on-save find-when-checking)
+        straight-host-usernames '((github . "trevarj")))
   (let ((bootstrap-file
          (expand-file-name
           "straight/repos/straight.el/bootstrap.el"
@@ -560,8 +561,7 @@
       (elfeed-show-visit)))
   :config
   (load-library (expand-file-name "secrets.el.gpg" user-emacs-directory))
-  :custom
-  (elfeed-feeds my/elfeed-feeds)
+  (setopt elfeed-feeds my/elfeed-feeds)
   :bind
   (("C-c @" . #'elfeed)
    :map elfeed-show-mode-map
@@ -574,11 +574,19 @@
          :branch "local-cookie")
   :config
   (load-library (expand-file-name "secrets.el.gpg" user-emacs-directory))
+  (setopt leetcode-session-cookie my/leetcode-session-cookie)
   :custom
-  (leetcode-session-cookie my/leetcode-session-cookie)
   (leetcode-prefer-language "cpp")
   (leetcode-save-solutions t)
   (leetcode-directory "~/Workspace/leetcode/"))
+
+(use-package aoc
+  :straight
+  (:host github :repo "trevarj/advent-of-code"
+         :local-repo "~/Workspace/advent-of-code")
+  :config
+  (load-library (expand-file-name "secrets.el.gpg" user-emacs-directory))
+  (setopt aoc-session-cookie my/aoc-session-cookie))
 
 (provide 'init)
 
