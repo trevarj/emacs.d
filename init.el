@@ -15,26 +15,6 @@
                       (time-subtract after-init-time before-init-time)))
              gcs-done))
 
-  ;; straight.el package manager
-  (defvar bootstrap-version)
-  (setq straight-use-package-by-default t
-        straight-check-for-modifications '(check-on-save find-when-checking)
-        straight-host-usernames '((github . "trevarj")))
-  (let ((bootstrap-file
-         (expand-file-name
-          "straight/repos/straight.el/bootstrap.el"
-          (or (bound-and-true-p straight-base-dir)
-              user-emacs-directory)))
-        (bootstrap-version 7))
-    (unless (file-exists-p bootstrap-file)
-      (with-current-buffer
-          (url-retrieve-synchronously
-           "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
-           'silent 'inhibit-cookies)
-        (goto-char (point-max))
-        (eval-print-last-sexp)))
-    (load bootstrap-file nil 'nomessage))
-
   (defun header-line-file-path ()
     "Set `header-line-format' if symbol `buffer-file-name' is not nil."
     (when buffer-file-name
@@ -59,6 +39,8 @@
    (buffer-list-update . header-line-file-path)
    (prog-mode . display-line-numbers-mode))
   :init
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+  (package-initialize)
   (add-to-list 'load-path (concat user-emacs-directory "/lisp"))
   (save-place-mode)
   (recentf-mode)
@@ -103,6 +85,7 @@
   (user-full-name "Trevor Arjeski")
   (user-mail-address "tmarjeski@gmail.com")
   (use-package-always-defer t)              ; always defer packages, use :demand instead
+  (use-package-always-ensure t)             ; always ensure installation of packages
   (custom-file "/tmp/custom.el")            ; customization file
   (desktop-load-locked-desktop 'check-pid)  ; load if lock pid doesn't exist
   (display-line-numbers-grow-only t)        ; Never shrink the linum width
@@ -137,6 +120,7 @@
   (fill-column 80)                                      ; 80 width pages
   (auto-fill-function 'do-auto-fill)                    ; always autofill
   (indent-tabs-mode nil)                                ; Use spaces only
+  (treesit-font-lock-level 4)                           ; More treesitter faces
   (major-mode                                           ; Guess major mode from file name
    (lambda ()
      (unless buffer-file-name
@@ -322,12 +306,6 @@
   :init
   (add-to-list 'completion-at-point-functions #'cape-file))
 
-;; Treesitter
-(use-package treesit
-  :straight nil
-  :config
-  (setq treesit-font-lock-level 4))
-
 (use-package treesit-auto
   :demand
   :custom
@@ -490,7 +468,6 @@
 
 ;; Secrets
 (use-package my-secrets
-  :straight nil
   :ensure nil)
 
 ;; IRC/ERC
@@ -590,10 +567,9 @@
    ("e" . 'elfeed-show-visit-eww)))
 
 (use-package leetcode
-  :straight
-  (:host github :type git
-         :repo "trevarj/leetcode.el"
-         :branch "local-cookie")
+  :vc
+  (:url "https://github.com/trevarj/leetcode.el"
+        :rev "9c5bd70")
   :load my-secrets
   :config
   (setopt leetcode-session-cookie my/leetcode-session-cookie)
@@ -603,9 +579,10 @@
   (leetcode-directory "~/Workspace/leetcode/"))
 
 (use-package aoc
-  :straight
-  (:host github :repo "trevarj/advent-of-code"
-         :local-repo "~/Workspace/advent-of-code")
+  :vc t
+  :load-path "~/Workspace/advent-of-code"
+  ;; (:url "https://github.com/trevarj/advent-of-code"
+  ;;       :rev "9c5bd70")
   :load my-secrets
   :config
   (setopt aoc-session-cookie my/aoc-session-cookie

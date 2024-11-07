@@ -5,7 +5,6 @@
 ;; (setq file-name-handler-alist-original file-name-handler-alist)
 ;; (setq file-name-handler-alist nil)
 
-(setq package-enable-at-startup nil)        ; Disable emacs package manager
 (scroll-bar-mode -1)                        ; Disable visible scrollbar
 (tool-bar-mode -1)                          ; Disable the toolbar
 (menu-bar-mode -1)                          ; Disable the menubar
