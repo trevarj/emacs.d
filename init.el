@@ -403,6 +403,22 @@
 
 ;; Terminal
 (use-package vterm
+  :after project
+  :preface
+  (defun project-vterm ()
+    "Start a vterm shell in the current project's root directory."
+    (interactive)
+    (require 'comint)
+    (let* ((default-directory (project-root (project-current t)))
+           (default-project-shell-name (project-prefixed-buffer-name "vterm"))
+           (shell-buffer (get-buffer default-project-shell-name)))
+      (if (and shell-buffer (not current-prefix-arg))
+          (if (comint-check-proc shell-buffer)
+              (pop-to-buffer shell-buffer (bound-and-true-p display-comint-buffer-action))
+            (vterm shell-buffer))
+        (vterm (generate-new-buffer-name default-project-shell-name)))))
+  :init
+  (add-to-list 'project-switch-commands '(project-vterm "Vterm" "t"))
   :config
   (set-face-foreground 'term-color-bright-black "#4C566A"))
 

@@ -93,3 +93,6 @@ secrets.el
 
 # emacs-request
 request/
+
+# bookmarks
+bookmarks
