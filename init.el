@@ -59,6 +59,7 @@
    (buffer-list-update . header-line-file-path)
    (prog-mode . display-line-numbers-mode))
   :init
+  (add-to-list 'load-path (concat user-emacs-directory "/lisp"))
   (save-place-mode)
   (recentf-mode)
   (desktop-save-mode)                           ; Session saving
@@ -471,8 +472,14 @@
 ;; Markdown
 (use-package markdown-mode)
 
+;; Secrets
+(use-package my-secrets
+  :straight nil
+  :ensure nil)
+
 ;; IRC/ERC
 (use-package erc
+  :load my-secrets
   :preface
   (defun erc-connect ()
     (interactive)
@@ -491,7 +498,6 @@
       (message "hidden fools: %s" (if hidden-fools "on" "off"))
       (set-buffer-modified-p t)))
   :config
-  (load-file (expand-file-name "secrets.el.gpg" user-emacs-directory))
   (setopt erc-modules (seq-union '(nicks scrolltobottom spelling) erc-modules)
           erc-nicks-colors (mapcar 'get-doom-theme-color
                                    '(orange yellow teal blue dark-blue cyan violet)))
@@ -554,13 +560,13 @@
    ("C-c -" . 'erc-toggle-fools)))
 
 (use-package elfeed
+  :load my-secrets
   :preface
   (defun elfeed-show-visit-eww ()
     (interactive)
     (let ((browse-url-browser-function #'eww-browse-url))
       (elfeed-show-visit)))
   :config
-  (load-library (expand-file-name "secrets.el.gpg" user-emacs-directory))
   (setopt elfeed-feeds my/elfeed-feeds)
   :bind
   (("C-c @" . #'elfeed)
@@ -572,8 +578,8 @@
   (:host github :type git
          :repo "trevarj/leetcode.el"
          :branch "local-cookie")
+  :load my-secrets
   :config
-  (load-library (expand-file-name "secrets.el.gpg" user-emacs-directory))
   (setopt leetcode-session-cookie my/leetcode-session-cookie)
   :custom
   (leetcode-prefer-language "cpp")
@@ -584,8 +590,8 @@
   :straight
   (:host github :repo "trevarj/advent-of-code"
          :local-repo "~/Workspace/advent-of-code")
+  :load my-secrets
   :config
-  (load-library (expand-file-name "secrets.el.gpg" user-emacs-directory))
   (setopt aoc-session-cookie my/aoc-session-cookie
           savehist-additional-variables
           (append savehist-additional-variables '(aoc-year aoc-day-level))))
