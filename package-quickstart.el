@@ -5566,8 +5566,6 @@ evaluate the variable `corfu-mode'.
 The mode's hook is called both when the mode is enabled and when it is
 disabled.
 
-\\{corfu-mode-map}
-
 (fn &optional ARG)" t)
 (put 'global-corfu-mode 'globalized-minor-mode t)
 (defvar global-corfu-mode nil "\
