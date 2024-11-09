@@ -39,8 +39,6 @@
    (buffer-list-update . header-line-file-path)
    (prog-mode . display-line-numbers-mode))
   :init
-  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-  (package-initialize)
   (add-to-list 'load-path (concat user-emacs-directory "/lisp"))
   (save-place-mode)
   (recentf-mode)
@@ -79,6 +77,9 @@
   (dolist (code-point nerdfont-code-points)
     (set-fontset-font t code-point (font-spec :family "Symbols Nerd Font
   Mono")))
+
+  :config
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 
   ;; Miscellaneous Options
   :custom
@@ -135,7 +136,7 @@
 
 ;; Ligatures
 (use-package ligature
-  :demand
+  :defer 2
   :config
   (ligature-set-ligatures
    'prog-mode

@@ -5,6 +5,7 @@
 ;; (setq file-name-handler-alist-original file-name-handler-alist)
 ;; (setq file-name-handler-alist nil)
 
+(setq package-quickstart t)                 ; Don't forget to run `package-quickstart-refresh'!
 (scroll-bar-mode -1)                        ; Disable visible scrollbar
 (tool-bar-mode -1)                          ; Disable the toolbar
 (menu-bar-mode -1)                          ; Disable the menubar
