@@ -294,9 +294,11 @@
   (corfu-quit-no-match 'separator)
   (corfu-preview-current nil)
   (tab-always-indent 'complete)
+  (corfu-left-margin-width 4)
+  (corfu-right-margin-width 4)
   :config
   (corfu-popupinfo-mode)
-  (add-to-list 'corfu--frame-parameters '(internal-border-width . 2))
+  (add-to-list 'corfu--frame-parameters '(internal-border-width . 4))
   (set-face-background 'corfu-border (get-doom-theme-color 'orange))
   :bind
   (:map corfu-map
