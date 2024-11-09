@@ -5,6 +5,10 @@
 ;;;
 ;;; Code:
 
+(use-package package
+  :config
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t))
+
 (use-package emacs
   :demand t
   :preface
@@ -77,9 +81,6 @@
   (dolist (code-point nerdfont-code-points)
     (set-fontset-font t code-point (font-spec :family "Symbols Nerd Font
   Mono")))
-
-  :config
-  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 
   ;; Miscellaneous Options
   :custom
@@ -167,18 +168,16 @@
   (set-face-background 'cursor (get-doom-theme-color 'orange))
   (set-face-background 'highlight (get-doom-theme-color 'yellow))
   (set-face-attribute 'mode-line nil
-                      :background (get-doom-theme-color 'black)
+                      :background (get-doom-theme-color 'base3)
                       :foreground (get-doom-theme-color 'base6)
                       :box nil)
   (set-face-attribute 'mode-line-active nil
-                      :background (get-doom-theme-color 'black)
-                      :box nil
-                      :overline "orange")
+                      :background (get-doom-theme-color 'base3)
+                      :box nil)
   (set-face-attribute 'mode-line-inactive nil
                       :background (get-doom-theme-color 'black)
                       :foreground (get-doom-theme-color 'base5)
-                      :box nil
-                      :overline t)
+                      :box nil)
   (set-face-attribute 'font-lock-function-name-face nil :weight 'bold)
   (set-face-attribute 'font-lock-keyword-face nil
                       :foreground (get-doom-theme-color 'orange) :weight 'bold)
