@@ -31,7 +31,7 @@
 ## Programming / Editing
 | Package            | Description                                         |
 |--------------------|-----------------------------------------------------|
-| apheleia           | Automatically run formatters                        |
+| format-all         | Automatically run formatters                        |
 | editorconfig       | Editor config support                               |
 | eglot              | Lsp client                                          |
 | envrc              | Direnv support per-buffer                           |
