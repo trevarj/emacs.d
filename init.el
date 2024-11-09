@@ -185,11 +185,8 @@
 
 ;; Diminish minor modes
 (use-package diminish
-  :demand)
-
-(use-package autorevert
   :demand
-  :diminish auto-revert-mode) ; doesn't work in :config above
+  :config (diminish 'auto-revert-mode))
 
 (use-package xref
   :custom
