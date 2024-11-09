@@ -164,8 +164,23 @@
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config)
   (set-face-background 'cursor (get-doom-theme-color 'orange))
+  (set-face-background 'highlight (get-doom-theme-color 'yellow))
+  (set-face-attribute 'mode-line nil
+                      :background (get-doom-theme-color 'black)
+                      :foreground (get-doom-theme-color 'base6)
+                      :box nil)
+  (set-face-attribute 'mode-line-active nil
+                      :background (get-doom-theme-color 'black)
+                      :box nil
+                      :overline "orange")
+  (set-face-attribute 'mode-line-inactive nil
+                      :background (get-doom-theme-color 'black)
+                      :foreground (get-doom-theme-color 'base5)
+                      :box nil
+                      :overline t)
   (set-face-attribute 'font-lock-function-name-face nil :weight 'bold)
-  (set-face-attribute 'font-lock-keyword-face nil :foreground (get-doom-theme-color 'orange) :weight 'bold)
+  (set-face-attribute 'font-lock-keyword-face nil
+                      :foreground (get-doom-theme-color 'orange) :weight 'bold)
   (set-face-attribute 'window-divider nil :inherit 'ansi-color-black))
 
 ;; Diminish minor modes
