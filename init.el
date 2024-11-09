@@ -357,15 +357,13 @@
   :hook (ibuffer-mode . ibuffer-auto-mode))
 
 ;; Formatting
-(use-package apheleia
-  :diminish apheleia-mode
-  :init
-  (apheleia-global-mode)
+(use-package format-all
+  :diminish
+  :commands format-all-mode
+  :hook (prog-mode . format-all-mode)
   :config
-  (setf (alist-get 'shfmt apheleia-formatters)
-        '("shfmt" "-i" "2" "-"))
-  (setf (alist-get 'sh-mode apheleia-mode-alist)
-        '(shfmt)))
+  (setq-default format-all-formatters
+                '(("Shell" (shfmt "-i" "2" "-ci")))))
 
 ;; Colorize hex color codes
 (use-package rainbow-mode)
@@ -552,7 +550,6 @@
   :hook
   ((erc-mode . (lambda ()
                  (auto-fill-mode -1)
-                 (apheleia-mode -1)
                  (setq-local scroll-margin 0)))
    (erc-text-matched . erc-hide-fools)
    (erc-match-mode . (lambda ()
