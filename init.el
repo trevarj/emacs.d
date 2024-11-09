@@ -115,6 +115,7 @@
   (epg-pinentry-mode 'loopback)             ; pinentry on minibuffer
   (mouse-wheel-progressive-speed nil)
   (scroll-preserve-screen-position 1)       ; PgUp/PgDown hold
+  (text-mode-ispell-word-completion nil)
   (gnus-init-file (expand-file-name
                    "gnus/gnus.el"
                    user-emacs-directory))
@@ -165,23 +166,27 @@
   (load-theme 'doom-nord t)
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config)
-  (set-face-background 'cursor (get-doom-theme-color 'orange))
-  (set-face-background 'highlight (get-doom-theme-color 'yellow))
-  (set-face-attribute 'mode-line nil
-                      :background (get-doom-theme-color 'base3)
-                      :foreground (get-doom-theme-color 'base6)
-                      :box nil)
-  (set-face-attribute 'mode-line-active nil
-                      :background (get-doom-theme-color 'base3)
-                      :box nil)
-  (set-face-attribute 'mode-line-inactive nil
-                      :background (get-doom-theme-color 'black)
-                      :foreground (get-doom-theme-color 'base5)
-                      :box nil)
-  (set-face-attribute 'font-lock-function-name-face nil :weight 'bold)
-  (set-face-attribute 'font-lock-keyword-face nil
-                      :foreground (get-doom-theme-color 'orange) :weight 'bold)
-  (set-face-attribute 'window-divider nil :inherit 'ansi-color-black))
+  (let ((bg (get-doom-theme-color 'base2))
+        (bg-light (get-doom-theme-color 'base3))
+        (yellow (get-doom-theme-color 'yellow))
+        (orange (get-doom-theme-color 'orange)))
+    (set-face-background 'cursor orange)
+    (set-face-background 'highlight yellow)
+    (set-face-attribute 'mode-line nil
+                        :background bg-light
+                        :foreground (get-doom-theme-color 'base6)
+                        :box `(:line-width (6 . 6) :color ,bg-light))
+    (set-face-attribute 'mode-line-active nil
+                        :background bg-light
+                        :box `(:line-width (6 . 6) :color ,bg-light))
+    (set-face-attribute 'mode-line-inactive nil
+                        :background bg
+                        :foreground (get-doom-theme-color 'base5)
+                        :box `(:line-width (6 . 6) :color ,bg))
+    (set-face-attribute 'font-lock-function-name-face nil :weight 'bold)
+    (set-face-attribute 'font-lock-keyword-face nil
+                        :foreground orange :weight 'bold)
+    (set-face-attribute 'window-divider nil :inherit 'ansi-color-black)))
 
 ;; Diminish minor modes
 (use-package diminish
