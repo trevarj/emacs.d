@@ -1235,69 +1235,6 @@ Disable `rainbow-delimiters-mode'.")
 
 
 )
-(let* ((load-file-name "/home/trev/.emacs.d/elpa/parinfer-rust-mode-20241108.856/parinfer-rust-mode-autoloads.el")(load-true-file-name load-file-name))
-
-
-
-(add-to-list 'load-path (or (and load-file-name (directory-file-name (file-name-directory load-file-name))) (car load-path)))
-
-
-
-
-(register-definition-prefixes "parinfer-rust-changes" '("parinfer-rust--"))
-
-
-
-(register-definition-prefixes "parinfer-rust-flycheck" '("parinfer-rust--flycheck-start"))
-
-
-
-(register-definition-prefixes "parinfer-rust-flymake" '("parinfer-rust-"))
-
-
-
-(register-definition-prefixes "parinfer-rust-helper" '("parinfer-rust-"))
-
-
-
-(autoload 'parinfer-rust-switch-mode "parinfer-rust-mode" "\
-Switch to a different Parinfer mode.
-
-Either: indent, smart, or paren." t)
-(autoload 'parinfer-rust-toggle-paren-mode "parinfer-rust-mode" "\
-Switch to paren mode if current mode is either smart or indent.
-Switch back to previous mode if current mode is paren mode. Uses
-`parinfer-rust-preferred-mode' as a fallback if previous mode is
-not available." t)
-(defvar parinfer-rust-mode-map (make-sparse-keymap) "\
-Keymap for `parinfer-rust-mode'.")
-(autoload 'parinfer-rust-mode "parinfer-rust-mode" "\
-A simpler way to write lisps.
-
-This is a minor mode.  If called interactively, toggle the
-`Parinfer-Rust mode' mode.  If the prefix argument is positive, enable
-the mode, and if it is zero or negative, disable the mode.
-
-If called from Lisp, toggle the mode if ARG is `toggle'.  Enable the
-mode if ARG is nil, omitted, or is a positive number.  Disable the mode
-if ARG is a negative number.
-
-To check whether the minor mode is enabled in the current buffer,
-evaluate the variable `parinfer-rust-mode'.
-
-The mode's hook is called both when the mode is enabled and when it is
-disabled.
-
-\\{parinfer-rust-mode-map}
-
-(fn &optional ARG)" t)
-(register-definition-prefixes "parinfer-rust-mode" '("parinfer-rust-"))
-
-
-(provide 'parinfer-rust-mode-autoloads)
-
-
-)
 (let* ((load-file-name "/home/trev/.emacs.d/elpa/orderless-20240926.921/orderless-autoloads.el")(load-true-file-name load-file-name))
 
 
@@ -6752,12 +6689,12 @@ disabled.
        (append
         '(ws-butler with-editor vterm vertico undo-fu-session undo-fu
                     treesit-auto transient sly s rust-mode request rainbow-mode
-                    rainbow-delimiters parinfer-rust-mode orderless nerd-icons
-                    nerd-icons-dired modus-themes markdown-mode marginalia dash
-                    magit-section magit log4e ligature aio leetcode language-id
-                    inheritenv f elisp-refs helpful git-modes geiser
-                    geiser-guile format-all envrc elfeed doom-themes diminish
-                    diff-hl corfu consult cape avy aoc ace-window)
+                    rainbow-delimiters orderless nerd-icons nerd-icons-dired
+                    modus-themes markdown-mode marginalia dash magit-section
+                    magit log4e ligature aio leetcode language-id inheritenv f
+                    elisp-refs helpful git-modes geiser geiser-guile format-all
+                    envrc elfeed doom-themes diminish diff-hl corfu consult cape
+                    avy aoc ace-window)
         package-activated-list)))
 (progn
   (require 'info) (info-initialize)

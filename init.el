@@ -49,6 +49,7 @@
   (desktop-save-mode)                           ; Session saving
   (column-number-mode)                          ; Column number mode
   (global-auto-revert-mode)                     ; Auto-refresh buffers
+  (electric-pair-mode)                          ; Pair the pairs
   (auto-fill-mode)                              ; Autofill mode
   (window-divider-mode)                         ; Gap between splits
   ;; Fonts
@@ -436,22 +437,6 @@
   (bash-ts-mode . eglot-ensure)
   (sh-mode . eglot-ensure)
   (rust-ts-mode . eglot-ensure))
-
-;; Lisps
-(use-package parinfer-rust-mode
-  :preface
-  (defun safe-parinfer-rust-mode nil
-    "Safely turn on `parinfer-rust-mode'."
-    (electric-pair-mode nil) ; conflicts with parinfer
-    (parinfer-rust-mode))
-  :custom
-  (parinfer-rust-troublesome-modes '())
-  :config
-  (set-face-attribute
-   'parinfer-rust-dim-parens nil
-   :foreground (cadr (assoc 'base6 doom-themes--colors)))
-  :hook
-  ((emacs-lisp-mode sly-mode geiser-mode) . #'safe-parinfer-rust-mode))
 
 ;; Rust
 (use-package rust-mode

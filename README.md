@@ -35,7 +35,6 @@
 | editorconfig       | Editor config support                               |
 | eglot              | Lsp client                                          |
 | envrc              | Direnv support per-buffer                           |
-| parinfer-rust-mode | Automatically handle parens and alignment for LISPs |
 | rainbow-delimiters | Help me see matching parens!                        |
 | ws-butler          | Remove extra whitespace                             |
 
