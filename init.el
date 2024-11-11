@@ -574,6 +574,7 @@
   (leetcode-directory "~/Workspace/leetcode/"))
 
 (use-package aoc
+  :ensure nil
   :load my-secrets
   :config
   (setopt aoc-session-cookie my/aoc-session-cookie
