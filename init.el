@@ -136,7 +136,7 @@
 
 ;; Ligatures
 (use-package ligature
-  :hook (prog-mode . global-ligature-mode)
+  :hook (prog-mode . ligature-mode)
   :config
   (ligature-set-ligatures
    'prog-mode
