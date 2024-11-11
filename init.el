@@ -574,10 +574,6 @@
   (leetcode-directory "~/Workspace/leetcode/"))
 
 (use-package aoc
-  :vc t
-  :load-path "~/Workspace/advent-of-code"
-  ;; (:url "https://github.com/trevarj/advent-of-code"
-  ;;       :rev "9c5bd70")
   :load my-secrets
   :config
   (setopt aoc-session-cookie my/aoc-session-cookie
