@@ -223,7 +223,7 @@
   (undo-fu-session-global-mode))
 
 ;; Minibuffer
-(use-package vertico ; completion
+(use-package vertico
   :init
   (vertico-mode))
 
