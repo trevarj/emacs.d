@@ -84,11 +84,15 @@ login."
           (pop-to-buffer (current-buffer)))))))
 
 (cl-defun aoc--check-submit-response (&key data &allow-other-keys)
-  (if (cl-search "That's not the right answer." data)
-      (message "Incorrect answer.")
+  (cond
+   ((cl-search "That's not the right answer." data)
+    (message "Incorrect answer."))
+   ((cl-search "You gave an answer too recently" data)
+    (message "Submitted too recently. Please wait."))
+   (t
     (aoc--increment-day-level)
     (aoc--render-data-to-help-buffer data "*aoc submission*")
-    (message "Answer submitted successfully.")))
+    (message "Answer submitted successfully."))))
 
 (cl-defun aoc--submit-error (&key status &allow-other-keys)
   (message "Could not submit answer: %s" status))
