@@ -1388,6 +1388,64 @@ disabled.
 
 
 )
+(let* ((load-file-name "/home/trev/.emacs.d/elpa/modus-themes-20241107.816/modus-themes-autoloads.el")(load-true-file-name load-file-name))
+
+
+
+(add-to-list 'load-path (or (and load-file-name (directory-file-name (file-name-directory load-file-name))) (car load-path)))
+
+
+
+
+(autoload 'modus-themes-contrast "modus-themes" "\
+Measure WCAG contrast ratio between C1 and C2.
+C1 and C2 are color values written in hexadecimal RGB.
+
+(fn C1 C2)")
+(autoload 'modus-themes-select "modus-themes" "\
+Load a Modus THEME using minibuffer completion.
+Run `modus-themes-after-load-theme-hook' after loading the theme.
+Disable other themes per `modus-themes-disable-other-themes'.
+
+(fn THEME)" t)
+(autoload 'modus-themes-toggle "modus-themes" "\
+Toggle between the two `modus-themes-to-toggle'.
+If `modus-themes-to-toggle' does not specify two Modus themes,
+prompt with completion for a theme among our collection (this is
+practically the same as the `modus-themes-select' command).
+
+Run `modus-themes-after-load-theme-hook' after loading the theme.
+Disable other themes per `modus-themes-disable-other-themes'." t)
+(function-put 'modus-themes-toggle 'interactive-only 't)
+(autoload 'modus-themes-rotate "modus-themes" "\
+Rotate to the next theme among THEMES.
+When called interactively THEMES is the value of `modus-themes-to-rotate'.
+
+If the current theme is already the next in line, then move to the one
+after.  Perform the rotation rightwards, such that the first element in
+the list becomes the last.  Do not modify THEMES in the process.
+
+(fn THEMES)" t)
+(autoload 'modus-themes-theme "modus-themes" "\
+Bind NAME's color PALETTE around face specs and variables.
+Face specifications are passed to `custom-theme-set-faces'.
+While variables are handled by `custom-theme-set-variables'.
+Those are stored in `modus-themes-faces' and
+`modus-themes-custom-variables' respectively.
+
+Optional OVERRIDES are appended to PALETTE, overriding
+corresponding entries.
+
+(fn NAME PALETTE &optional OVERRIDES)" nil t)
+(function-put 'modus-themes-theme 'lisp-indent-function 0)
+(when load-file-name (let ((dir (file-name-directory load-file-name))) (unless (equal dir (expand-file-name "themes/" data-directory)) (add-to-list 'custom-theme-load-path dir))))
+(register-definition-prefixes "modus-themes" '("modus-themes-"))
+
+
+(provide 'modus-themes-autoloads)
+
+
+)
 (let* ((load-file-name "/home/trev/.emacs.d/elpa/markdown-mode-20241107.349/markdown-mode-autoloads.el")(load-true-file-name load-file-name))
 
 
@@ -5115,6 +5173,8 @@ evaluate the variable `diff-hl-mode'.
 The mode's hook is called both when the mode is enabled and when it is
 disabled.
 
+\\{diff-hl-mode-map}
+
 (fn &optional ARG)" t)
 (autoload 'turn-on-diff-hl-mode "diff-hl" "\
 Turn on `diff-hl-mode' or `diff-hl-dir-mode' in a buffer if appropriate.")
@@ -6492,7 +6552,7 @@ Transpose lines in the active region." t)
 
 
 )
-(let* ((load-file-name "/home/trev/.emacs.d/elpa/aoc-1.0.0/aoc-autoloads.el")(load-true-file-name load-file-name))
+(let* ((load-file-name "/home/trev/.emacs.d/elpa/aoc/aoc-autoloads.el")(load-true-file-name load-file-name))
 
 
 
@@ -6514,6 +6574,7 @@ Submit a solution for given year, day and level.
 
 (fn YEAR DAY LEVEL ANSWER)" t)
 (register-definition-prefixes "aoc" '("aoc-"))
+
 
 
 (provide 'aoc-autoloads)
@@ -6629,11 +6690,11 @@ disabled.
         '(ws-butler with-editor vterm vertico undo-fu-session undo-fu
                     treesit-auto transient sly s rust-mode request rainbow-mode
                     rainbow-delimiters orderless nerd-icons nerd-icons-dired
-                    markdown-mode marginalia dash magit-section magit log4e
-                    ligature aio leetcode language-id inheritenv f elisp-refs
-                    helpful git-modes geiser geiser-guile format-all envrc
-                    elfeed doom-themes diminish diff-hl corfu consult cape avy
-                    aoc ace-window)
+                    modus-themes markdown-mode marginalia dash magit-section
+                    magit log4e ligature aio leetcode language-id inheritenv f
+                    elisp-refs helpful git-modes geiser geiser-guile format-all
+                    envrc elfeed doom-themes diminish diff-hl corfu consult cape
+                    avy aoc ace-window)
         package-activated-list)))
 (progn
   (require 'info) (info-initialize)
@@ -6644,6 +6705,7 @@ disabled.
            "/home/trev/.emacs.d/elpa/magit-20241106.1441"
            "/home/trev/.emacs.d/elpa/magit-section-20241102.1300"
            "/home/trev/.emacs.d/elpa/dash-20240510.1327"
+           "/home/trev/.emacs.d/elpa/modus-themes-20241107.816"
            "/home/trev/.emacs.d/elpa/orderless-20240926.921"
            "/home/trev/.emacs.d/elpa/sly-20240809.2119"
            "/home/trev/.emacs.d/elpa/transient-20241106.1703"
