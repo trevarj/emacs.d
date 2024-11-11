@@ -38,6 +38,13 @@
     "Toggles back to previously visited buffer"
     (interactive) (switch-to-buffer nil))
 
+  (defun my/use-package-ensure (name args _state &optional _no-refresh)
+    "Checks for local package before checking remote archives."
+    (if-let* ((path (locate-library (symbol-name name)))
+              (_ (not (package-installed-p name))))
+        (package-install-file path)
+      (use-package-ensure-elpa name args _state _no-refresh)))
+
   :hook
   ((emacs-startup . display-startup-time)
    (buffer-list-update . header-line-file-path)
@@ -88,7 +95,8 @@
   (user-full-name "Trevor Arjeski")
   (user-mail-address "tmarjeski@gmail.com")
   (use-package-always-defer t)              ; always defer packages, use :demand instead
-  (use-package-always-ensure t)             ; always ensure installation of packages
+  (use-package-always-ensure t)             ; always ensure packages
+  (use-package-ensure-function #'my/use-package-ensure)
   (custom-file "/tmp/custom.el")            ; customization file
   (desktop-load-locked-desktop 'check-pid)  ; load if lock pid doesn't exist
   (display-line-numbers-grow-only t)        ; Never shrink the linum width
@@ -574,10 +582,6 @@
   (leetcode-directory "~/Workspace/leetcode/"))
 
 (use-package aoc
-  :vc t
-  :load-path "~/Workspace/advent-of-code"
-  ;; (:url "https://github.com/trevarj/advent-of-code"
-  ;;       :rev "9c5bd70")
   :load my-secrets
   :config
   (setopt aoc-session-cookie my/aoc-session-cookie
