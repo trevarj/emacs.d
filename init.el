@@ -284,6 +284,9 @@
 (use-package corfu
   :init
   (global-corfu-mode)
+  :bind
+  (:map corfu-map
+        ("RET" . nil))
   :custom
   (corfu-auto t)
   (corfu-popupinfo-delay 0)
@@ -295,10 +298,7 @@
   :config
   (corfu-popupinfo-mode)
   (add-to-list 'corfu--frame-parameters '(internal-border-width . 4))
-  (set-face-background 'corfu-border (get-doom-theme-color 'orange))
-  :bind
-  (:map corfu-map
-        ("RET" . nil)))
+  (set-face-background 'corfu-border (get-doom-theme-color 'orange)))
 
 (use-package orderless
   :custom
@@ -404,6 +404,11 @@
 
 ;; Eglot LSP
 (use-package eglot
+  :hook
+  (c-ts-mode . eglot-ensure)
+  (bash-ts-mode . eglot-ensure)
+  (sh-mode . eglot-ensure)
+  (rust-ts-mode . eglot-ensure)
   :bind
   (:map eglot-mode-map
         :prefix-map eglot-prefix-keymap
@@ -426,12 +431,7 @@
                             :procMacro
                             (:enable :json-false))))
           ((c-ts-mode c++-ts-mode) . ("clangd"))))
-  (defalias 'start-lsp-server #'eglot)
-  :hook
-  (c-ts-mode . eglot-ensure)
-  (bash-ts-mode . eglot-ensure)
-  (sh-mode . eglot-ensure)
-  (rust-ts-mode . eglot-ensure))
+  (defalias 'start-lsp-server #'eglot))
 
 ;; Rust
 (use-package rust-mode
@@ -476,23 +476,6 @@
       (erc-match-toggle-hidden-fools hidden-fools)
       (message "hidden fools: %s" (if hidden-fools "on" "off"))
       (set-buffer-modified-p t)))
-  :config
-  (setopt erc-modules (seq-union '(nicks scrolltobottom spelling) erc-modules)
-          erc-nicks-colors (mapcar 'get-doom-theme-color
-                                   '(orange yellow teal blue dark-blue cyan violet)))
-  ;; for more "themed" erc-nicks-colors
-  (setq erc-nicks--create-pool-function 'erc-nicks--create-culled-pool)
-
-  ;; Fix for restoring query buffers with self-messages
-  (advice-add #'erc-login
-              :before (lambda ()
-                        (erc-server-send "CAP REQ :znc.in/self-message")
-                        (erc-server-send "CAP END")))
-  ;; Clear out query bufs when using using `AutoClearQueryBuffer = false`
-  (add-to-list 'erc-kill-buffer-hook 'erc-clear-query-buffer)
-  (erc-spelling-mode)
-  (erc-scrolltobottom-mode)
-  (defun erc-match-directed-at-fool-p (_msg) nil)
   :custom
   (erc-server "orangepi")
   (erc-port "7777")
@@ -522,6 +505,23 @@
                     (erc-button-nick-default-face erc-nick-default-face)
                     erc-default-face erc-action-face erc-fool-face
                     erc-notice-face erc-input-face erc-prompt-face))
+  :config
+  (setopt erc-modules (seq-union '(nicks scrolltobottom spelling) erc-modules)
+          erc-nicks-colors (mapcar 'get-doom-theme-color
+                                   '(orange yellow teal blue dark-blue cyan violet)))
+  ;; for more "themed" erc-nicks-colors
+  (setq erc-nicks--create-pool-function 'erc-nicks--create-culled-pool)
+
+  ;; Fix for restoring query buffers with self-messages
+  (advice-add #'erc-login
+              :before (lambda ()
+                        (erc-server-send "CAP REQ :znc.in/self-message")
+                        (erc-server-send "CAP END")))
+  ;; Clear out query bufs when using using `AutoClearQueryBuffer = false`
+  (add-to-list 'erc-kill-buffer-hook 'erc-clear-query-buffer)
+  (erc-spelling-mode)
+  (erc-scrolltobottom-mode)
+  (defun erc-match-directed-at-fool-p (_msg) nil)
   :hook
   ((erc-mode . (lambda ()
                  (auto-fill-mode -1)
