@@ -551,6 +551,11 @@
    :map elfeed-show-mode-map
    ("e" . 'elfeed-show-visit-eww)))
 
+;; GNU Bug tracker
+(use-package debbugs)
+
+;;; Local Packages
+
 (use-package leetcode
   :vc
   (:url "https://github.com/trevarj/leetcode.el"
