@@ -224,7 +224,9 @@
 ;; Minibuffer
 (use-package vertico
   :init
-  (vertico-mode))
+  (vertico-mode)
+  :custom
+  (vertico-count 6))
 
 ;; Save minibuffer history between restarts
 (use-package savehist
