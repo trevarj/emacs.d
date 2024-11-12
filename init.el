@@ -238,7 +238,6 @@
   (marginalia-mode))
 
 (use-package consult
-  ;; https://github.com/minad/consult?tab=readme-ov-file#use-package-example
   :bind (("C-c c r" . consult-register)
          ("C-c /" . consult-ripgrep)
          ("C-c <SPC>" . consult-fd)
@@ -267,11 +266,10 @@
          :map minibuffer-local-map
          ("M-r" . consult-history)
          ("M-s" . consult-history))                 ; orig. next-matching-history-element
-  ;; https://github.com/minad/consult?tab=readme-ov-file#custom-variables
-  :config
-  (setq read-buffer-completion-ignore-case t
-        read-file-name-completion-ignore-case t
-        completion-ignore-case t))
+  :custom
+  (read-buffer-completion-ignore-case t
+   read-file-name-completion-ignore-case t
+   completion-ignore-case t))
 
 (use-package helpful
   :bind
