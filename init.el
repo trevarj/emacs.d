@@ -61,7 +61,6 @@
   (window-divider-mode)                         ; Gap between splits
   ;; Fonts
   (set-face-attribute 'default nil :family "Iosevka JBM" :height 150 :weight 'medium)
-  (set-face-attribute 'fixed-pitch nil :font "Iosevka JBM" :height 150)
   (set-face-attribute 'variable-pitch nil :family "Noto Sans")
   ;; https://github.com/ryanoasis/nerd-fonts/wiki/Glyph-Sets-and-Code-Points
   (defvar nerdfont-code-points
