@@ -38,7 +38,7 @@
     "Toggles back to previously visited buffer"
     (interactive) (switch-to-buffer nil))
 
-  (defun my/use-package-ensure (name args _state &optional _no-refresh)
+  (defun trev/use-package-ensure (name args _state &optional _no-refresh)
     "Checks for local package before checking remote archives."
     (if-let* ((path (locate-library (symbol-name name)))
               (_ (not (package-installed-p name))))
@@ -78,7 +78,7 @@
   (user-mail-address "tmarjeski@gmail.com")
   (use-package-always-defer t)              ; always defer packages, use :demand instead
   (use-package-always-ensure t)             ; always ensure packages
-  (use-package-ensure-function #'my/use-package-ensure)
+  (use-package-ensure-function #'trev/use-package-ensure)
   (custom-file "/tmp/custom.el")            ; customization file
   (desktop-load-locked-desktop 'check-pid)  ; load if lock pid doesn't exist
   (display-line-numbers-grow-only t)        ; Never shrink the linum width
@@ -465,7 +465,7 @@
     (erc :server "orangepi"
          :port 7777
          :user "trev"
-         :password my/erc-password))
+         :password trev/erc-password))
   (defun erc-clear-query-buffer ()
     (when (erc-query-buffer-p)
       (erc-send-input-line "*status" (format "clearbuffer %s" (erc-target)))))
@@ -490,7 +490,7 @@
   (erc-track-exclude '("#emacs" "#systemcrafters-live" "*status"))
   ;; works with bug#67767 v2 patch
   (erc-nicks-track-faces t)
-  (erc-fools my/erc-fools)
+  (erc-fools trev/erc-fools)
   (erc-fool-highlight-type 'all)
   (erc-current-nick-highlight-type 'all)
   (erc-insert-timestamp-function 'erc-insert-timestamp-left)
@@ -544,7 +544,7 @@
     (let ((browse-url-browser-function #'eww-browse-url))
       (elfeed-show-visit)))
   :config
-  (setopt elfeed-feeds my/elfeed-feeds)
+  (setopt elfeed-feeds trev/elfeed-feeds)
   :bind
   (("C-c @" . #'elfeed)
    :map elfeed-show-mode-map
@@ -561,7 +561,7 @@
         :rev "9c5bd70")
   :load my-secrets
   :config
-  (setopt leetcode-session-cookie my/leetcode-session-cookie)
+  (setopt leetcode-session-cookie trev/leetcode-session-cookie)
   :custom
   (leetcode-prefer-language "cpp")
   (leetcode-save-solutions t)
@@ -570,7 +570,7 @@
 (use-package aoc
   :load my-secrets
   :config
-  (setopt aoc-session-cookie my/aoc-session-cookie
+  (setopt aoc-session-cookie trev/aoc-session-cookie
           savehist-additional-variables
           (append savehist-additional-variables '(aoc-year aoc-day-level))))
 
