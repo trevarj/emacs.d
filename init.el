@@ -223,8 +223,6 @@
 
 ;; Searching
 (use-package isearch
-  :custom
-  (search-whitespace-regexp ".*?")
   :bind
   (:map isearch-mode-map
         ("C-n" . isearch-repeat-forward)
