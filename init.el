@@ -233,6 +233,17 @@
   (grep-command "rg -nS --noheading")
   (grep-use-null-device nil))
 
+;; Ibuffer
+(use-package ibuffer
+  :preface
+  (defun ibuffer-mark-special-for-delete ()
+    (interactive)
+    (ibuffer-mark-special-buffers)
+    (ibuffer-change-marks ?\> ?\D))
+  :bind
+  (:map ibuffer-mode-map
+        ("* D" . #'ibuffer-mark-special-for-delete)))
+
 ;; Minibuffer
 (use-package vertico
   :custom
