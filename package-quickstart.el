@@ -5569,7 +5569,7 @@ defined." t)
 
 
 )
-(let* ((load-file-name "/home/trev/.emacs.d/elpa/corfu-20241105.2131/corfu-autoloads.el")(load-true-file-name load-file-name))
+(let* ((load-file-name "/home/trev/.emacs.d/elpa/corfu-20241112.830/corfu-autoloads.el")(load-true-file-name load-file-name))
 
 
 

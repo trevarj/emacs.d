@@ -41,9 +41,10 @@
   (defun trev/use-package-ensure (name args _state &optional _no-refresh)
     "Checks for local package before checking remote archives."
     (if-let* ((path (locate-library (symbol-name name)))
+              (not-feature (not (featurep name)))
               (_ (not (package-installed-p name))))
         (package-install-file path)
-      (use-package-ensure-elpa name args _state _no-refresh)))
+      (when not-feature (use-package-ensure-elpa name args _state _no-refresh))))
 
   :hook
   ((emacs-startup . display-startup-time)
@@ -88,6 +89,7 @@
   (global-auto-revert-non-file-buffers t)   ; Auto-refresh buffers like dired
   (auto-revert-verbose nil)                 ; But silence it
   (enable-recursive-minibuffers t)          ; Recursive mini-buffers
+  (read-extended-command-predicate #'command-completion-default-include-p)
   (inhibit-startup-message t)               ; No startup screen
   (fill-column 80)                          ; Line width 80 chars
   (comment-auto-fill-only-comments t)       ; Autofill comments only
@@ -95,7 +97,7 @@
   (mode-line-end-spaces nil)                ; ^
   (window-divider-default-right-width 16)   ; Padding between splits
   (display-buffer-alist
-   '(("\\*\\(Help\\|helpful\\|Customize\\|info\\).*\\*"
+   '(("\\*\\(Help\\|helpful\\|Customize\\|info\\|xref\\).*\\*"
       (display-buffer-reuse-window display-buffer-in-side-window)
       (side . right)
       (slot . 0)
@@ -140,7 +142,7 @@
    '(
      "-<<" "-<" "-<-" "<--" "<---" "<<-" "<-" "->" "->>" "-->" "--->" "->-" ">-" ">>-"
      "=<<" "=<" "=<=" "<==" "<===" "<<=" "<=" "=>" "=>>" "==>" "===>" "=>=" ">=" ">>="
-     "<->" "<-->" "<--->" "<---->" "<=>" "<==>" "<===>" "<====>" "::" ":::" "__"
+     "<->" "<-->" "<--->" "<---->" "<=>" "<==>" "<===>" "<====>" "::" ":::" "__" "--"
      "<~~" "~~>" "==" "!=" "/=" "~=" "<>" "===" "!==" "!===" "=/=" "=!="
      "<:" ":=" "*=" "*+" "<*" "<*>" "*>" "<." "<.>" ".>" "+*" "=*" "=:" ":>"
      "(*" "*)" "++" "+++" "|-" "-|" "<!--" "<!---")))
@@ -219,22 +221,62 @@
   :config
   (undo-fu-session-global-mode))
 
+;; Searching
+(use-package isearch
+  :custom
+  (search-whitespace-regexp ".*?")
+  :bind
+  (:map isearch-mode-map
+        ("C-n" . isearch-repeat-forward)
+        ("C-p" . isearch-repeat-backward)))
+
+(use-package grep
+  :custom
+  (grep-command "rg -nS --noheading")
+  (grep-use-null-device nil))
+
 ;; Minibuffer
 (use-package vertico
-  :init
-  (vertico-mode)
   :custom
-  (vertico-count 6))
+  (vertico-scroll-margin 5)
+  (vertico-count 10)
+  (vertico-cycle t)
+  :init (vertico-mode))
+
+(use-package orderless
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-defaults nil)
+  (completion-category-overrides '((file (styles partial-completion)))))
+
+(use-package icomplete
+  :disabled
+  :init (fido-vertical-mode)
+  :custom
+  (icomplete-compute-delay 0.05)
+  (icomplete-delay-completions-threshold 2000)
+  (completion-styles '(flex partial-completion emacs22))
+  (completion-category-overrides '((file (styles basic partial-completion))))
+  (completions-max-height 10)
+  :custom-face
+  (icomplete-selected-match ((t (:background ,(get-doom-theme-color 'base4)))))
+  :bind
+  (:map icomplete-fido-mode-map
+        (("TAB" . 'icomplete-force-complete)))
+  (:map completion-list-mode-map
+        (("C-p" . 'minibuffer-previous-completion)
+         ("C-n" . 'minibuffer-next-completion))))
 
 ;; Save minibuffer history between restarts
 (use-package savehist
   :init
   (savehist-mode))
 
-(use-package marginalia ; completion definitions
-  :init
-  (marginalia-mode))
+;; Minibuffer annotations
+(use-package marginalia
+  :init (marginalia-mode))
 
+;; Useful functions
 (use-package consult
   :bind (("C-c c r" . consult-register)
          ("C-c /" . consult-ripgrep)
@@ -247,12 +289,10 @@
          ("C-c c b" . consult-bookmark)            ; orig. bookmark-jump
          ("M-g M-g" . consult-goto-line)           ; orig. goto-line
          ("M-g e" . consult-compile-error)
-         ("M-g f" . consult-flymake)               ; Alternative: consult-flymake
+         ("M-g f" . consult-flymake)
          ("M-g g" . consult-goto-line)             ; orig. goto-line
          ("M-g k" . consult-global-mark)
          ("M-g m" . consult-mark)
-         ("C-s" . consult-line)
-         ("C-c c s" . isearch-forward)
          ("M-y" . consult-yank-pop)                ; orig. yank-pop
          ([remap Info-search] . consult-info)
          :map isearch-mode-map
