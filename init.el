@@ -280,6 +280,7 @@
 (use-package consult
   :bind (("C-c c r" . consult-register)
          ("C-c /" . consult-ripgrep)
+         ("C-<return>" . consult-line)
          ("C-c <SPC>" . consult-fd)
          ("C-c c i" . consult-info)
          ("C-c c m" . consult-man)
