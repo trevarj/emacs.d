@@ -95,10 +95,11 @@
   (mode-line-end-spaces nil)                ; ^
   (window-divider-default-right-width 16)   ; Padding between splits
   (display-buffer-alist
-   '(("\\\\*\\\\(Help\\\\|helpful\\\\|Customize\\\\|info\\\\).*\\\\*"
+   '(("\\*\\(Help\\|helpful\\|Customize\\|info\\).*\\*"
       (display-buffer-reuse-window display-buffer-in-side-window)
       (side . right)
-      (slot . 1))))                         ; Prefer right split for matched buffers
+      (slot . 0)
+      (window-width .5))))                         ; Prefer right split for matched buffers
   (backup-directory-alist '(("." . "~/.cache/emacs/backups")))
   (auto-save-file-name-transforms '((".*" "~/.cache/emacs/saves/" t)))
   (undo-limit 67108864)                     ; Undo limit of 64mb.
