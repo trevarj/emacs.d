@@ -90,8 +90,6 @@
   (auto-revert-verbose nil)                 ; But silence it
   (enable-recursive-minibuffers t)          ; Recursive mini-buffers
   (inhibit-startup-message t)               ; No startup screen
-  (scroll-step 1)                           ; Vim style scrolling
-  (scroll-margin 10)                        ; Vim style scroll off
   (fill-column 80)                          ; Line width 80 chars
   (comment-auto-fill-only-comments t)       ; Autofill comments only
   (mode-line-front-space nil)               ; Nicer -nw mode line
