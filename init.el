@@ -315,9 +315,9 @@
          ("M-r" . consult-history)
          ("M-s" . consult-history))                 ; orig. next-matching-history-element
   :custom
-  (read-buffer-completion-ignore-case t
-   read-file-name-completion-ignore-case t
-   completion-ignore-case t))
+  (read-buffer-completion-ignore-case t)
+  (read-file-name-completion-ignore-case t)
+  (completion-ignore-case t))
 
 (use-package helpful
   :bind
@@ -400,7 +400,9 @@
 (use-package format-all
   :diminish
   :commands format-all-mode
-  :hook (prog-mode . format-all-mode)
+  :hook
+  (prog-mode . format-all-mode)
+  (prog-mode . format-all-ensure-formatter)
   :config
   (setq-default format-all-formatters
                 '(("Shell" (shfmt "-i" "2" "-ci")))))
