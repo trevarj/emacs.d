@@ -230,7 +230,7 @@
 
 (use-package grep
   :custom
-  (grep-command "rg -nS --noheading")
+  (grep-command "rg -nS --no-heading")
   (grep-use-null-device nil))
 
 ;; Ibuffer
