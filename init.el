@@ -483,6 +483,10 @@
           ((c-ts-mode c++-ts-mode) . ("clangd"))))
   (defalias 'start-lsp-server #'eglot))
 
+;; Paredit
+(use-package paredit
+  :hook ((lisp-mode emacs-lisp-mode scheme-mode) . enable-paredit-mode))
+
 ;; Rust
 (use-package rust-mode
   :custom

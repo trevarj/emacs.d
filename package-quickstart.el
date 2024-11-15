@@ -1235,6 +1235,49 @@ Disable `rainbow-delimiters-mode'.")
 
 
 )
+(let* ((load-file-name "/home/trev/.emacs.d/elpa/paredit-20241103.2046/paredit-autoloads.el")(load-true-file-name load-file-name))
+
+
+
+(add-to-list 'load-path (or (and load-file-name (directory-file-name (file-name-directory load-file-name))) (car load-path)))
+
+
+
+
+(autoload 'paredit-mode "paredit" "\
+Minor mode for pseudo-structurally editing Lisp code.
+
+With a prefix argument, enable Paredit Mode even if there are
+  unbalanced parentheses in the buffer.
+Paredit behaves badly if parentheses are unbalanced, so exercise
+  caution when forcing Paredit Mode to be enabled, and consider
+  fixing unbalanced parentheses instead.
+\\<paredit-mode-map>
+
+This is a minor mode.  If called interactively, toggle the `Paredit
+mode' mode.  If the prefix argument is positive, enable the mode, and if
+it is zero or negative, disable the mode.
+
+If called from Lisp, toggle the mode if ARG is `toggle'.  Enable the
+mode if ARG is nil, omitted, or is a positive number.  Disable the mode
+if ARG is a negative number.
+
+To check whether the minor mode is enabled in the current buffer,
+evaluate the variable `paredit-mode'.
+
+The mode's hook is called both when the mode is enabled and when it is
+disabled.
+
+(fn &optional ARG)" t)
+(autoload 'enable-paredit-mode "paredit" "\
+Turn on pseudo-structural editing of Lisp code." t)
+(register-definition-prefixes "paredit" '("disable-paredit-mode" "paredit-"))
+
+
+(provide 'paredit-autoloads)
+
+
+)
 (let* ((load-file-name "/home/trev/.emacs.d/elpa/orderless-20240926.921/orderless-autoloads.el")(load-true-file-name load-file-name))
 
 
@@ -6780,12 +6823,12 @@ disabled.
        (append
         '(ws-butler with-editor vterm vertico undo-fu-session undo-fu
                     treesit-auto transient sly s rust-mode request rainbow-mode
-                    rainbow-delimiters orderless nerd-icons nerd-icons-dired
-                    my-secrets markdown-mode marginalia dash magit-section magit
-                    log4e ligature aio leetcode language-id inheritenv f
-                    elisp-refs helpful git-modes geiser geiser-guile format-all
-                    envrc elfeed doom-themes diminish diff-hl debbugs corfu
-                    consult cape avy aoc ace-window)
+                    rainbow-delimiters paredit orderless nerd-icons
+                    nerd-icons-dired my-secrets markdown-mode marginalia dash
+                    magit-section magit log4e ligature aio leetcode language-id
+                    inheritenv f elisp-refs helpful git-modes geiser
+                    geiser-guile format-all envrc elfeed doom-themes diminish
+                    diff-hl debbugs corfu consult cape avy aoc ace-window)
         package-activated-list)))
 (progn
   (require 'info) (info-initialize)
