@@ -111,7 +111,7 @@
   (epg-pinentry-mode 'loopback)             ; pinentry on minibuffer
   (mouse-wheel-progressive-speed nil)
   (scroll-preserve-screen-position 1)       ; PgUp/PgDown hold
-  (text-mode-ispell-word-completion nil)
+  (tab-always-indent 'complete)             ; TAB to complete
   (gnus-init-file (expand-file-name
                    "gnus/gnus.el"
                    user-emacs-directory))
@@ -340,7 +340,6 @@
   (corfu-popupinfo-delay 0)
   (corfu-quit-no-match 'separator)
   (corfu-preview-current nil)
-  (tab-always-indent 'complete)
   (corfu-left-margin-width 4)
   (corfu-right-margin-width 4)
   :config
@@ -356,7 +355,9 @@
 ;; Completion-at-point helper
 (use-package cape
   :init
-  (add-to-list 'completion-at-point-functions #'cape-file))
+  (add-to-list 'completion-at-point-functions #'cape-file)
+  :custom
+  (text-mode-ispell-word-completion 'cape-dict))
 
 (use-package treesit-auto
   :demand
