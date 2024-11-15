@@ -128,7 +128,7 @@
          (set-auto-mode)))))
   ;; Generic keybindings
   :bind
-  (("C-x b" . ibuffer)
+  (("C-c b" . ibuffer)
    ("C-'" . 'switch-to-buffer-last)
    ("C-x C-z" . nil) ; disable suspend-frame
    ("C-c !" . 'open-user-config)))
@@ -294,13 +294,12 @@
          ("C-c c i" . consult-info)
          ("C-c c m" . consult-man)
          ("C-c r" . consult-recent-file)
-         ("C-c b" . consult-buffer)                ; orig. switch-to-buffer
+         ("C-x b" . consult-buffer)                ; orig. switch-to-buffer
          ("C-c c p" . consult-project-buffer)      ; orig. project-switch-to-buffer
          ("C-c c b" . consult-bookmark)            ; orig. bookmark-jump
          ("M-g M-g" . consult-goto-line)           ; orig. goto-line
          ("M-g e" . consult-compile-error)
          ("M-g f" . consult-flymake)
-         ("M-g g" . consult-goto-line)             ; orig. goto-line
          ("M-g k" . consult-global-mark)
          ("M-g m" . consult-mark)
          ("M-y" . consult-yank-pop)                ; orig. yank-pop
