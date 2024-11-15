@@ -630,6 +630,9 @@
           savehist-additional-variables
           (append savehist-additional-variables '(aoc-year aoc-day-level))))
 
+(use-package launch-program
+  :bind (("s-SPC" . launch-program-launch)))
+
 (provide 'init)
 
 ;; Local Variables:
