@@ -82,55 +82,49 @@
 
   ;; Miscellaneous Options
   :custom
-  (user-full-name "Trevor Arjeski")
-  (user-mail-address "tmarjeski@gmail.com")
-  (custom-file "/tmp/custom.el")           ; customization file
-  (desktop-load-locked-desktop 'check-pid) ; load if lock pid doesn't exist
-  (display-line-numbers-grow-only t)       ; Never shrink the linum width
-  (display-line-numbers-width-start t)     ; Calculate linum width at start
+  (auto-fill-function 'do-auto-fill)
+  (auto-revert-verbose nil)
+  (auto-save-file-name-transforms '((".*" "~/.cache/emacs/saves/" t)))
+  (backup-directory-alist '(("." . "~/.cache/emacs/backups")))
+  (comment-auto-fill-only-comments t)                   ; Autofill comments only
   (confirm-kill-emacs nil)
-  (use-dialog-box nil)                    ; Bye
-  (use-short-answers t)                   ; y/n
-  (global-auto-revert-non-file-buffers t) ; Auto-refresh buffers like dired
-  (auto-revert-verbose nil)               ; But silence it
-  (enable-recursive-minibuffers t)        ; Recursive mini-buffers
-  (read-extended-command-predicate #'command-completion-default-include-p)
-  (inhibit-startup-message t)             ; No startup screen
-  (fill-column 80)                        ; Line width 80 chars
-  (comment-auto-fill-only-comments t)     ; Autofill comments only
-  (mode-line-front-space nil)             ; Nicer -nw mode line
-  (mode-line-end-spaces nil)              ; ^
-  (window-divider-default-right-width 16) ; Padding between splits
-  (display-buffer-alist
+  (custom-file "/tmp/custom.el")                        ; customization file
+  (desktop-load-locked-desktop 'check-pid)              ; load if lock pid doesn't exist
+  (display-buffer-alist                                 ; Prefer right split for matched buffers
    '(("\\*\\(Help\\|helpful\\|Customize\\|info\\|xref\\).*\\*"
       (display-buffer-reuse-window display-buffer-in-side-window)
       (side . right)
       (slot . 0)
-      (window-width .5))))              ; Prefer right split for matched buffers
-  (backup-directory-alist '(("." . "~/.cache/emacs/backups")))
-  (auto-save-file-name-transforms '((".*" "~/.cache/emacs/saves/" t)))
-  (undo-limit 67108864)                 ; Undo limit of 64mb.
-  (undo-strong-limit 100663296)         ;               96mb.
-  (undo-outer-limit 1006632960)         ;               960mb.
+      (window-width .5))))
+  (display-line-numbers-grow-only t)                    ; Never shrink the linum width
+  (display-line-numbers-width-start t)                  ; Calculate linum width at start
   (eldoc-echo-area-use-multiline-p nil)
-  (epg-pinentry-mode 'loopback)         ; pinentry on minibuffer
-  (mouse-wheel-progressive-speed nil)
-  (scroll-preserve-screen-position 1)   ; PgUp/PgDown hold
-  (tab-always-indent 'complete)         ; TAB to complete
+  (enable-recursive-minibuffers t)                      ; Recursive mini-buffers
+  (epg-pinentry-mode 'loopback)                         ; pinentry on minibuffer
+  (fill-column 80)                                      ; 80 width pages
+  (global-auto-revert-non-file-buffers t)               ; Auto-refresh buffers like dired
   (gnus-init-file (expand-file-name
                    "gnus/gnus.el"
                    user-emacs-directory))
-  (send-mail-function 'message-send-mail-with-sendmail) ; Use sendmail
-  (fill-column 80)                                      ; 80 width pages
-  (auto-fill-function 'do-auto-fill)                    ; always autofill
   (indent-tabs-mode nil)                                ; Use spaces only
-  (use-default-font-for-symbols nil)                    ; For nerd fonts
+  (inhibit-startup-message t)                           ; No startup screen
+  (mode-line-end-spaces nil)
+  (mode-line-front-space nil)                           ; Nicer -nw mode line
+  (mouse-wheel-progressive-speed nil)
+  (read-extended-command-predicate #'command-completion-default-include-p)
+  (scroll-preserve-screen-position 1)                   ; PgUp/PgDown hold
+  (send-mail-function 'message-send-mail-with-sendmail) ; Use sendmail
+  (tab-always-indent 'complete)                         ; TAB to complete
   (treesit-font-lock-level 4)                           ; More treesitter faces
-  (major-mode                           ; Guess major mode from file name
-   (lambda ()
-     (unless buffer-file-name
-       (let ((buffer-file-name (buffer-name)))
-         (set-auto-mode)))))
+  (undo-limit 67108864)                                 ; 64mb.
+  (undo-outer-limit 1006632960)                         ; 960mb.
+  (undo-strong-limit 100663296)                         ; 96mb.
+  (use-default-font-for-symbols nil)                    ; For nerd fonts
+  (use-dialog-box nil)                                  ; Bye
+  (use-short-answers t)                                 ; y/n
+  (user-full-name "Trevor Arjeski")
+  (user-mail-address "tmarjeski@gmail.com")
+  (window-divider-default-right-width 16)               ; Padding between splits
   ;; Generic keybindings
   :bind
   (("C-c b" . ibuffer)
