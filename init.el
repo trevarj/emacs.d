@@ -188,6 +188,17 @@
                         :foreground orange :weight 'bold)
     (set-face-attribute 'window-divider nil :inherit 'ansi-color-black)))
 
+;; Project.el
+
+(use-package project
+  :custom
+  (project-switch-commands
+   '((project-find-file "Find file" ?f)
+     (consult-ripgrep "Find regexp" ?g)
+     (magit-project-status "Magit" ?m)
+     (project-vterm "Vterm" ?v)
+     (project-any-command "Other" ?o))))
+
 ;; Diminish minor modes
 (use-package diminish
   :demand
@@ -452,8 +463,6 @@
               (pop-to-buffer shell-buffer (bound-and-true-p display-comint-buffer-action))
             (vterm shell-buffer))
         (vterm (generate-new-buffer-name default-project-shell-name)))))
-  :init
-  (add-to-list 'project-switch-commands '(project-vterm "Vterm" "t"))
   :config
   (set-face-foreground 'term-color-bright-black "#4C566A"))
 
