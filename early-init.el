@@ -2,7 +2,8 @@
 
 ;; Startup hacks
 (setq gc-cons-threshold most-positive-fixnum
-      gc-cons-percentage 0.6)
+      gc-cons-percentage 0.6
+      vc-handled-backends '(Git))
 
 ;; After Emacs has completely started, reset the values to more sensible ones.
 (add-hook
