@@ -190,7 +190,7 @@
    '((project-find-file "Find file" ?f)
      (consult-ripgrep "Find regexp" ?g)
      (magit-project-status "Magit" ?m)
-     (project-vterm "Vterm" ?v)
+     (eat-project-other-window "Term" ?t)
      (project-any-command "Other" ?o))))
 
 ;; Diminish minor modes
@@ -444,23 +444,11 @@
   (dired-mode . nerd-icons-dired-mode))
 
 ;; Terminal
-(use-package vterm
-  :after project
-  :preface
-  (defun project-vterm ()
-    "Start a vterm shell in the current project's root directory."
-    (interactive)
-    (require 'comint)
-    (let* ((default-directory (project-root (project-current t)))
-           (default-project-shell-name (project-prefixed-buffer-name "vterm"))
-           (shell-buffer (get-buffer default-project-shell-name)))
-      (if (and shell-buffer (not current-prefix-arg))
-          (if (comint-check-proc shell-buffer)
-              (pop-to-buffer shell-buffer (bound-and-true-p display-comint-buffer-action))
-            (vterm shell-buffer))
-        (vterm (generate-new-buffer-name default-project-shell-name)))))
-  :config
-  (set-face-foreground 'term-color-bright-black "#4C566A"))
+(use-package eat
+  :commands (eat)
+  :custom
+  (eat-kill-buffer-on-exit t)
+  (eat-term-scrollback-size 1200000))
 
 ;; Eglot LSP
 (use-package eglot

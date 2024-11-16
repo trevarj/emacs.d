@@ -157,75 +157,6 @@ else like the former.
 
 
 )
-(let* ((load-file-name "/home/trev/.emacs.d/elpa/vterm-20240825.133/vterm-autoloads.el")(load-true-file-name load-file-name))
-
-
-
-(add-to-list 'load-path (or (and load-file-name (directory-file-name (file-name-directory load-file-name))) (car load-path)))
-
-
-
-
-(autoload 'vterm-module-compile "vterm" "\
-Compile vterm-module." t)
-(autoload 'vterm--bookmark-handler "vterm" "\
-Handler to restore a vterm bookmark BMK.
-
-If a vterm buffer of the same name does not exist, the function will create a
-new vterm buffer of the name. It also checks the current directory and sets
-it to the bookmarked directory if needed.
-
-(fn BMK)")
-(autoload 'vterm-next-error-function "vterm" "\
-Advance to the next error message and visit the file where the error was.
-This is the value of `next-error-function' in Compilation
-buffers.  Prefix arg N says how many error messages to move
-forwards (or backwards, if negative).
-
-Optional argument RESET clears all the errors.
-
-(fn N &optional RESET)" t)
-(autoload 'vterm "vterm" "\
-Create an interactive Vterm buffer.
-Start a new Vterm session, or switch to an already active
-session.  Return the buffer selected (or created).
-
-With a nonnumeric prefix arg, create a new session.
-
-With a string prefix arg, create a new session with arg as buffer name.
-
-With a numeric prefix arg (as in `C-u 42 M-x vterm RET'), switch
-to the session with that number, or create it if it doesn't
-already exist.
-
-The buffer name used for Vterm sessions is determined by the
-value of `vterm-buffer-name'.
-
-(fn &optional ARG)" t)
-(autoload 'vterm-other-window "vterm" "\
-Create an interactive Vterm buffer in another window.
-Start a new Vterm session, or switch to an already active
-session.  Return the buffer selected (or created).
-
-With a nonnumeric prefix arg, create a new session.
-
-With a string prefix arg, create a new session with arg as buffer name.
-
-With a numeric prefix arg (as in `C-u 42 M-x vterm RET'), switch
-to the session with that number, or create it if it doesn't
-already exist.
-
-The buffer name used for Vterm sessions is determined by the
-value of `vterm-buffer-name'.
-
-(fn &optional ARG)" t)
-(register-definition-prefixes "vterm" '("vterm-"))
-
-
-(provide 'vterm-autoloads)
-
-
-)
 (let* ((load-file-name "/home/trev/.emacs.d/elpa/vertico-20241105.2131/vertico-autoloads.el")(load-true-file-name load-file-name))
 
 
@@ -5066,6 +4997,140 @@ Show the bookmarked entry saved in the `RECORD'.
 
 
 )
+(let* ((load-file-name "/home/trev/.emacs.d/elpa/eat-0.9.4/eat-autoloads.el")(load-true-file-name load-file-name))
+
+
+
+(add-to-list 'load-path (or (and load-file-name (directory-file-name (file-name-directory load-file-name))) (car load-path)))
+
+
+
+
+(autoload 'eat-term-make "eat" "\
+Make a Eat terminal at POSITION in BUFFER.
+
+(fn BUFFER POSITION)")
+(autoload 'eat "eat" "\
+Start a new Eat terminal emulator in a buffer.
+
+Start a new Eat session, or switch to an already active session.
+Return the buffer selected (or created).
+
+With a non-numeric prefix ARG, create a new session.
+
+With a numeric prefix ARG (like \\[universal-argument] 42 \\[eat]),
+switch to the session with that number, or create it if it doesn't
+already exist.
+
+With double prefix argument ARG, ask for the program to run and run it
+in a newly created session.
+
+PROGRAM can be a shell command.
+
+(fn &optional PROGRAM ARG)" t)
+(autoload 'eat-other-window "eat" "\
+Start a new Eat terminal emulator in a buffer in another window.
+
+Start a new Eat session, or switch to an already active session.
+Return the buffer selected (or created).
+
+With a non-numeric prefix ARG, create a new session.
+
+With a numeric prefix ARG switch to the session with that number, or
+create it if it doesn't already exist.
+
+With double prefix argument ARG, ask for the program to run and run it
+in a newly created session.
+
+PROGRAM can be a shell command.
+
+(fn &optional PROGRAM ARG)" t)
+(defvar eat-eshell-mode nil "\
+Non-nil if Eat-Eshell mode is enabled.
+See the `eat-eshell-mode' command
+for a description of this minor mode.
+Setting this variable directly does not take effect;
+either customize it (see the info node `Easy Customization')
+or call the function `eat-eshell-mode'.")
+(custom-autoload 'eat-eshell-mode "eat" nil)
+(autoload 'eat-eshell-mode "eat" "\
+Toggle Eat terminal emulation in Eshell.
+
+This is a global minor mode.  If called interactively, toggle the
+`Eat-Eshell mode' mode.  If the prefix argument is positive, enable the
+mode, and if it is zero or negative, disable the mode.
+
+If called from Lisp, toggle the mode if ARG is `toggle'.  Enable the
+mode if ARG is nil, omitted, or is a positive number.  Disable the mode
+if ARG is a negative number.
+
+To check whether the minor mode is enabled in the current buffer,
+evaluate `(default-value \\='eat-eshell-mode)'.
+
+The mode's hook is called both when the mode is enabled and when it is
+disabled.
+
+(fn &optional ARG)" t)
+(defvar eat-eshell-visual-command-mode nil "\
+Non-nil if Eat-Eshell-Visual-Command mode is enabled.
+See the `eat-eshell-visual-command-mode' command
+for a description of this minor mode.
+Setting this variable directly does not take effect;
+either customize it (see the info node `Easy Customization')
+or call the function `eat-eshell-visual-command-mode'.")
+(custom-autoload 'eat-eshell-visual-command-mode "eat" nil)
+(autoload 'eat-eshell-visual-command-mode "eat" "\
+Toggle running Eshell visual commands with Eat.
+
+This is a global minor mode.  If called interactively, toggle the
+`Eat-Eshell-Visual-Command mode' mode.  If the prefix argument is
+positive, enable the mode, and if it is zero or negative, disable the
+mode.
+
+If called from Lisp, toggle the mode if ARG is `toggle'.  Enable the
+mode if ARG is nil, omitted, or is a positive number.  Disable the mode
+if ARG is a negative number.
+
+To check whether the minor mode is enabled in the current buffer,
+evaluate `(default-value \\='eat-eshell-visual-command-mode)'.
+
+The mode's hook is called both when the mode is enabled and when it is
+disabled.
+
+(fn &optional ARG)" t)
+(autoload 'eat-project "eat" "\
+Start Eat in the current project's root directory.
+
+Start a new Eat session, or switch to an already active session.
+Return the buffer selected (or created).
+
+With a non-numeric prefix ARG, create a new session.
+
+With a numeric prefix ARG (like
+\\[universal-argument] 42 \\[eat-project]), switch to the session with
+that number, or create it if it doesn't already exist.
+
+(fn &optional ARG)" t)
+(autoload 'eat-project-other-window "eat" "\
+Start Eat in the current project root directory in another window.
+
+Start a new Eat session, or switch to an already active session.
+Return the buffer selected (or created).
+
+With a non-numeric prefix ARG, create a new session.
+
+With a numeric prefix ARG (like
+\\[universal-argument] 42 \\[eat-project]), switch to the session with
+that number, or create it if it doesn't already exist.
+
+(fn &optional ARG)" t)
+(register-definition-prefixes "eat" '("eat-"))
+
+
+(provide 'eat-autoloads)
+
+
+)
 (let* ((load-file-name "/home/trev/.emacs.d/elpa/doom-themes-20240909.2117/doom-themes-autoloads.el")(load-true-file-name load-file-name))
 
 
@@ -6775,21 +6840,21 @@ disabled.
 (setq package-activated-list
       (delete-dups
        (append
-        '(ws-butler with-editor vterm vertico undo-fu-session undo-fu
-                    treesit-auto sly s rust-mode request rainbow-mode
-                    rainbow-delimiters paredit orderless nerd-icons
-                    nerd-icons-dired my-secrets markdown-mode marginalia dash
-                    magit-section magit log4e ligature aio leetcode consult
-                    launch-program language-id inheritenv f elisp-refs helpful
-                    git-modes geiser geiser-guile format-all envrc elfeed
-                    doom-themes diminish diff-hl debbugs corfu cape avy aoc
-                    ace-window)
+        '(ws-butler with-editor vertico undo-fu-session undo-fu treesit-auto sly
+                    s rust-mode request rainbow-mode rainbow-delimiters paredit
+                    orderless nerd-icons nerd-icons-dired my-secrets
+                    markdown-mode marginalia dash magit-section magit log4e
+                    ligature aio leetcode consult launch-program language-id
+                    inheritenv f elisp-refs helpful git-modes geiser
+                    geiser-guile format-all envrc elfeed eat doom-themes
+                    diminish diff-hl debbugs corfu cape avy aoc ace-window)
         package-activated-list)))
 (progn
   (require 'info) (info-initialize)
   (setq Info-directory-list
         (append
          '("/home/trev/.emacs.d/elpa/debbugs-0.42"
+           "/home/trev/.emacs.d/elpa/eat-0.9.4"
            "/home/trev/.emacs.d/elpa/geiser-guile-20240920.35"
            "/home/trev/.emacs.d/elpa/geiser-20240907.2235"
            "/home/trev/.emacs.d/elpa/magit-20241106.1441"
