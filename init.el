@@ -9,6 +9,21 @@
   :config
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t))
 
+(use-package use-package
+  :preface
+  (defun trev/use-package-ensure (name args _state &optional _no-refresh)
+    "Checks for local package before checking remote archives."
+    (if-let* ((path (locate-library (symbol-name name)))
+              (not-feature (not (featurep name)))
+              (_ (not (package-installed-p name))))
+        (package-install-file path)
+      (when not-feature (use-package-ensure-elpa name args _state _no-refresh))))
+  :custom
+  (use-package-expand-minimally t)
+  (use-package-always-defer t)              ; always defer packages, use :demand instead
+  (use-package-always-ensure t)             ; always ensure packages
+  (use-package-ensure-function #'trev/use-package-ensure))
+
 (use-package emacs
   :demand t
   :preface
@@ -38,14 +53,6 @@
     "Toggles back to previously visited buffer"
     (interactive) (switch-to-buffer nil))
 
-  (defun trev/use-package-ensure (name args _state &optional _no-refresh)
-    "Checks for local package before checking remote archives."
-    (if-let* ((path (locate-library (symbol-name name)))
-              (not-feature (not (featurep name)))
-              (_ (not (package-installed-p name))))
-        (package-install-file path)
-      (when not-feature (use-package-ensure-elpa name args _state _no-refresh))))
-
   :hook
   ((emacs-startup . display-startup-time)
    (buffer-list-update . header-line-file-path)
@@ -54,12 +61,13 @@
   (add-to-list 'load-path (concat user-emacs-directory "/lisp"))
   (save-place-mode)
   (recentf-mode)
-  (desktop-save-mode)                           ; Session saving
-  (column-number-mode)                          ; Column number mode
-  (global-auto-revert-mode)                     ; Auto-refresh buffers
-  (electric-pair-mode)                          ; Pair the pairs
-  (auto-fill-mode)                              ; Autofill mode
-  (window-divider-mode)                         ; Gap between splits
+  (desktop-save-mode)                   ; Session saving
+  (column-number-mode)                  ; Column number mode
+  (global-auto-revert-mode)             ; Auto-refresh buffers
+  (electric-pair-mode)                  ; Pair the pairs
+  (auto-fill-mode)                      ; Autofill mode
+  (window-divider-mode)                 ; Gap between splits
+  (put 'suspend-frame 'disabled t)      ; Disable suspend-frame
   ;; Fonts
   (set-face-attribute 'default nil :family "Iosevka JBM" :height 150 :weight 'medium)
   (set-face-attribute 'variable-pitch nil :family "Noto Sans")
@@ -76,42 +84,39 @@
   :custom
   (user-full-name "Trevor Arjeski")
   (user-mail-address "tmarjeski@gmail.com")
-  (use-package-always-defer t)              ; always defer packages, use :demand instead
-  (use-package-always-ensure t)             ; always ensure packages
-  (use-package-ensure-function #'trev/use-package-ensure)
-  (custom-file "/tmp/custom.el")            ; customization file
-  (desktop-load-locked-desktop 'check-pid)  ; load if lock pid doesn't exist
-  (display-line-numbers-grow-only t)        ; Never shrink the linum width
-  (display-line-numbers-width-start t)      ; Calculate linum width at start
+  (custom-file "/tmp/custom.el")           ; customization file
+  (desktop-load-locked-desktop 'check-pid) ; load if lock pid doesn't exist
+  (display-line-numbers-grow-only t)       ; Never shrink the linum width
+  (display-line-numbers-width-start t)     ; Calculate linum width at start
   (confirm-kill-emacs nil)
-  (use-dialog-box nil)                      ; Bye
-  (use-short-answers t)                     ; y/n
-  (global-auto-revert-non-file-buffers t)   ; Auto-refresh buffers like dired
-  (auto-revert-verbose nil)                 ; But silence it
-  (enable-recursive-minibuffers t)          ; Recursive mini-buffers
+  (use-dialog-box nil)                    ; Bye
+  (use-short-answers t)                   ; y/n
+  (global-auto-revert-non-file-buffers t) ; Auto-refresh buffers like dired
+  (auto-revert-verbose nil)               ; But silence it
+  (enable-recursive-minibuffers t)        ; Recursive mini-buffers
   (read-extended-command-predicate #'command-completion-default-include-p)
-  (inhibit-startup-message t)               ; No startup screen
-  (fill-column 80)                          ; Line width 80 chars
-  (comment-auto-fill-only-comments t)       ; Autofill comments only
-  (mode-line-front-space nil)               ; Nicer -nw mode line
-  (mode-line-end-spaces nil)                ; ^
-  (window-divider-default-right-width 16)   ; Padding between splits
+  (inhibit-startup-message t)             ; No startup screen
+  (fill-column 80)                        ; Line width 80 chars
+  (comment-auto-fill-only-comments t)     ; Autofill comments only
+  (mode-line-front-space nil)             ; Nicer -nw mode line
+  (mode-line-end-spaces nil)              ; ^
+  (window-divider-default-right-width 16) ; Padding between splits
   (display-buffer-alist
    '(("\\*\\(Help\\|helpful\\|Customize\\|info\\|xref\\).*\\*"
       (display-buffer-reuse-window display-buffer-in-side-window)
       (side . right)
       (slot . 0)
-      (window-width .5))))                         ; Prefer right split for matched buffers
+      (window-width .5))))              ; Prefer right split for matched buffers
   (backup-directory-alist '(("." . "~/.cache/emacs/backups")))
   (auto-save-file-name-transforms '((".*" "~/.cache/emacs/saves/" t)))
-  (undo-limit 67108864)                     ; Undo limit of 64mb.
-  (undo-strong-limit 100663296)             ;               96mb.
-  (undo-outer-limit 1006632960)             ;               960mb.
+  (undo-limit 67108864)                 ; Undo limit of 64mb.
+  (undo-strong-limit 100663296)         ;               96mb.
+  (undo-outer-limit 1006632960)         ;               960mb.
   (eldoc-echo-area-use-multiline-p nil)
-  (epg-pinentry-mode 'loopback)             ; pinentry on minibuffer
+  (epg-pinentry-mode 'loopback)         ; pinentry on minibuffer
   (mouse-wheel-progressive-speed nil)
-  (scroll-preserve-screen-position 1)       ; PgUp/PgDown hold
-  (tab-always-indent 'complete)             ; TAB to complete
+  (scroll-preserve-screen-position 1)   ; PgUp/PgDown hold
+  (tab-always-indent 'complete)         ; TAB to complete
   (gnus-init-file (expand-file-name
                    "gnus/gnus.el"
                    user-emacs-directory))
@@ -121,7 +126,7 @@
   (indent-tabs-mode nil)                                ; Use spaces only
   (use-default-font-for-symbols nil)                    ; For nerd fonts
   (treesit-font-lock-level 4)                           ; More treesitter faces
-  (major-mode                                           ; Guess major mode from file name
+  (major-mode                           ; Guess major mode from file name
    (lambda ()
      (unless buffer-file-name
        (let ((buffer-file-name (buffer-name)))
@@ -130,7 +135,6 @@
   :bind
   (("C-c b" . ibuffer)
    ("C-'" . 'switch-to-buffer-last)
-   ("C-x C-z" . nil) ; disable suspend-frame
    ("C-c !" . 'open-user-config)))
 
 ;; Ligatures
