@@ -185,6 +185,9 @@
 ;; Project.el
 
 (use-package project
+  :bind
+  (:map project-prefix-map
+        (("t" . 'eat-project-other-window)))
   :custom
   (project-switch-commands
    '((project-find-file "Find file" ?f)
