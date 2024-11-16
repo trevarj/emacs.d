@@ -1,9 +1,21 @@
 ;;; early-init.el --- Trev's Early Init Config -*- lexical-binding: t -*-
 
 ;; Startup hacks
-(setq gc-cons-threshold (* 1024 1024 100))
-;; (setq file-name-handler-alist-original file-name-handler-alist)
-;; (setq file-name-handler-alist nil)
+(setq gc-cons-threshold most-positive-fixnum
+      gc-cons-percentage 0.6)
+
+;; After Emacs has completely started, reset the values to more sensible ones.
+(add-hook
+ 'emacs-startup-hook
+ (let ((orig-file-name-handler-alist file-name-handler-alist)
+       (orig-vc-handled-backends vc-handled-backends))
+   (setq file-name-handler-alist nil
+         vc-handled-backends nil)
+   (lambda ()
+     (setq gc-cons-threshold (* 16 1024 1024) ; 16mb
+           gc-cons-percentage 0.1
+           file-name-handler-alist orig-file-name-handler-alist
+           vc-handled-backends orig-vc-handled-backends))))
 
 (setq package-quickstart t)                 ; Don't forget to run `package-quickstart-refresh'!
 (scroll-bar-mode -1)                        ; Disable visible scrollbar
