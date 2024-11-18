@@ -5,7 +5,7 @@
 ;; Author: Trevor Arjeski <tmarjeski@gmail.com>
 ;; Keywords: lisp
 ;; Package-Version: 1.0.0
-;; Package-Requires: ((s "20220902.1511"))
+;; Package-Requires: ((s "1.13.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
