@@ -248,13 +248,14 @@
 ;; Ibuffer
 (use-package ibuffer
   :preface
-  (defun ibuffer-mark-special-for-delete ()
+  (defun ibuffer-mark-unimportant-for-delete ()
     (interactive)
     (ibuffer-mark-special-buffers)
+    (ibuffer-mark-read-only-buffers)
     (ibuffer-change-marks ?> ?D))
   :bind
   (:map ibuffer-mode-map
-        ("* D" . #'ibuffer-mark-special-for-delete)))
+        ("* D" . #'ibuffer-mark-unimportant-for-delete)))
 
 ;; Minibuffer
 (use-package vertico
