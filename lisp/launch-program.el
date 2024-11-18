@@ -5,7 +5,7 @@
 ;; Author: Trevor Arjeski <tmarjeski@gmail.com>
 ;; Keywords: lisp
 ;; Package-Version: 1.0.0
-;; Package-Requires: ((s "20220902.1511") (consult "20241115.517"))
+;; Package-Requires: ((s "20220902.1511"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -27,7 +27,6 @@
 
 ;;; Code:
 
-(require 'consult)
 (require 's)
 
 (defconst regex-string "^\\[Desktop Entry\\](?:\\s|.)*?^Name=(.*)\\n(?:\\s|.)*?^Exec=.*"
@@ -51,8 +50,8 @@
   (let ((apps (mapcar 'parse-result
                       (s-split "\n" (shell-command-to-string rg-cmd) t))))
     (launch-program--launch-desktop-file
-     (cadr (assoc-string (consult--read (mapcar 'car apps)
-                                        :prompt "Launch a program: ") apps)))))
+     (cadr (assoc-string (completing-read "Launch a program: "
+                                          (mapcar 'car apps)) apps)))))
 
 (provide 'launch-program)
 ;;; launch-program.el ends here
