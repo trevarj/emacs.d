@@ -5,7 +5,7 @@
 ;; Author: Trevor Arjeski <tmarjeski@gmail.com>
 ;; Keywords: lisp
 ;; Package-Version: 1.0.0
-;; Package-Requires: ((emacs "29.4") (request "0.3.3"))
+;; Package-Requires: ((emacs "29.4") (request "20230127.417"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
