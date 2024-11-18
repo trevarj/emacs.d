@@ -531,6 +531,15 @@
       (erc-match-toggle-hidden-fools hidden-fools)
       (message "hidden fools: %s" (if hidden-fools "on" "off"))
       (set-buffer-modified-p t)))
+
+  (defun erc-track-external-notification ()
+    "Run on `erc-track-list-changed-hook' and silently writes to a named
+fifo /tmp/erc-track.fifo."
+    (when-let* ((fifo "/tmp/erc-track.fifo")
+                (file-exists-p fifo))
+      (write-region
+       (format "%s\n" (or (mapcar 'buffer-name (mapcar #'car erc-modified-channels-alist)) ""))
+       nil fifo t 'quiet)))
   :custom
   (erc-server "orangepi")
   (erc-port "7777")
@@ -578,14 +587,15 @@
   (erc-scrolltobottom-mode)
   (defun erc-match-directed-at-fool-p (_msg) nil)
   :hook
-  ((erc-mode . (lambda ()
-                 (auto-fill-mode -1)
-                 (setq-local scroll-margin 0)))
-   (erc-text-matched . erc-hide-fools)
-   (erc-match-mode . (lambda ()
-                       (set-face-attribute 'erc-current-nick-face nil
-                                           :foreground (get-doom-theme-color 'red)
-                                           :slant 'italic :weight 'heavy))))
+  (erc-mode . (lambda ()
+                (auto-fill-mode -1)
+                (setq-local scroll-margin 0)))
+  (erc-text-matched . erc-hide-fools)
+  (erc-match-mode . (lambda ()
+                      (set-face-attribute 'erc-current-nick-face nil
+                                          :foreground (get-doom-theme-color 'red)
+                                          :slant 'italic :weight 'heavy)))
+  (erc-track-list-changed . erc-track-external-notification)
   :bind
   (("C-c e" . 'erc-connect)
    :map erc-mode-map
