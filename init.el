@@ -108,9 +108,11 @@
                    user-emacs-directory))
   (indent-tabs-mode nil)                                ; Use spaces only
   (inhibit-startup-message t)                           ; No startup screen
+  (kill-buffer-quit-windows t)
   (mode-line-end-spaces nil)
   (mode-line-front-space nil)                           ; Nicer -nw mode line
   (mouse-wheel-progressive-speed nil)
+  (quit-restore-window-no-switch 'skip-first)
   (read-extended-command-predicate #'command-completion-default-include-p)
   (scroll-preserve-screen-position 1)                   ; PgUp/PgDown hold
   (send-mail-function 'message-send-mail-with-sendmail) ; Use sendmail
