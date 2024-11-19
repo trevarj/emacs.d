@@ -244,8 +244,8 @@
 
 (use-package grep
   :custom
-  (grep-command "rg -nS --no-heading")
-  (grep-use-null-device nil))
+  (grep-use-headings t)
+  (grep-command "rg -nHS0 --no-heading "))
 
 ;; Ibuffer
 (use-package ibuffer
