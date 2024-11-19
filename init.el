@@ -592,6 +592,7 @@ fifo /tmp/erc-track.fifo."
   :hook
   (erc-mode . (lambda ()
                 (auto-fill-mode -1)
+                (add-to-list 'completion-at-point-functions 'cape-emoji)
                 (setq-local scroll-margin 0)))
   (erc-text-matched . erc-hide-fools)
   (erc-match-mode . (lambda ()
