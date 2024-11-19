@@ -237,6 +237,8 @@
 
 ;; Searching
 (use-package isearch
+  :custom
+  (isearch-lazy-count t)
   :bind
   (:map isearch-mode-map
         ("C-n" . isearch-repeat-forward)
