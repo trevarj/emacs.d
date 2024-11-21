@@ -634,6 +634,72 @@ Clear all undo/redo steps." t)
 
 
 )
+(let* ((load-file-name "/home/trev/.emacs.d/elpa/transient-20241115.2034/transient-autoloads.el")(load-true-file-name load-file-name))
+
+
+
+(add-to-list 'load-path (or (and load-file-name (directory-file-name (file-name-directory load-file-name))) (car load-path)))
+
+
+
+
+(autoload 'transient-insert-suffix "transient" "\
+Insert a SUFFIX into PREFIX before LOC.
+PREFIX is a prefix command, a symbol.
+SUFFIX is a suffix command or a group specification (of
+  the same forms as expected by `transient-define-prefix').
+LOC is a command, a key vector, a key description (a string
+  as returned by `key-description'), or a coordination list
+  (whose last element may also be a command or key).
+Remove a conflicting binding unless optional KEEP-OTHER is
+  non-nil.
+See info node `(transient)Modifying Existing Transients'.
+
+(fn PREFIX LOC SUFFIX &optional KEEP-OTHER)")
+(function-put 'transient-insert-suffix 'lisp-indent-function 'defun)
+(autoload 'transient-append-suffix "transient" "\
+Insert a SUFFIX into PREFIX after LOC.
+PREFIX is a prefix command, a symbol.
+SUFFIX is a suffix command or a group specification (of
+  the same forms as expected by `transient-define-prefix').
+LOC is a command, a key vector, a key description (a string
+  as returned by `key-description'), or a coordination list
+  (whose last element may also be a command or key).
+Remove a conflicting binding unless optional KEEP-OTHER is
+  non-nil.
+See info node `(transient)Modifying Existing Transients'.
+
+(fn PREFIX LOC SUFFIX &optional KEEP-OTHER)")
+(function-put 'transient-append-suffix 'lisp-indent-function 'defun)
+(autoload 'transient-replace-suffix "transient" "\
+Replace the suffix at LOC in PREFIX with SUFFIX.
+PREFIX is a prefix command, a symbol.
+SUFFIX is a suffix command or a group specification (of
+  the same forms as expected by `transient-define-prefix').
+LOC is a command, a key vector, a key description (a string
+  as returned by `key-description'), or a coordination list
+  (whose last element may also be a command or key).
+See info node `(transient)Modifying Existing Transients'.
+
+(fn PREFIX LOC SUFFIX)")
+(function-put 'transient-replace-suffix 'lisp-indent-function 'defun)
+(autoload 'transient-remove-suffix "transient" "\
+Remove the suffix or group at LOC in PREFIX.
+PREFIX is a prefix command, a symbol.
+LOC is a command, a key vector, a key description (a string
+  as returned by `key-description'), or a coordination list
+  (whose last element may also be a command or key).
+See info node `(transient)Modifying Existing Transients'.
+
+(fn PREFIX LOC)")
+(function-put 'transient-remove-suffix 'lisp-indent-function 'defun)
+(register-definition-prefixes "transient" '("find-function-advised-original" "transient"))
+
+
+(provide 'transient-autoloads)
+
+
+)
 (let* ((load-file-name "/home/trev/.emacs.d/elpa/sly-20240809.2119/sly-autoloads.el")(load-true-file-name load-file-name))
 
 
@@ -1308,7 +1374,7 @@ disabled.
 
 
 )
-(let* ((load-file-name "/home/trev/.emacs.d/elpa/markdown-mode-20241107.349/markdown-mode-autoloads.el")(load-true-file-name load-file-name))
+(let* ((load-file-name "/home/trev/.emacs.d/elpa/markdown-mode-20241117.1510/markdown-mode-autoloads.el")(load-true-file-name load-file-name))
 
 
 
@@ -1530,7 +1596,7 @@ with the variables' values as arguments, which were recorded by
 
 
 )
-(let* ((load-file-name "/home/trev/.emacs.d/elpa/magit-20241106.1441/magit-autoloads.el")(load-true-file-name load-file-name))
+(let* ((load-file-name "/home/trev/.emacs.d/elpa/magit-20241116.1557/magit-autoloads.el")(load-true-file-name load-file-name))
 
 
 
@@ -3941,7 +4007,7 @@ returns nil." t)
 
 
 )
-(let* ((load-file-name "/home/trev/.emacs.d/elpa/inheritenv-20230804.651/inheritenv-autoloads.el")(load-true-file-name load-file-name))
+(let* ((load-file-name "/home/trev/.emacs.d/elpa/inheritenv-20241119.1355/inheritenv-autoloads.el")(load-true-file-name load-file-name))
 
 
 
@@ -4417,7 +4483,7 @@ or zero, and enabled otherwise.
 
 
 )
-(let* ((load-file-name "/home/trev/.emacs.d/elpa/envrc-20240613.907/envrc-autoloads.el")(load-true-file-name load-file-name))
+(let* ((load-file-name "/home/trev/.emacs.d/elpa/envrc-20241118.1700/envrc-autoloads.el")(load-true-file-name load-file-name))
 
 
 
@@ -4462,9 +4528,11 @@ If called from Lisp, toggle the mode if ARG is `toggle'.
 Enable the mode if ARG is nil, omitted, or is a positive number.
 Disable the mode if ARG is a negative number.
 
-Envrc mode is enabled in all buffers where `(lambda nil (when (and (not
-(minibufferp)) (not (file-remote-p default-directory)) (executable-find
-envrc-direnv-executable)) (envrc-mode 1)))' would do it.
+Envrc mode is enabled in all buffers where `(lambda nil (when (cond
+((minibufferp) nil) ((file-remote-p default-directory) (and envrc-remote
+(seq-contains-p envrc-supported-tramp-methods (with-parsed-tramp-file-name
+default-directory vec vec-method)))) (t (executable-find
+envrc-direnv-executable))) (envrc-mode 1)))' would do it.
 
 See `envrc-mode' for more information on Envrc mode.
 
@@ -4709,7 +4777,7 @@ that number, or create it if it doesn't already exist.
 
 
 )
-(let* ((load-file-name "/home/trev/.emacs.d/elpa/doom-themes-20240909.2117/doom-themes-autoloads.el")(load-true-file-name load-file-name))
+(let* ((load-file-name "/home/trev/.emacs.d/elpa/doom-themes-20241120.157/doom-themes-autoloads.el")(load-true-file-name load-file-name))
 
 
 
@@ -5823,7 +5891,7 @@ Complete candidate using quick keys." t)
 
 
 )
-(let* ((load-file-name "/home/trev/.emacs.d/elpa/consult-20241115.517/consult-autoloads.el")(load-true-file-name load-file-name))
+(let* ((load-file-name "/home/trev/.emacs.d/elpa/consult-20241117.2113/consult-autoloads.el")(load-true-file-name load-file-name))
 
 
 
@@ -6840,14 +6908,15 @@ disabled.
 (setq package-activated-list
       (delete-dups
        (append
-        '(ws-butler with-editor vertico undo-fu-session undo-fu treesit-auto sly
-                    s rust-mode request rainbow-mode rainbow-delimiters paredit
-                    orderless nerd-icons nerd-icons-dired my-secrets
-                    markdown-mode marginalia dash magit-section magit log4e
-                    ligature aio leetcode launch-program language-id inheritenv
-                    f elisp-refs helpful git-modes geiser geiser-guile
-                    format-all envrc elfeed eat doom-themes diminish diff-hl
-                    debbugs corfu consult cape avy aoc ace-window)
+        '(ws-butler with-editor vertico undo-fu-session undo-fu treesit-auto
+                    transient sly s rust-mode request rainbow-mode
+                    rainbow-delimiters paredit orderless nerd-icons
+                    nerd-icons-dired my-secrets markdown-mode marginalia dash
+                    magit-section magit log4e ligature aio leetcode
+                    launch-program language-id inheritenv f elisp-refs helpful
+                    git-modes geiser geiser-guile format-all envrc elfeed eat
+                    doom-themes diminish diff-hl debbugs corfu consult cape avy
+                    aoc ace-window)
         package-activated-list)))
 (progn
   (require 'info) (info-initialize)
@@ -6857,11 +6926,12 @@ disabled.
            "/home/trev/.emacs.d/elpa/eat-0.9.4"
            "/home/trev/.emacs.d/elpa/geiser-guile-20240920.35"
            "/home/trev/.emacs.d/elpa/geiser-20240907.2235"
-           "/home/trev/.emacs.d/elpa/magit-20241106.1441"
+           "/home/trev/.emacs.d/elpa/magit-20241116.1557"
            "/home/trev/.emacs.d/elpa/magit-section-20241102.1300"
            "/home/trev/.emacs.d/elpa/dash-20240510.1327"
            "/home/trev/.emacs.d/elpa/orderless-20240926.921"
            "/home/trev/.emacs.d/elpa/sly-20240809.2119"
+           "/home/trev/.emacs.d/elpa/transient-20241115.2034"
            "/home/trev/.emacs.d/elpa/with-editor-20240831.2230")
          Info-directory-list)))
 
