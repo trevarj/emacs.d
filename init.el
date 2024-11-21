@@ -603,7 +603,7 @@ fifo /tmp/erc-track.fifo."
                                           :slant 'italic :weight 'heavy)))
   (erc-track-list-changed . erc-track-external-notification)
   :bind
-  (("C-c e" . 'erc-connect)
+  (("C-c #" . 'erc-connect)
    :map erc-mode-map
    ("C-c -" . 'erc-toggle-fools)))
 
