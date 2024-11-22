@@ -103,9 +103,6 @@
   (epg-pinentry-mode 'loopback)                         ; pinentry on minibuffer
   (fill-column 80)                                      ; 80 width pages
   (global-auto-revert-non-file-buffers t)               ; Auto-refresh buffers like dired
-  (gnus-init-file (expand-file-name
-                   "gnus/gnus.el"
-                   user-emacs-directory))
   (indent-tabs-mode nil)                                ; Use spaces only
   (inhibit-startup-message t)                           ; No startup screen
   (kill-buffer-quit-windows t)
@@ -652,6 +649,7 @@ This moves them into the Spam folder."
     (gnus-summary-move-article nil "nnimap+imap.gmail.com:[Gmail]/Spam"))
 
   :custom
+  (gnus-init-file nil)
   ;; You need to replace this key ID with your own key ID!
   (mml-secure-openpgp-signers '("A52D68794EBED758"))
   ;; This tells Gnus to get email from Gmail via IMAP.
