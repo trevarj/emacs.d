@@ -525,7 +525,7 @@
     (erc :server "orangepi"
          :port 7777
          :user "trev"
-         :password trev/erc-password))
+         :password trev/irc-password))
   (defun erc-clear-query-buffer ()
     (when (erc-query-buffer-p)
       (erc-send-input-line "*status" (format "clearbuffer %s" (erc-target)))))
