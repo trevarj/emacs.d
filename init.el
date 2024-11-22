@@ -648,6 +648,7 @@ This moves them into the Spam folder."
 
   :custom
   (gnus-init-file nil)
+  (gnus-use-dribble-file nil)
   ;; You need to replace this key ID with your own key ID!
   (mml-secure-openpgp-signers '("A52D68794EBED758"))
   ;; This tells Gnus to get email from Gmail via IMAP.
@@ -689,8 +690,6 @@ This moves them into the Spam folder."
   (gnus-sum-thread-tree-root "")
   (gnus-sum-thread-tree-single-leaf "╰► ")
   (gnus-sum-thread-tree-vertical "│")
-
-  (gnus-always-read-dribble-file t)
   :hook
   ;; Encrypt all messages
   (message-setup . mml-secure-message-encrypt)
