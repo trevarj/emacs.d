@@ -491,7 +491,8 @@
 
 ;; Paredit
 (use-package paredit
-  :hook ((lisp-mode emacs-lisp-mode scheme-mode) . enable-paredit-mode))
+  :hook ((lisp-mode emacs-lisp-mode scheme-mode) . enable-paredit-mode)
+  :bind (:map paredit-mode-map (("M-?" . nil))))
 
 ;; Rust
 (use-package rust-mode
