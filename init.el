@@ -403,11 +403,9 @@
 
 ;; Avy navigation
 (use-package avy
-  :custom
-  (avy-background t)
   :bind
   (("C-c w" . #'avy-goto-word-1)
-   ("C-c s" . #'avy-goto-char)))
+   ("C-c s" . #'avy-goto-char-timer)))
 
 (use-package ibuffer
   :hook (ibuffer-mode . ibuffer-auto-mode))
