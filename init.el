@@ -682,7 +682,10 @@ This moves them into the Spam folder."
   (gnus-user-date-format-alist '((t . "%d %b %Y %H:%M")))
   (gnus-summary-thread-gathering-function 'gnus-gather-threads-by-references)
   (gnus-thread-sort-functions '(gnus-thread-sort-by-most-recent-date))
+  ;; Only show first message in list
   (gnus-thread-hide-subtree t)
+  ;; ignore the subject and look at 'In-Reply-To:' and 'References:' headers
+  (gnus-thread-ignore-subject t)
   (gnus-thread-indent-level 2)
   (gnus-sum-thread-tree-false-root "")
   (gnus-sum-thread-tree-indent " ")
