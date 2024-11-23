@@ -679,7 +679,6 @@ This moves them into the Spam folder."
   ;; https://www.emacswiki.org/emacs/GnusFormatting
   (gnus-summary-line-format "%U%R%z %([%&user-date;]  %-20,20f  %B%s%)\n")
   (gnus-group-line-format "%M%S%p%P%B%(%G%) (%y)\n")
-  (gnus-user-date-format-alist '((t . "%d %b %Y %H:%M")))
   (gnus-summary-thread-gathering-function 'gnus-gather-threads-by-references)
   (gnus-thread-sort-functions '(gnus-thread-sort-by-most-recent-date))
   ;; Only show first message in list
