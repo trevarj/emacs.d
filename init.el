@@ -518,13 +518,15 @@
   :preface
   (defun erc-connect ()
     (interactive)
-    (erc :server "orangepi"
-         :port 7777
-         :user "trev"
-         :password trev/irc-password))
+    (erc :server erc-server
+         :port erc-port
+         :user erc-nick
+         :full-name erc-user-full-name))
+
   (defun erc-clear-query-buffer ()
     (when (erc-query-buffer-p)
       (erc-send-input-line "*status" (format "clearbuffer %s" (erc-target)))))
+
   (let ((hidden-fools t))
     (defun erc-toggle-fools ()
       (interactive)
@@ -543,9 +545,9 @@ fifo /tmp/erc-track.fifo."
        nil fifo t 'quiet)))
   :custom
   (erc-server "orangepi")
-  (erc-port "7777")
+  (erc-port 7777)
   (erc-nick "trev")
-  (erc-user-full-name "trev")
+  (erc-user-full-name user-full-name)
   (erc-prompt 'erc-prompt-format)
   (erc-prompt-format (propertize "%n:" 'font-lock-face 'erc-input-face))
   (erc-track-exclude-types '("JOIN" "NICK" "QUIT" "MODE" "AWAY" "PART")
@@ -555,7 +557,6 @@ fifo /tmp/erc-track.fifo."
   (erc-track-exclude '("#emacs" "#systemcrafters-live" "*status"))
   ;; works with bug#67767 v2 patch
   (erc-nicks-track-faces t)
-  (erc-fools trev/erc-fools)
   (erc-fool-highlight-type 'all)
   (erc-current-nick-highlight-type 'all)
   (erc-insert-timestamp-function 'erc-insert-timestamp-left)
@@ -610,8 +611,6 @@ fifo /tmp/erc-track.fifo."
     (interactive)
     (let ((browse-url-browser-function #'eww-browse-url))
       (elfeed-show-visit)))
-  :config
-  (setopt elfeed-feeds trev/elfeed-feeds)
   :bind
   (("C-c @" . #'elfeed)
    :map elfeed-show-mode-map
@@ -710,8 +709,6 @@ This moves them into the Spam folder."
   (:url "https://github.com/trevarj/leetcode.el"
         :rev "9c5bd70")
   :load my-secrets
-  :config
-  (setopt leetcode-session-cookie trev/leetcode-session-cookie)
   :custom
   (leetcode-prefer-language "cpp")
   (leetcode-save-solutions t)
@@ -720,8 +717,7 @@ This moves them into the Spam folder."
 (use-package aoc
   :load my-secrets
   :config
-  (setopt aoc-session-cookie trev/aoc-session-cookie
-          savehist-additional-variables
+  (setopt savehist-additional-variables
           (append savehist-additional-variables '(aoc-year aoc-day-level))))
 
 (use-package launch-program
