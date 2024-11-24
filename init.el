@@ -623,11 +623,6 @@ fifo /tmp/erc-track.fifo."
 (use-package gnus
   ;; Gmail integration taken from https://github.com/kensanata/ggg
   :preface
-  (defun my-gnus-summary-keys ()
-    (local-set-key "y" 'gmail-archive)
-    (local-set-key "d" 'gmail-trash)
-    (local-set-key "$" 'gmail-report-spam))
-
   (defun gmail-archive ()
     "Archive the current or marked mails.
 This moves them into the All Mail folder."
@@ -701,7 +696,12 @@ This moves them into the Spam folder."
   :hook
   ;; Encrypt all messages
   (message-setup . mml-secure-message-encrypt)
-  (gnus-summary-mode . my-gnus-summary-keys))
+  :bind
+  (:map
+   gnus-summary-mode-map
+   (("y" . 'gmail-archive)
+    ("d" . 'gmail-trash)
+    ("$" . 'gmail-report-spam))))
 
 ;;; Local Packages
 
