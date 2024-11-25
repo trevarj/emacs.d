@@ -96,3 +96,6 @@ request/
 
 # bookmarks
 bookmarks
+
+# package quickstart
+package-quickstart.el
