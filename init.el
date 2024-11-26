@@ -642,6 +642,8 @@ This moves them into the Spam folder."
   :bind
   (:map
    gnus-summary-mode-map
+   :prefix-map gmail-prefix-map
+   :prefix "G"
    (("y" . 'gmail-archive)
     ("d" . 'gmail-trash)
     ("$" . 'gmail-report-spam)))
