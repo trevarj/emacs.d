@@ -19,10 +19,10 @@
         (package-install-file path)
       (when not-feature (use-package-ensure-elpa name args _state _no-refresh))))
   :custom
-  (use-package-expand-minimally t)
-  (use-package-always-defer t)              ; always defer packages, use :demand instead
-  (use-package-always-ensure t)             ; always ensure packages
-  (use-package-ensure-function #'trev/use-package-ensure))
+  (use-package-always-defer t)
+  (use-package-always-ensure t)
+  (use-package-ensure-function #'trev/use-package-ensure)
+  (use-package-expand-minimally t))
 
 (use-package emacs
   :demand t
@@ -261,16 +261,16 @@
 ;; Minibuffer
 (use-package vertico
   :custom
-  (vertico-scroll-margin 5)
   (vertico-count 10)
   (vertico-cycle t)
+  (vertico-scroll-margin 5)
   :init (vertico-mode))
 
 (use-package orderless
   :custom
-  (completion-styles '(orderless basic))
   (completion-category-defaults nil)
-  (completion-category-overrides '((file (styles partial-completion)))))
+  (completion-category-overrides '((file (styles partial-completion))))
+  (completion-styles '(orderless basic)))
 
 (use-package icomplete
   :disabled
@@ -282,11 +282,11 @@
         (("C-p" . 'minibuffer-previous-completion)
          ("C-n" . 'minibuffer-next-completion)))
   :custom
+  (completion-category-overrides '((file (styles basic partial-completion))))
+  (completion-styles '(flex partial-completion emacs22))
+  (completions-max-height 10)
   (icomplete-compute-delay 0.05)
   (icomplete-delay-completions-threshold 2000)
-  (completion-styles '(flex partial-completion emacs22))
-  (completion-category-overrides '((file (styles basic partial-completion))))
-  (completions-max-height 10)
   :custom-face
   (icomplete-selected-match ((t (:background ,(get-doom-theme-color 'base4))))))
 
@@ -328,9 +328,9 @@
          ("M-r" . consult-history)
          ("M-s" . consult-history))                 ; orig. next-matching-history-element
   :custom
+  (completion-ignore-case t)
   (read-buffer-completion-ignore-case t)
-  (read-file-name-completion-ignore-case t)
-  (completion-ignore-case t))
+  (read-file-name-completion-ignore-case t))
 
 (use-package helpful
   :bind
@@ -350,10 +350,10 @@
         ("RET" . nil))
   :custom
   (corfu-auto t)
-  (corfu-popupinfo-delay 0)
-  (corfu-quit-no-match 'separator)
-  (corfu-preview-current nil)
   (corfu-left-margin-width 4)
+  (corfu-popupinfo-delay 0)
+  (corfu-preview-current nil)
+  (corfu-quit-no-match 'separator)
   (corfu-right-margin-width 4)
   :config
   (corfu-popupinfo-mode)
@@ -548,33 +548,32 @@ fifo /tmp/erc-track.fifo."
    :map erc-mode-map
    ("C-c -" . 'erc-toggle-fools))
   :custom
-  (erc-server "orangepi")
-  (erc-port 7777)
-  (erc-nick "trev")
-  (erc-user-full-name user-full-name)
-  (erc-prompt 'erc-prompt-format)
-  (erc-prompt-format (propertize "%n:" 'font-lock-face 'erc-input-face))
-  (erc-track-exclude-types '("JOIN" "NICK" "QUIT" "MODE" "AWAY" "PART")
-                           "353" "324" "332" "329" "333" "477")
-  (erc-hide-list '("JOIN" "NICK" "QUIT" "MODE" "AWAY" "PART" "353"))
-  (erc-track-exclude-server-buffer t)
-  (erc-track-exclude '("#emacs" "#systemcrafters-live" "*status"))
-  ;; works with bug#67767 v2 patch
-  (erc-nicks-track-faces t)
-  (erc-fool-highlight-type 'all)
   (erc-current-nick-highlight-type 'all)
-  (erc-insert-timestamp-function 'erc-insert-timestamp-left)
-  (erc-timestamp-format "%H:%M")
-  (erc-receive-query-display 'bury)
   (erc-fill-function 'erc-fill-static)
   (erc-fill-static-center 16)
+  (erc-fool-highlight-type 'all)
+  (erc-hide-list '("JOIN" "NICK" "QUIT" "MODE" "AWAY" "PART" "353"))
+  (erc-insert-timestamp-function 'erc-insert-timestamp-left)
+  (erc-nick "trev")
+  (erc-nicks-track-faces t)
+  (erc-port 7777)
+  (erc-prompt 'erc-prompt-format)
+  (erc-prompt-format (propertize "%n:" 'font-lock-face 'erc-input-face))
+  (erc-receive-query-display 'bury)
+  (erc-server "orangepi")
+  (erc-timestamp-format "%H:%M")
+  (erc-track-exclude '("#emacs" "#systemcrafters-live" "*status"))
+  (erc-track-exclude-server-buffer t)
+  (erc-track-exclude-types '("JOIN" "NICK" "QUIT" "MODE" "AWAY" "PART")
+                           "353" "324" "332" "329" "333" "477")
   (erc-track-faces-priority-list
    '(erc-error-face erc-current-nick-face erc-keyword-face erc-pal-face
                     erc-nick-msg-face erc-direct-msg-face
                     erc-dangerous-host-face erc-nick-default-face
                     (erc-button-nick-default-face erc-nick-default-face)
                     erc-default-face erc-action-face erc-fool-face
-                    erc-notice-face erc-input-face erc-prompt-face))
+                    erc-notice-face erc-input-face erc-prompt-face)
+   (erc-user-full-name user-full-name))
   :config
   (setopt erc-modules (seq-union '(nicks scrolltobottom spelling) erc-modules)
           erc-nicks-colors (mapcar 'get-doom-theme-color
@@ -695,9 +694,9 @@ This moves them into the Spam folder."
         :rev "9c5bd70")
   :load my-secrets
   :custom
+  (leetcode-directory "~/Workspace/leetcode/")
   (leetcode-prefer-language "cpp")
-  (leetcode-save-solutions t)
-  (leetcode-directory "~/Workspace/leetcode/"))
+  (leetcode-save-solutions t))
 
 (use-package aoc
   :load my-secrets
