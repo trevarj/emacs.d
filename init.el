@@ -653,35 +653,25 @@ This moves them into the Spam folder."
   :custom
   (gnus-init-file nil)
   (gnus-use-dribble-file nil)
-  ;; You need to replace this key ID with your own key ID!
   (mml-secure-openpgp-signers '("A52D68794EBED758"))
-  ;; This tells Gnus to get email from Gmail via IMAP.
+  (mml-secure-openpgp-encrypt-to-self t)
   (gnus-select-method
    '(nnimap "gmail"
-            ;; It could also be imap.googlemail.com if that's your server.
             (nnimap-address "imap.gmail.com")
             (nnimap-server-port 993)
             (nnimap-stream ssl)))
   (gnus-secondary-select-methods
    '((nntp "news.gmane.io"
            (nntp-connection-timeout 5))))
-  ;; This tells Gnus to use the Gmail SMTP server. This
-  ;; automatically leaves a copy in the Gmail Sent folder.
   (smtpmail-smtp-server "smtp.gmail.com")
   (smtpmail-smtp-service 587)
-  ;; Tell message mode to use SMTP.
   (message-send-mail-function 'smtpmail-send-it)
-  ;; Gmail system labels have the prefix [Gmail], which matches
-  ;; the default value of gnus-ignored-newsgroups. That's why we
-  ;; redefine it.
+  ;; Don't ignore gmail inboxes
   (gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
   ;; The agent seems to confuse nnimap, therefore we'll disable it.
   (gnus-agent nil)
   ;; We don't want local, unencrypted copies of emails we write.
   (gnus-message-archive-group nil)
-  ;; We want to be able to read the emails we wrote.
-  (mml-secure-openpgp-encrypt-to-self t)
-
   ;; https://www.emacswiki.org/emacs/GnusFormatting
   (gnus-summary-line-format "%U%R%z %([%&user-date;]  %-20,20f  %B%s%)\n")
   (gnus-group-line-format "%M%S%p%P%B%(%G%) (%y)\n")
