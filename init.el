@@ -651,47 +651,41 @@ This moves them into the Spam folder."
   ;; Encrypt all messages
   (message-setup . mml-secure-message-encrypt)
   :custom
+  (gnus-agent nil)
+  (gnus-group-line-format "%M%S%p%P%B%(%G%) (%y)\n")
+  (gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
   (gnus-init-file nil)
-  (gnus-use-dribble-file nil)
-  (mml-secure-openpgp-signers '("A52D68794EBED758"))
-  (mml-secure-openpgp-encrypt-to-self t)
+  (gnus-message-archive-group nil)
+  (gnus-secondary-select-methods
+   '((nntp "news.gmane.io"
+           (nntp-connection-timeout 5))))
   (gnus-select-method
    '(nnimap "gmail"
             (nnimap-address "imap.gmail.com")
             (nnimap-server-port 993)
             (nnimap-stream ssl)))
-  (gnus-secondary-select-methods
-   '((nntp "news.gmane.io"
-           (nntp-connection-timeout 5))))
-  (smtpmail-smtp-server "smtp.gmail.com")
-  (smtpmail-smtp-service 587)
-  (message-send-mail-function 'smtpmail-send-it)
-  ;; Don't ignore gmail inboxes
-  (gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
-  ;; The agent seems to confuse nnimap, therefore we'll disable it.
-  (gnus-agent nil)
-  ;; We don't want local, unencrypted copies of emails we write.
-  (gnus-message-archive-group nil)
-  ;; https://www.emacswiki.org/emacs/GnusFormatting
-  (gnus-summary-line-format "%U%R%z %([%&user-date;]  %-20,20f  %B%s%)\n")
-  (gnus-group-line-format "%M%S%p%P%B%(%G%) (%y)\n")
-  (gnus-user-date-format-alist
-   '(((gnus-seconds-today) . "Today %10R")
-     ((+ (* 60 60 24) (gnus-seconds-today)) . "Yesterday %6R")
-     (t . "%Y-%m-%d %R")))
-  (gnus-summary-thread-gathering-function 'gnus-gather-threads-by-references)
-  (gnus-thread-sort-functions '(gnus-thread-sort-by-most-recent-date))
-  ;; Only show first message in list
-  (gnus-thread-hide-subtree t)
-  ;; ignore the subject and look at 'In-Reply-To:' and 'References:' headers
-  (gnus-thread-ignore-subject t)
-  (gnus-thread-indent-level 2)
   (gnus-sum-thread-tree-false-root "")
   (gnus-sum-thread-tree-indent " ")
   (gnus-sum-thread-tree-leaf-with-other "├► ")
   (gnus-sum-thread-tree-root "")
   (gnus-sum-thread-tree-single-leaf "╰► ")
-  (gnus-sum-thread-tree-vertical "│"))
+  (gnus-sum-thread-tree-vertical "│")
+  (gnus-summary-line-format "%U%R%z %([%&user-date;]  %-20,20f  %B%s%)\n")
+  (gnus-summary-thread-gathering-function 'gnus-gather-threads-by-references)
+  (gnus-thread-hide-subtree t)
+  (gnus-thread-ignore-subject t)
+  (gnus-thread-indent-level 2)
+  (gnus-thread-sort-functions '(gnus-thread-sort-by-most-recent-date))
+  (gnus-use-dribble-file nil)
+  (gnus-user-date-format-alist
+   '(((gnus-seconds-today) . "Today %10R")
+     ((+ (* 60 60 24) (gnus-seconds-today)) . "Yesterday %6R")
+     (t . "%Y-%m-%d %R")))
+  (message-send-mail-function 'smtpmail-send-it)
+  (mml-secure-openpgp-encrypt-to-self t)
+  (mml-secure-openpgp-signers '("A52D68794EBED758"))
+  (smtpmail-smtp-server "smtp.gmail.com")
+  (smtpmail-smtp-service 587))
 
 ;;; Local Packages
 
