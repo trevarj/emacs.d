@@ -80,6 +80,11 @@
     (dolist (code-point nerdfont-code-points)
       (set-fontset-font t code-point (font-spec :family "Symbols Nerd Font Mono"))))
 
+  ;; Generic keybindings
+  :bind
+  (("C-c b" . ibuffer)
+   ("C-'" . 'switch-to-buffer-last)
+   ("C-c !" . 'open-user-config))
   ;; Miscellaneous Options
   :custom
   (auto-fill-function 'do-auto-fill)
@@ -123,12 +128,7 @@
   (use-short-answers t)                                 ; y/n
   (user-full-name "Trevor Arjeski")
   (user-mail-address "tmarjeski@gmail.com")
-  (window-divider-default-right-width 16)               ; Padding between splits
-  ;; Generic keybindings
-  :bind
-  (("C-c b" . ibuffer)
-   ("C-'" . 'switch-to-buffer-last)
-   ("C-c !" . 'open-user-config)))
+  (window-divider-default-right-width 16))               ; Padding between splits
 
 ;; Ligatures
 (use-package ligature
@@ -207,14 +207,14 @@
 
 ;; Keybinding
 (use-package which-key
-  :diminish which-key-mode
-  :config
-  (which-key-setup-side-window-bottom)
-  (setq which-key-sort-order 'which-key-description-order)
   :init
   (which-key-mode)
   :bind
-  (("C-c K" . 'which-key-show-major-mode)))
+  (("C-c K" . 'which-key-show-major-mode))
+  :config
+  (which-key-setup-side-window-bottom)
+  (setq which-key-sort-order 'which-key-description-order)
+  :diminish which-key-mode)
 
 ;; Window navigation
 (use-package ace-window
@@ -275,6 +275,12 @@
 (use-package icomplete
   :disabled
   :init (fido-vertical-mode)
+  :bind
+  (:map icomplete-fido-mode-map
+        (("TAB" . 'icomplete-force-complete)))
+  (:map completion-list-mode-map
+        (("C-p" . 'minibuffer-previous-completion)
+         ("C-n" . 'minibuffer-next-completion)))
   :custom
   (icomplete-compute-delay 0.05)
   (icomplete-delay-completions-threshold 2000)
@@ -282,13 +288,7 @@
   (completion-category-overrides '((file (styles basic partial-completion))))
   (completions-max-height 10)
   :custom-face
-  (icomplete-selected-match ((t (:background ,(get-doom-theme-color 'base4)))))
-  :bind
-  (:map icomplete-fido-mode-map
-        (("TAB" . 'icomplete-force-complete)))
-  (:map completion-list-mode-map
-        (("C-p" . 'minibuffer-previous-completion)
-         ("C-n" . 'minibuffer-next-completion))))
+  (icomplete-selected-match ((t (:background ,(get-doom-theme-color 'base4))))))
 
 ;; Save minibuffer history between restarts
 (use-package savehist
@@ -382,9 +382,9 @@
 
 ;; Whitespace handling
 (use-package ws-butler
-  :diminish
   :config
-  (ws-butler-global-mode))
+  (ws-butler-global-mode)
+  :diminish)
 
 ;; Rainbow delimiters
 (use-package rainbow-delimiters
@@ -392,9 +392,9 @@
 
 ;; Editorconfig
 (use-package editorconfig
-  :diminish
   :config
-  (editorconfig-mode))
+  (editorconfig-mode)
+  :diminish)
 
 ;; Buffer specific direnv
 (use-package envrc
@@ -412,14 +412,14 @@
 
 ;; Formatting
 (use-package format-all
-  :diminish
   :commands format-all-mode
   :hook
   (prog-mode . format-all-mode)
   (prog-mode . format-all-ensure-formatter)
   :config
   (setq-default format-all-formatters
-                '(("Shell" (shfmt "-i" "2" "-ci")))))
+                '(("Shell" (shfmt "-i" "2" "-ci"))))
+  :diminish)
 
 ;; Colorize hex color codes
 (use-package rainbow-mode)
@@ -543,6 +543,10 @@ fifo /tmp/erc-track.fifo."
       (write-region
        (format "%s\n" (or (mapcar 'buffer-name (mapcar #'car erc-modified-channels-alist)) ""))
        nil fifo t 'quiet)))
+  :bind
+  (("C-c #" . 'erc-connect)
+   :map erc-mode-map
+   ("C-c -" . 'erc-toggle-fools))
   :custom
   (erc-server "orangepi")
   (erc-port 7777)
@@ -598,11 +602,7 @@ fifo /tmp/erc-track.fifo."
                       (set-face-attribute 'erc-current-nick-face nil
                                           :foreground (get-doom-theme-color 'red)
                                           :slant 'italic :weight 'heavy)))
-  (erc-track-list-changed . erc-track-external-notification)
-  :bind
-  (("C-c #" . 'erc-connect)
-   :map erc-mode-map
-   ("C-c -" . 'erc-toggle-fools)))
+  (erc-track-list-changed . erc-track-external-notification))
 
 (use-package elfeed
   :load my-secrets
@@ -639,7 +639,15 @@ This moves them into the Trash folder."
 This moves them into the Spam folder."
     (interactive)
     (gnus-summary-move-article nil "nnimap+imap.gmail.com:[Gmail]/Spam"))
-
+  :bind
+  (:map
+   gnus-summary-mode-map
+   (("y" . 'gmail-archive)
+    ("d" . 'gmail-trash)
+    ("$" . 'gmail-report-spam)))
+  :hook
+  ;; Encrypt all messages
+  (message-setup . mml-secure-message-encrypt)
   :custom
   (gnus-init-file nil)
   (gnus-use-dribble-file nil)
@@ -691,16 +699,7 @@ This moves them into the Spam folder."
   (gnus-sum-thread-tree-leaf-with-other "├► ")
   (gnus-sum-thread-tree-root "")
   (gnus-sum-thread-tree-single-leaf "╰► ")
-  (gnus-sum-thread-tree-vertical "│")
-  :hook
-  ;; Encrypt all messages
-  (message-setup . mml-secure-message-encrypt)
-  :bind
-  (:map
-   gnus-summary-mode-map
-   (("y" . 'gmail-archive)
-    ("d" . 'gmail-trash)
-    ("$" . 'gmail-report-spam))))
+  (gnus-sum-thread-tree-vertical "│"))
 
 ;;; Local Packages
 
