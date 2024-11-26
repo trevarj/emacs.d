@@ -82,7 +82,8 @@
 
   ;; Generic keybindings
   :bind
-  (("C-c b" . ibuffer)
+  (("C-x K" . 'kill-current-buffer)
+   ("C-c b" . 'ibuffer)
    ("C-'" . 'switch-to-buffer-last)
    ("C-c !" . 'open-user-config))
   ;; Miscellaneous Options
@@ -651,6 +652,7 @@ This moves them into the Spam folder."
   (message-setup . mml-secure-message-encrypt)
   :custom
   (gnus-agent nil)
+  (gnus-check-new-newsgroups nil)
   (gnus-group-line-format "%M%S%p%P%B%(%G%) (%y)\n")
   (gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
   (gnus-init-file nil)
