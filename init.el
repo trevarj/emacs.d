@@ -641,6 +641,9 @@ This moves them into the Spam folder."
     (gnus-summary-move-article nil "nnimap+imap.gmail.com:[Gmail]/Spam"))
   :bind
   (:map
+   gnus-article-mode-map
+   (("q" . 'kill-current-buffer)))
+  (:map
    gnus-summary-mode-map
    :prefix-map gmail-prefix-map
    :prefix "C-c"
