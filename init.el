@@ -117,6 +117,7 @@
   (mouse-wheel-progressive-speed nil)
   (quit-restore-window-no-switch 'skip-first)
   (read-extended-command-predicate #'command-completion-default-include-p)
+  (ring-bell-function 'silent)
   (scroll-preserve-screen-position 1)                   ; PgUp/PgDown hold
   (send-mail-function 'message-send-mail-with-sendmail) ; Use sendmail
   (tab-always-indent 'complete)                         ; TAB to complete
