@@ -563,6 +563,7 @@ fifo /tmp/erc-track.fifo."
   (erc-prompt-format (propertize "%n:" 'font-lock-face 'erc-input-face))
   (erc-receive-query-display 'bury)
   (erc-server "orangepi")
+  (erc-server-reconnect-function 'erc-server-delayed-check-reconnect)
   (erc-timestamp-format "%H:%M")
   (erc-track-exclude '("#emacs" "#systemcrafters-live" "*status"))
   (erc-track-exclude-server-buffer t)
