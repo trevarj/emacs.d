@@ -140,11 +140,11 @@ login."
                      (read-number "Day: " (car aoc-day-level))
                      (read-number "Level: " (cdr aoc-day-level))
                      (read-string "Answer: ")))
-  (when (and (not (and (eq year aoc-year)
-                       (equal '(day level) aoc-day-level)))
-             (yes-or-no-p
-              (format "Set current problem to %d, Day %d Level %d?"
-                      year day level)))
+  (when (when (not (and (eq year aoc-year)
+                        (equal '(day level) aoc-day-level)))
+          (yes-or-no-p
+           (format "Set current problem to %d, Day %d Level %d?"
+                   year day level)))
     (setopt aoc-year year
             aoc-day-level (cons day level)))
   (request (format "https://adventofcode.com/%d/day/%d/answer" year day)
