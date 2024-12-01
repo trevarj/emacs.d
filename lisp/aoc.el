@@ -138,7 +138,7 @@ login."
   "Submit a solution for given year, day and level."
   (interactive (list (read-number "Year: " aoc-year)
                      (read-number "Day: " (car aoc-day-level))
-                     (read-number "Level: " (cadr aoc-day-level))
+                     (read-number "Level: " (cdr aoc-day-level))
                      (read-string "Answer: ")))
   (when (and (not (and (eq year aoc-year)
                        (equal '(day level) aoc-day-level)))
