@@ -141,7 +141,7 @@ login."
                      (read-number "Level: " (cdr aoc-day-level))
                      (read-string "Answer: ")))
   (when (when (not (and (eq year aoc-year)
-                        (equal '(day level) aoc-day-level)))
+                        (equal `(,day . ,level) aoc-day-level)))
           (yes-or-no-p
            (format "Set current problem to %d, Day %d Level %d?"
                    year day level)))
