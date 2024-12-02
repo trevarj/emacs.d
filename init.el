@@ -260,6 +260,10 @@
   (:map ibuffer-mode-map
         ("* D" . #'ibuffer-mark-unimportant-for-delete)))
 
+(use-package autoinsert
+  :custom (auto-insert-query nil)
+  :init (auto-insert-mode))
+
 ;; Minibuffer
 (use-package vertico
   :custom
