@@ -85,7 +85,7 @@ login."
 
 (cl-defun aoc--check-submit-response (&key data &allow-other-keys)
   (cond
-   ((cl-search "That's not the right answer." data)
+   ((cl-search "That's not the right answer" data)
     (message "Incorrect answer."))
    ((cl-search "You gave an answer too recently" data)
     (message "Submitted too recently. Please wait."))
