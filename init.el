@@ -261,7 +261,6 @@
         ("* D" . #'ibuffer-mark-unimportant-for-delete)))
 
 (use-package autoinsert
-  :custom (auto-insert-query nil)
   :init (auto-insert-mode))
 
 ;; Minibuffer
@@ -714,9 +713,6 @@ This moves them into the Spam folder."
   :config
   (setopt savehist-additional-variables
           (append savehist-additional-variables '(aoc-year aoc-day-level))))
-
-(use-package launch-program
-  :bind (("s-SPC" . launch-program-launch)))
 
 (provide 'init)
 
