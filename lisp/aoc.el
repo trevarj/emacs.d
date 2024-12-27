@@ -73,27 +73,14 @@ login."
           (`(,day . 2) (cons (1+ day) 1))
           (`(,day . 1) (cons day 2)))))
 
-(defun aoc--render-data-to-help-buffer (data buffer)
-  "Render HTML data (if non-nil) and open it in a help buffer."
-  (when data
-    (with-temp-buffer
-      (insert data)
-      (let ((dom (libxml-parse-html-region (point-min) (point-max))))
-        (with-help-window buffer
-          (shr-insert-document dom)
-          (pop-to-buffer (current-buffer)))))))
-
 (cl-defun aoc--check-submit-response (&key data &allow-other-keys)
   (cond
-   ((cl-search "That's not the right answer" data)
-    (message "Incorrect answer. : %s" data))
-   ((cl-search "You gave an answer too recently" data)
-    (message "Submitted too recently. Please wait. %s" data))
    ((cl-search "That's the right answer!" data)
     (aoc--increment-day-level)
     (aoc--render-data-to-help-buffer data "*aoc submission*")
     (message "Answer submitted successfully."))
-   (t (message "Incorrect: %s" data))))
+   (t (message "Submission failed.")
+      (aoc--render-data-to-help-buffer data "*aoc submission*"))))
 
 (cl-defun aoc--submit-error (&key status &allow-other-keys)
   (message "Could not submit answer: %s" status))
@@ -126,13 +113,9 @@ login."
   "View AoC problem for given year and day."
   (interactive (list (read-number "Year: " aoc-year)
                      (read-number "Day: " (car aoc-day-level))))
-  (request (format "https://adventofcode.com/%d/day/%d" year day)
-    :headers `(("Cookie" . ,(format "session=%s" aoc-session-cookie)))
-    :parse 'buffer-string
-    :complete (cl-function
-               (lambda (&key data &allow-other-keys)
-                 (aoc--render-data-to-help-buffer
-                  data (format "*AoC Day %d Year %d" day year))))))
+  (unless (assoc ".adventofcode.com" url-cookie-secure-storage)
+    (url-cookie-store "session" aoc-session-cookie nil ".adventofcode.com" "/" t)  )
+  (eww (format "https://adventofcode.com/%d/day/%d" year day)))
 
 ;;;###autoload
 (defun aoc-submit-answer (year day level answer)
