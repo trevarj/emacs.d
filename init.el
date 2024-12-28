@@ -313,7 +313,7 @@
          ;; Minibuffer history
          :map minibuffer-local-map
          ("M-r" . consult-history)
-         ("M-s" . consult-history))                 ; orig. next-matching-history-element
+         ("M-s" . consult-history))                ; orig. next-matching-history-element
   :custom
   (completion-ignore-case t)
   (read-buffer-completion-ignore-case t)
@@ -438,6 +438,8 @@
 ;; Terminal
 (use-package eat
   :commands (eat)
+  :hook ((eshell-load . eat-eshell-mode)
+         (eshell-load . eat-eshell-visual-command-mode))
   :custom
   (eat-kill-buffer-on-exit t)
   (eat-term-scrollback-size 1200000))
