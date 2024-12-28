@@ -275,25 +275,7 @@
   :custom
   (completion-category-defaults nil)
   (completion-category-overrides '((file (styles partial-completion))))
-  (completion-styles '(orderless basic)))
-
-(use-package icomplete
-  :disabled
-  :init (fido-vertical-mode)
-  :bind
-  (:map icomplete-fido-mode-map
-        (("TAB" . 'icomplete-force-complete)))
-  (:map completion-list-mode-map
-        (("C-p" . 'minibuffer-previous-completion)
-         ("C-n" . 'minibuffer-next-completion)))
-  :custom
-  (completion-category-overrides '((file (styles basic partial-completion))))
-  (completion-styles '(flex partial-completion emacs22))
-  (completions-max-height 10)
-  (icomplete-compute-delay 0.05)
-  (icomplete-delay-completions-threshold 2000)
-  :custom-face
-  (icomplete-selected-match ((t (:background ,(get-doom-theme-color 'base4))))))
+  (completion-styles '(orderless emacs22)))
 
 ;; Save minibuffer history between restarts
 (use-package savehist
@@ -356,10 +338,11 @@
   :custom
   (corfu-auto t)
   (corfu-left-margin-width 4)
+  (corfu-right-margin-width 4)
   (corfu-popupinfo-delay 0)
   (corfu-preview-current nil)
   (corfu-quit-no-match 'separator)
-  (corfu-right-margin-width 4)
+  (global-corfu-minibuffer nil)
   :config
   (corfu-popupinfo-mode)
   (add-to-list 'corfu--frame-parameters '(internal-border-width . 4))
@@ -387,6 +370,7 @@
 
 ;; Whitespace handling
 (use-package ws-butler
+  :demand 2
   :config
   (ws-butler-global-mode)
   :diminish)
