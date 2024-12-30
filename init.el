@@ -39,12 +39,6 @@
     (when buffer-file-name
       (setq header-line-format '("%f"))))
 
-  (defun sudo-save ()
-    (interactive)
-    (if (not buffer-file-name)
-        (write-file (concat "/sudo:root@localhost:" (ido-read-file-name "File:")))
-      (write-file (concat "/sudo:root@localhost:" buffer-file-name))))
-
   (defun open-user-config ()
     "Opens user's config file"
     (interactive) (find-file user-init-file))
@@ -58,6 +52,7 @@
    (buffer-list-update . header-line-file-path)
    (prog-mode . display-line-numbers-mode))
   :init
+  (load-theme 'nord t)
   (add-to-list 'load-path (concat user-emacs-directory "/lisp"))
   (save-place-mode)
   (recentf-mode)
@@ -69,7 +64,7 @@
   (window-divider-mode)                 ; Gap between splits
   (put 'suspend-frame 'disabled t)      ; Disable suspend-frame
   ;; Fonts
-  (set-face-attribute 'default nil :family "Iosevka JBM" :height 150 :weight 'medium)
+  (set-face-attribute 'default nil :family "Iosevka JBM" :height 168 :weight 'medium)
   (set-face-attribute 'variable-pitch nil :family "Noto Sans")
   ;; https://github.com/ryanoasis/nerd-fonts/wiki/Glyph-Sets-and-Code-Points
   (let ((nerdfont-code-points
@@ -95,6 +90,7 @@
   (comment-auto-fill-only-comments t)                   ; Autofill comments only
   (confirm-kill-emacs nil)
   (custom-file "/tmp/custom.el")                        ; customization file
+  (custom-safe-themes t)
   (desktop-load-locked-desktop 'check-pid)              ; load if lock pid doesn't exist
   (display-buffer-alist                                 ; Prefer right split for matched buffers
    '(("\\*\\(Help\\|helpful\\|Customize\\|info\\|xref\\).*\\*"
@@ -132,6 +128,8 @@
   (user-mail-address "tmarjeski@gmail.com")
   (window-divider-default-right-width 16))               ; Padding between splits
 
+(use-package autothemer)
+
 ;; Ligatures
 (use-package ligature
   :hook (prog-mode . ligature-mode)
@@ -146,45 +144,7 @@
      "<:" ":=" "*=" "*+" "<*" "<*>" "*>" "<." "<.>" ".>" "+*" "=*" "=:" ":>"
      "(*" "*)" "++" "+++" "|-" "-|" "<!--" "<!---")))
 
-;; Colorscheme
-(use-package doom-themes
-  :demand
-  :preface
-  (defun get-doom-theme-color (name)
-    (car (alist-get name doom-themes--colors)))
-  :custom
-  (doom-themes-enable-bold t)
-  (doom-themes-enable-italic nil)
-  (doom-nord-padded-modeline t)
-  (doom-nord-brighter-modeline t)
-  :config
-  (load-theme 'doom-nord t)
-  ;; Corrects (and improves) org-mode's native fontification.
-  (doom-themes-org-config)
-  (let ((bg (get-doom-theme-color 'base2))
-        (bg-light (get-doom-theme-color 'base3))
-        (yellow (get-doom-theme-color 'yellow))
-        (orange (get-doom-theme-color 'orange)))
-    (set-face-background 'cursor orange)
-    (set-face-background 'highlight yellow)
-    (set-face-attribute 'mode-line nil
-                        :background bg-light
-                        :foreground (get-doom-theme-color 'base6)
-                        :box `(:line-width (6 . 6) :color ,bg-light))
-    (set-face-attribute 'mode-line-active nil
-                        :background bg-light
-                        :box `(:line-width (6 . 6) :color ,bg-light))
-    (set-face-attribute 'mode-line-inactive nil
-                        :background bg
-                        :foreground (get-doom-theme-color 'base5)
-                        :box `(:line-width (6 . 6) :color ,bg))
-    (set-face-attribute 'font-lock-function-name-face nil :weight 'bold)
-    (set-face-attribute 'font-lock-keyword-face nil
-                        :foreground orange :weight 'bold)
-    (set-face-attribute 'window-divider nil :inherit 'ansi-color-black)))
-
 ;; Project.el
-
 (use-package project
   :bind
   (:map project-prefix-map
@@ -219,8 +179,7 @@
   :diminish which-key-mode)
 
 ;; Window navigation
-(use-package ace-window
-  :bind (("M-o" . ace-window)))
+(use-package ace-window :bind (("M-o" . ace-window)))
 
 (use-package undo-fu
   :init
@@ -260,8 +219,7 @@
   (:map ibuffer-mode-map
         ("* D" . #'ibuffer-mark-unimportant-for-delete)))
 
-(use-package autoinsert
-  :init (auto-insert-mode))
+(use-package autoinsert :init (auto-insert-mode))
 
 ;; Minibuffer
 (use-package vertico
@@ -278,13 +236,10 @@
   (completion-styles '(orderless emacs22)))
 
 ;; Save minibuffer history between restarts
-(use-package savehist
-  :init
-  (savehist-mode))
+(use-package savehist :init (savehist-mode))
 
 ;; Minibuffer annotations
-(use-package marginalia
-  :init (marginalia-mode))
+(use-package marginalia :init (marginalia-mode))
 
 ;; Useful functions
 (use-package consult
@@ -345,8 +300,7 @@
   (global-corfu-minibuffer nil)
   :config
   (corfu-popupinfo-mode)
-  (add-to-list 'corfu--frame-parameters '(internal-border-width . 4))
-  (set-face-background 'corfu-border (get-doom-theme-color 'orange)))
+  (add-to-list 'corfu--frame-parameters '(internal-border-width . 4)))
 
 (use-package orderless
   :custom
@@ -376,8 +330,7 @@
   :diminish)
 
 ;; Rainbow delimiters
-(use-package rainbow-delimiters
-  :hook (prog-mode . rainbow-delimiters-mode))
+(use-package rainbow-delimiters :hook (prog-mode . rainbow-delimiters-mode))
 
 ;; Editorconfig
 (use-package editorconfig
@@ -396,8 +349,7 @@
   (("C-c w" . #'avy-goto-word-1)
    ("C-c s" . #'avy-goto-char-timer)))
 
-(use-package ibuffer
-  :hook (ibuffer-mode . ibuffer-auto-mode))
+(use-package ibuffer :hook (ibuffer-mode . ibuffer-auto-mode))
 
 ;; Formatting
 (use-package format-all
@@ -431,9 +383,7 @@
   (global-diff-hl-mode)
   (diff-hl-flydiff-mode))
 
-(use-package nerd-icons-dired
-  :hook
-  (dired-mode . nerd-icons-dired-mode))
+(use-package nerd-icons-dired :hook (dired-mode . nerd-icons-dired-mode))
 
 ;; Terminal
 (use-package eat
@@ -500,8 +450,7 @@
 (use-package markdown-mode)
 
 ;; Secrets
-(use-package my-secrets
-  :ensure nil)
+(use-package my-secrets :ensure nil)
 
 ;; IRC/ERC
 (use-package erc
@@ -547,6 +496,7 @@ fifo /tmp/erc-track.fifo."
   (erc-insert-timestamp-function 'erc-insert-timestamp-left)
   (erc-nick "trev")
   (erc-nicks-track-faces t)
+  (erc-nicks-colors 'font-lock)
   (erc-port 7777)
   (erc-prompt 'erc-prompt-format)
   (erc-prompt-format (propertize "%n:" 'font-lock-face 'erc-input-face))
@@ -567,11 +517,7 @@ fifo /tmp/erc-track.fifo."
                     erc-notice-face erc-input-face erc-prompt-face)
    (erc-user-full-name user-full-name))
   :config
-  (setopt erc-modules (seq-union '(nicks scrolltobottom spelling) erc-modules)
-          erc-nicks-colors (mapcar 'get-doom-theme-color
-                                   '(orange yellow teal blue dark-blue cyan violet)))
-  ;; for more "themed" erc-nicks-colors
-  (setq erc-nicks--create-pool-function 'erc-nicks--create-culled-pool)
+  (setopt erc-modules (seq-union '(nicks scrolltobottom spelling) erc-modules))
 
   ;; Fix for restoring query buffers with self-messages
   (advice-add #'erc-login
@@ -586,13 +532,8 @@ fifo /tmp/erc-track.fifo."
   :hook
   (erc-mode . (lambda ()
                 (auto-fill-mode -1)
-                (add-to-list 'completion-at-point-functions 'cape-emoji)
-                (setq-local scroll-margin 0)))
+                (add-to-list 'completion-at-point-functions 'cape-emoji)))
   (erc-text-matched . erc-hide-fools)
-  (erc-match-mode . (lambda ()
-                      (set-face-attribute 'erc-current-nick-face nil
-                                          :foreground (get-doom-theme-color 'red)
-                                          :slant 'italic :weight 'heavy)))
   (erc-track-list-changed . erc-track-external-notification))
 
 (use-package elfeed
@@ -650,6 +591,9 @@ This moves them into the Spam folder."
   (gnus-group-line-format "%M%S%p%P%B%(%G%) (%y)\n")
   (gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
   (gnus-init-file nil)
+  (gnus-logo-colors
+   `(,(face-attribute font-lock-string-face :foreground)
+     ,(face-attribute font-lock-type-face :foreground)))
   (gnus-message-archive-group nil)
   (gnus-secondary-select-methods
    '((nntp "news.gmane.io"
