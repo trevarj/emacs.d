@@ -518,6 +518,8 @@ fifo /tmp/erc-track.fifo."
    (erc-user-full-name user-full-name))
   :config
   (setopt erc-modules (seq-union '(nicks scrolltobottom spelling) erc-modules))
+  ;; for more "themed" erc-nicks-colors
+  (setq erc-nicks--create-pool-function 'erc-nicks--create-culled-pool)
 
   ;; Fix for restoring query buffers with self-messages
   (advice-add #'erc-login
