@@ -362,6 +362,12 @@
                 '(("Shell" (shfmt "-i" "2" "-ci"))))
   :diminish)
 
+;; Spelling
+(use-package ispell
+  :custom
+  (ispell-local-dictionary "english")
+  (ispell-alternate-dictionary "/usr/lib/aspell/english.alias"))
+
 ;; Colorize hex color codes
 (use-package rainbow-mode)
 
@@ -514,6 +520,7 @@ fifo /tmp/erc-track.fifo."
   (erc-receive-query-display 'bury)
   (erc-server "orangepi")
   (erc-server-reconnect-function 'erc-server-delayed-check-reconnect)
+  (erc-spelling-dictionaries '(("Libera.Chat" "english")))
   (erc-timestamp-format "%H:%M")
   (erc-track-exclude '("#emacs" "#systemcrafters-live" "*status"))
   (erc-track-exclude-server-buffer t)
@@ -568,20 +575,14 @@ fifo /tmp/erc-track.fifo."
   ;; Gmail integration taken from https://github.com/kensanata/ggg
   :preface
   (defun gmail-archive ()
-    "Archive the current or marked mails.
-This moves them into the All Mail folder."
     (interactive)
     (gnus-summary-move-article nil "nnimap+imap.gmail.com:[Gmail]/All Mail"))
 
   (defun gmail-trash ()
-    "Trash the current or marked mails.
-This moves them into the Trash folder."
     (interactive)
     (gnus-summary-move-article nil "nnimap+imap.gmail.com:[Gmail]/Trash"))
 
   (defun gmail-report-spam ()
-    "Report the current or marked mails as spam.
-This moves them into the Spam folder."
     (interactive)
     (gnus-summary-move-article nil "nnimap+imap.gmail.com:[Gmail]/Spam"))
   :bind
