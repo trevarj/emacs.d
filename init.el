@@ -154,7 +154,7 @@
    '((project-find-file "Find file" ?f)
      (consult-ripgrep "Find regexp" ?g)
      (magit-project-status "Magit" ?m)
-     (eat-project-other-window "Term" ?t)
+     (project-vterm "Vterm" ?t)
      (project-any-command "Other" ?o))))
 
 ;; Diminish minor modes
@@ -386,13 +386,24 @@
 (use-package nerd-icons-dired :hook (dired-mode . nerd-icons-dired-mode))
 
 ;; Terminal
-(use-package eat
-  :commands (eat)
-  :hook ((eshell-load . eat-eshell-mode)
-         (eshell-load . eat-eshell-visual-command-mode))
-  :custom
-  (eat-kill-buffer-on-exit t)
-  (eat-term-scrollback-size 1200000))
+(use-package vterm
+  :bind (:map project-prefix-map
+              ("t" . project-vterm))
+  :preface
+  (defun project-vterm ()
+    (interactive)
+    (defvar vterm-buffer-name)
+    (let* ((default-directory (project-root     (project-current t)))
+           (vterm-buffer-name (project-prefixed-buffer-name "vterm"))
+           (vterm-buffer (get-buffer vterm-buffer-name)))
+      (if (and vterm-buffer (not current-prefix-arg))
+          (pop-to-buffer vterm-buffer (bound-and-true-p display-comint-buffer-action))
+        (vterm))))
+  :config
+  (add-to-list 'project-kill-buffer-conditions '(major-mode . vterm-mode))
+  (setq vterm-copy-exclude-prompt t)
+  (setq vterm-max-scrollback 100000)
+  (setq vterm-tramp-shells '(("ssh" "/bin/bash"))))
 
 ;; Eglot LSP
 (use-package eglot
