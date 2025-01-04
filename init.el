@@ -606,8 +606,8 @@ fifo /tmp/erc-track.fifo."
   (gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
   (gnus-init-file nil)
   (gnus-logo-colors
-   `(,(face-attribute font-lock-string-face :foreground)
-     ,(face-attribute font-lock-type-face :foreground)))
+   `(,(face-attribute font-lock-builtin-face :foreground)
+     ,(face-attribute font-lock-keyword-face :foreground)))
   (gnus-message-archive-group nil)
   (gnus-secondary-select-methods
    '((nntp "news.gmane.io"
