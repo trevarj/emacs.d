@@ -8,7 +8,6 @@
 | Package          | Description              |
 |------------------|--------------------------|
 | diminish         | Hide unimportant modes   |
-| doom-themes      | Nord with tweakz         |
 | ligature         | Need my font liggies!    |
 | nerd-icons-dired | Pleasing icons for dired |
 | which-key        | Show buttons             |
