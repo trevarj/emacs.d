@@ -25,7 +25,6 @@
   (use-package-expand-minimally t))
 
 (use-package emacs
-  :demand t
   :preface
   (defun display-startup-time ()
     (message "Emacs loaded in %s with %d garbage collections."
@@ -315,6 +314,7 @@
   (text-mode-ispell-word-completion 'cape-dict))
 
 (use-package treesit-auto
+  :if (treesit-available-p)
   :demand
   :custom
   (treesit-auto-install 'prompt)
@@ -450,7 +450,7 @@
 ;; Rust
 (use-package rust-mode
   :custom
-  (rust-mode-treesitter-derive t)
+  (rust-mode-treesitter-derive (treesit-available-p))
   (rust-format-on-save t))
 
 ;; Guile
