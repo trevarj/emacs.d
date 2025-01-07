@@ -730,7 +730,7 @@
   (trailing-whitespace (:background red))
   (secondary-selection (:extend t :background base4))
   (region (:extend t :background base4))
-  (highlight (:foreground yellow :background base3))
+  (highlight (:weight 'bold :background base3))
   (link-visited (:foreground magenta :inherit 'link))
   (link (:weight 'bold :underline t :foreground blue))
   (shadow (:foreground base5))
