@@ -296,7 +296,7 @@
   (corfu-popupinfo-delay 0)
   (corfu-preview-current nil)
   (corfu-quit-no-match 'separator)
-  (global-corfu-minibuffer nil)
+  (global-corfu-minibuffer t)
   :config
   (corfu-popupinfo-mode)
   (add-to-list 'corfu--frame-parameters '(internal-border-width . 4)))
