@@ -747,7 +747,7 @@
   (erc-keep-place-indicator-arrow (:foreground green))
   (erc-keep-place-indicator-line (:underline (:color green :style 'wave)))
   (erc-button-nick-default-face (:inherit 'erc-nick-default-face))
-  (erc-button (:weight 'bold))
+  (erc-button (:weight 'bold :foreground cyan :underline (:color cyan :style 'line)))
   (erc-fill-wrap-merge-indicator-face (:foreground base5-alt2))
   (erc-timestamp-face (:weight 'bold :foreground base4))
   (erc-nick-msg-face (:weight 'bold :foreground red))
