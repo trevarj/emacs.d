@@ -172,10 +172,10 @@
   (which-key-mode)
   :bind
   (("C-c K" . 'which-key-show-major-mode))
-  :config
-  (which-key-setup-side-window-bottom)
-  (setq which-key-sort-order 'which-key-description-order)
-  :diminish which-key-mode)
+  :diminish
+  :custom
+  (which-key-popup-type 'side-window)
+  (which-key-sort-order 'which-key-description-order))
 
 ;; Window navigation
 (use-package ace-window :bind (("M-o" . ace-window)))
