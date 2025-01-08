@@ -290,7 +290,6 @@
   (:map corfu-map
         ("RET" . nil))
   :custom
-  (corfu-auto t)
   (corfu-left-margin-width 4)
   (corfu-right-margin-width 4)
   (corfu-popupinfo-delay 0)
