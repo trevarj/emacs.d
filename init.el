@@ -290,25 +290,16 @@
   (global-treesit-auto-mode))
 
 ;; Whitespace handling
-(use-package ws-butler
-  :demand 2
-  :config
-  (ws-butler-global-mode)
-  :diminish)
+(use-package ws-butler :demand 2 :config (ws-butler-global-mode) :diminish)
 
 ;; Rainbow delimiters
 (use-package rainbow-delimiters :hook (prog-mode . rainbow-delimiters-mode))
 
 ;; Editorconfig
-(use-package editorconfig
-  :config
-  (editorconfig-mode)
-  :diminish)
+(use-package editorconfig :config (editorconfig-mode) :diminish)
 
 ;; Buffer specific direnv
-(use-package envrc
-  :diminish
-  :config (envrc-global-mode))
+(use-package envrc :diminish :config (envrc-global-mode))
 
 ;; Avy navigation
 (use-package avy
@@ -431,9 +422,7 @@
   (add-to-list 'geiser-guile-load-path "~/Workspace/guix"))
 
 ;; Common Lisp
-(use-package sly
-  :custom
-  (inferior-lisp-program (executable-find "sbcl")))
+(use-package sly :custom (inferior-lisp-program (executable-find "sbcl")))
 
 ;; Markdown
 (use-package markdown-mode)
