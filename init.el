@@ -65,15 +65,6 @@
   ;; Fonts
   (set-face-attribute 'default nil :family "Iosevka JBM" :height 168 :weight 'medium)
   (set-face-attribute 'variable-pitch nil :family "Noto Sans")
-  ;; https://github.com/ryanoasis/nerd-fonts/wiki/Glyph-Sets-and-Code-Points
-  (let ((nerdfont-code-points
-         '((#xE6FA . #xE6B2) (#xE700 . #xE7C5) (#xF000 . #xF2E0) (#xE200 . #xE2A9)
-           (#xF500 . #xFD46) (#xE300 . #xE3EB) (#xF400 . #xF532) (#xE0B4 . #xE0C8)
-           (#xF0001 . #xF1AF0) (#xE0CC . #xE0D4) (#x23FB . #x23FE) (#xF300 . #xF372)
-           (#xE000 . #xE00A) (#xEA60 . #xEBEB) #x2665 #x26A1 #xF2A1 #xF27C #xE0A3 #xE0CA)))
-    (dolist (code-point nerdfont-code-points)
-      (set-fontset-font t code-point (font-spec :family "Symbols Nerd Font Mono"))))
-
   ;; Generic keybindings
   :bind
   (("C-x K" . 'kill-current-buffer)
@@ -124,7 +115,6 @@
   (undo-limit 67108864)                                 ; 64mb.
   (undo-outer-limit 1006632960)                         ; 960mb.
   (undo-strong-limit 100663296)                         ; 96mb.
-  (use-default-font-for-symbols nil)                    ; For nerd fonts
   (use-dialog-box nil)                                  ; Bye
   (use-short-answers t)                                 ; y/n
   (user-full-name "Trevor Arjeski")
@@ -346,8 +336,6 @@
   :config
   (global-diff-hl-mode)
   (diff-hl-flydiff-mode))
-
-(use-package nerd-icons-dired :hook (dired-mode . nerd-icons-dired-mode))
 
 ;; Terminal
 (use-package vterm
