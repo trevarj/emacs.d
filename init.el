@@ -430,13 +430,11 @@
     (when (erc-query-buffer-p)
       (erc-send-input-line "*status" (format "clearbuffer %s" (erc-target)))))
 
-  (let ((hidden-fools t))
-    (defun erc-toggle-fools ()
-      (interactive)
-      (setq hidden-fools (not hidden-fools))
-      (erc-match-toggle-hidden-fools hidden-fools)
-      (message "hidden fools: %s" (if hidden-fools "on" "off"))
-      (set-buffer-modified-p t)))
+  (defun erc-toggle-fools ()
+    (interactive)
+    (message "erc: hidden fools %s"
+             (if (equal '(t) (erc-match-toggle-hidden-fools nil)) "OFF" "ON"))
+    (set-buffer-modified-p t))
 
   (defun erc-track-external-notification ()
     "Run on `erc-track-list-changed-hook' and silently writes to a named
