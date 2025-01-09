@@ -141,7 +141,7 @@
   :custom
   (project-switch-commands
    '((project-find-file "Find file" ?f)
-     (consult-ripgrep "Find regexp" ?g)
+     (project-find-regexp "Find regexp" ?g)
      (magit-project-status "Magit" ?m)
      (project-vterm "Vterm" ?t)
      (project-any-command "Other" ?o))))
