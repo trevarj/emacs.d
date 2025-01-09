@@ -78,6 +78,9 @@
   :bind
   (("C-x K" . 'kill-current-buffer)
    ("C-c b" . 'ibuffer)
+   ("C-c r" . 'recentf-open)
+   ("C-c SPC" . 'project-find-file)
+   ("C-c /" . 'project-find-regexp)
    ("C-'" . 'switch-to-buffer-last)
    ("C-c !" . 'open-user-config))
   ;; Miscellaneous Options
@@ -92,11 +95,12 @@
   (custom-safe-themes t)
   (desktop-load-locked-desktop 'check-pid)              ; load if lock pid doesn't exist
   (display-buffer-alist                                 ; Prefer right split for matched buffers
-   '(("\\*\\(Help\\|helpful\\|Customize\\|info\\|xref\\).*\\*"
+   '(("\\*\\(Help\\|helpful\\|Customize\\|info\\).*\\*"
       (display-buffer-reuse-window display-buffer-in-side-window)
-      (side . right)
-      (slot . 0)
-      (window-width .5))))
+      (side . right) (slot . 0) (window-width .5))
+     ("*xref*"
+      (display-buffer-reuse-window display-buffer-in-side-window)
+      (side . bottom) (slot . 0) (window-width .2))))
   (display-line-numbers-grow-only t)                    ; Never shrink the linum width
   (display-line-numbers-width-start t)                  ; Calculate linum width at start
   (eldoc-echo-area-use-multiline-p nil)
@@ -237,39 +241,6 @@
 ;; Minibuffer annotations
 (use-package marginalia :init (marginalia-mode))
 
-;; Useful functions
-(use-package consult
-  :bind (("C-c c r" . consult-register)
-         ("C-c /" . consult-ripgrep)
-         ("C-<return>" . consult-line)
-         ("C-c <SPC>" . consult-fd)
-         ("C-c c i" . consult-info)
-         ("C-c c m" . consult-man)
-         ("C-c r" . consult-recent-file)
-         ("C-x b" . consult-buffer)                ; orig. switch-to-buffer
-         ("C-c c p" . consult-project-buffer)      ; orig. project-switch-to-buffer
-         ("C-c c b" . consult-bookmark)            ; orig. bookmark-jump
-         ("M-g M-g" . consult-goto-line)           ; orig. goto-line
-         ("M-g e" . consult-compile-error)
-         ("M-g f" . consult-flymake)
-         ("M-g k" . consult-global-mark)
-         ("M-g m" . consult-mark)
-         ("M-y" . consult-yank-pop)                ; orig. yank-pop
-         ([remap Info-search] . consult-info)
-         :map isearch-mode-map
-         ("M-e" . consult-isearch-history)         ; orig. isearch-edit-string
-         ("M-s L" . consult-line-multi)            ; needed by consult-line to detect isearch
-         ("M-s e" . consult-isearch-history)       ; orig. isearch-edit-string
-         ("M-s l" . consult-line)                  ; needed by consult-line to detect isearch
-         ;; Minibuffer history
-         :map minibuffer-local-map
-         ("M-r" . consult-history)
-         ("M-s" . consult-history))                ; orig. next-matching-history-element
-  :custom
-  (completion-ignore-case t)
-  (read-buffer-completion-ignore-case t)
-  (read-file-name-completion-ignore-case t))
-
 (use-package helpful
   :bind
   (("C-h f" . #'helpful-callable)
@@ -406,6 +377,11 @@
   (setq vterm-copy-exclude-prompt t)
   (setq vterm-max-scrollback 100000)
   (setq vterm-tramp-shells '(("ssh" "/bin/bash"))))
+
+(use-package flymake
+  :bind
+  (:map flymake-mode-map
+        ("M-g f" . 'flymake-show-project-diagnostics)))
 
 ;; Eglot LSP
 (use-package eglot
