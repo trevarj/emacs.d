@@ -612,16 +612,6 @@ fifo /tmp/erc-track.fifo."
 
 ;;; Local Packages
 
-(use-package leetcode
-  :vc
-  (:url "https://github.com/trevarj/leetcode.el"
-        :rev "9c5bd70")
-  :load my-secrets
-  :custom
-  (leetcode-directory "~/Workspace/leetcode/")
-  (leetcode-prefer-language "cpp")
-  (leetcode-save-solutions t))
-
 (use-package aoc
   :load my-secrets
   :config
