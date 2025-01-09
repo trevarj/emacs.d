@@ -436,10 +436,8 @@
   :preface
   (defun erc-connect ()
     (interactive)
-    (erc :server erc-server
-         :port erc-port
-         :user erc-nick
-         :full-name erc-user-full-name))
+    (erc :server erc-server :port erc-port
+         :user erc-nick :full-name erc-user-full-name))
 
   (defun erc-clear-query-buffer ()
     (when (erc-query-buffer-p)
@@ -487,17 +485,13 @@ fifo /tmp/erc-track.fifo."
   (erc-track-exclude-server-buffer t)
   (erc-track-exclude-types '("JOIN" "NICK" "QUIT" "MODE" "AWAY" "PART")
                            "353" "324" "332" "329" "333" "477")
-  (erc-track-faces-priority-list
-   '(erc-error-face erc-current-nick-face erc-keyword-face erc-pal-face
-                    erc-nick-msg-face erc-direct-msg-face
-                    erc-dangerous-host-face erc-nick-default-face
-                    (erc-button-nick-default-face erc-nick-default-face)
-                    erc-default-face erc-action-face erc-fool-face
-                    erc-notice-face erc-input-face erc-prompt-face)
-   (erc-user-full-name user-full-name))
+  (erc-user-full-name user-full-name)
   :config
-  (setopt erc-modules (seq-union '(nicks scrolltobottom spelling) erc-modules))
-
+  (setopt erc-modules (seq-union '(nicks scrolltobottom spelling) erc-modules)
+          erc-track-faces-priority-list
+          (seq-remove
+           (lambda (elt) (and (listp elt) (seq-contains-p elt 'erc-default-face)))
+           erc-track-faces-priority-list))
   ;; Fix for restoring query buffers with self-messages
   (advice-add #'erc-login
               :before (lambda ()
