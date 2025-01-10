@@ -158,29 +158,25 @@
 
 ;; Keybinding
 (use-package which-key
-  :init
-  (which-key-mode)
-  :bind
-  (("C-c K" . 'which-key-show-major-mode))
-  :diminish
+  :init (which-key-mode)
+  :bind (("C-c K" . 'which-key-show-major-mode))
   :custom
   (which-key-popup-type 'side-window)
-  (which-key-sort-order 'which-key-description-order))
+  (which-key-sort-order 'which-key-description-order)
+  :diminish)
 
 ;; Window navigation
 (use-package ace-window :bind (("M-o" . ace-window)))
 
 (use-package undo-fu
-  :init
-  (global-unset-key (kbd "C-z"))
+  :init (global-unset-key (kbd "C-z"))
   :bind
   (("C-z" . 'undo-fu-only-undo)
    ("C-S-z" . 'undo-fu-only-redo)))
 
 (use-package undo-fu-session
   :demand
-  :config
-  (undo-fu-session-global-mode))
+  :config (undo-fu-session-global-mode))
 
 ;; Searching
 (use-package isearch
@@ -241,11 +237,8 @@
 
 ;; Completion
 (use-package corfu
-  :init
-  (global-corfu-mode)
-  :bind
-  (:map corfu-map
-        ("RET" . nil))
+  :init (global-corfu-mode)
+  :bind (:map corfu-map ("RET" . nil))
   :custom
   (corfu-left-margin-width 4)
   (corfu-right-margin-width 4)
@@ -264,10 +257,8 @@
 
 ;; Completion-at-point helper
 (use-package cape
-  :init
-  (add-to-list 'completion-at-point-functions #'cape-file)
-  :custom
-  (text-mode-ispell-word-completion 'cape-dict))
+  :init (add-to-list 'completion-at-point-functions #'cape-file)
+  :custom (text-mode-ispell-word-completion 'cape-dict))
 
 (use-package treesit-auto
   :if (treesit-available-p)
@@ -380,7 +371,6 @@
         ("r" . eglot-find-implementation)
         ("t" . eglot-find-typeDefinition))
   :config
-  ;; Server customization
   (setf eglot-server-programs
         '(((bash-ts-mode sh-mode) . ("bash-language-server" "start"))
           (rust-ts-mode . ("rust-analyzer"
