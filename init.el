@@ -24,6 +24,8 @@
   (use-package-ensure-function #'trev/use-package-ensure)
   (use-package-expand-minimally t))
 
+(use-package autothemer)
+
 (use-package emacs
   :preface
   (defun display-startup-time ()
@@ -120,8 +122,6 @@
   (user-full-name "Trevor Arjeski")
   (user-mail-address "tmarjeski@gmail.com")
   (window-divider-default-right-width 16))               ; Padding between splits
-
-(use-package autothemer)
 
 ;; Ligatures
 (use-package ligature
