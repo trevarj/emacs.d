@@ -75,6 +75,7 @@
    ("C-c SPC" . 'project-find-file)
    ("C-c /" . 'project-find-regexp)
    ("C-'" . 'switch-to-buffer-last)
+   ("C-<return>" . 'occur)
    ("C-c !" . 'open-user-config))
   ;; Miscellaneous Options
   :custom
@@ -90,10 +91,10 @@
   (display-buffer-alist                                 ; Prefer right split for matched buffers
    '(("\\*\\(Help\\|helpful\\|Customize\\|info\\).*\\*"
       (display-buffer-reuse-window display-buffer-in-side-window)
-      (side . right) (slot . 0) (window-width .5))
-     ("*xref*"
-      (display-buffer-reuse-window display-buffer-in-side-window)
-      (side . bottom) (slot . 0) (window-width .2))))
+      (side . right) (slot . 0) (window-width . .5))
+     ("\\*\\(xref\\|Occur\\).*\\*"
+      (display-buffer-below-selected display-buffer-at-bottom)
+      (window-height . .2))))
   (display-line-numbers-grow-only t)                    ; Never shrink the linum width
   (display-line-numbers-width-start t)                  ; Calculate linum width at start
   (eldoc-echo-area-use-multiline-p nil)
