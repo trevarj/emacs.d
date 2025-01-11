@@ -725,7 +725,7 @@
   (line-number-minor-tick (:weight 'bold :background base6))
   (line-number-major-tick (:weight 'bold :background base7))
   (line-number-current-line
-   (:weight 'normal :foreground base7 :inherit ('hl-line 'default)))
+   (:weight 'normal :foreground base6))
   (line-number
    (:weight 'normal :foreground base4 :inherit 'default))
   (trailing-whitespace (:background red))
