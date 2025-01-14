@@ -453,7 +453,7 @@ fifo /tmp/erc-track.fifo."
   (erc-prompt 'erc-prompt-format)
   (erc-prompt-format (propertize "%n:" 'font-lock-face 'erc-input-face))
   (erc-receive-query-display 'bury)
-  (erc-server "orangepi")
+  (erc-server "znc")
   (erc-server-reconnect-function 'erc-server-delayed-check-reconnect)
   (erc-spelling-dictionaries '(("Libera.Chat" "english")))
   (erc-timestamp-format "%H:%M")
