@@ -797,7 +797,7 @@
   (nerd-icons-green (:foreground green)) (nerd-icons-red-alt (:foreground red))
   (nerd-icons-dred (:foreground red)) (nerd-icons-lred (:foreground red))
   (nerd-icons-red (:foreground red))
-  (hl-line (:extend t :weight 'bold :background base3-alt))
+  (hl-line (:extend t :background base3-alt))
   (elfeed-search-filter-face (:inherit 'mode-line-buffer-id))
   (elfeed-search-unread-count-face (:foreground fg))
   (elfeed-search-last-update-face nil)
