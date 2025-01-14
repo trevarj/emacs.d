@@ -285,7 +285,7 @@
 ;; Avy navigation
 (use-package avy
   :bind
-  (("C-c w" . #'avy-goto-word-1)
+  (("C-c w" . #'avy-goto-word-0)
    ("C-c s" . #'avy-goto-char-timer)))
 
 (use-package ibuffer :hook (ibuffer-mode . ibuffer-auto-mode))
