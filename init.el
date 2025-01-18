@@ -93,7 +93,7 @@
    '(("\\*\\(Help\\|helpful\\|Customize\\|info\\).*\\*"
       (display-buffer-reuse-window display-buffer-in-side-window)
       (side . right) (slot . 0) (window-width . .5))
-     ("\\*\\(xref\\|Occur\\).*\\*"
+     ("\\*\\(xref\\|Occur\\|.*diagnostics\\).*\\*"
       (display-buffer-below-selected display-buffer-at-bottom)
       (window-height . .2))))
   (display-line-numbers-grow-only t)                    ; Never shrink the linum width
