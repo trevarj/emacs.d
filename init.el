@@ -70,7 +70,7 @@
   ;; Generic keybindings
   :bind
   (("C-x K" . 'kill-current-buffer)
-   ("C-c b" . 'ibuffer)
+   ("C-c b" . 'ibuffer-other-window)
    ("C-c r" . 'recentf-open)
    ("C-c SPC" . 'project-find-file)
    ("C-c /" . 'project-find-regexp)
@@ -90,7 +90,7 @@
   (custom-safe-themes t)
   (desktop-load-locked-desktop 'check-pid)              ; load if lock pid doesn't exist
   (display-buffer-alist                                 ; Prefer right split for matched buffers
-   '(("\\*\\(Help\\|helpful\\|Customize\\|info\\).*\\*"
+   '(("\\*\\(Help\\|helpful\\|Customize\\|info\\|Ibuffer\\).*\\*"
       (display-buffer-reuse-window display-buffer-in-side-window)
       (side . right) (slot . 0) (window-width . .5))
      ("\\*\\(xref\\|Occur\\|.*diagnostics\\).*\\*"
