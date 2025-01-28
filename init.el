@@ -76,7 +76,8 @@
    ("C-c /" . 'project-find-regexp)
    ("C-'" . 'switch-to-buffer-last)
    ("C-<return>" . 'occur)
-   ("C-c !" . 'open-user-config))
+   ("C-c !" . 'open-user-config)
+   ("M-o" . 'other-window))
   ;; Miscellaneous Options
   :custom
   (auto-fill-function 'do-auto-fill)
@@ -168,8 +169,10 @@
   (which-key-sort-order 'which-key-description-order)
   :diminish)
 
-;; Window navigation
-(use-package ace-window :bind (("M-o" . ace-window)))
+(use-package repeat
+  :defer 1
+  :hook (after-init . repeat-mode)
+  :bind ("M-RET" . repeat))
 
 (use-package undo-fu
   :init (global-unset-key (kbd "C-z"))
