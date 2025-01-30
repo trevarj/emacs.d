@@ -458,7 +458,7 @@ fifo /tmp/erc-track.fifo."
   (erc-fill-function 'erc-fill-static)
   (erc-fill-static-center 16)
   (erc-fool-highlight-type 'all)
-  (erc-hide-list '("JOIN" "NICK" "QUIT" "MODE" "AWAY" "PART" "353"))
+  (erc-hide-list '("JOIN" "NICK" "QUIT" "MODE" "AWAY" "PART" "353" "324" "329"))
   (erc-insert-timestamp-function 'erc-insert-timestamp-left)
   (erc-nick "trev")
   (erc-nicks-track-faces t)
