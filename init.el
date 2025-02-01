@@ -164,6 +164,8 @@
   :demand
   :config (diminish 'auto-revert-mode))
 
+(use-package eldoc :diminish)
+
 (use-package xref
   :custom
   (xref-auto-jump-to-first-definition 'show)
