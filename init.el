@@ -59,7 +59,6 @@
   (recentf-mode)
   (desktop-save-mode)                   ; Session saving
   (column-number-mode)                  ; Column number mode
-  (global-auto-revert-mode)             ; Auto-refresh buffers
   (electric-pair-mode)                  ; Pair the pairs
   (auto-fill-mode)                      ; Autofill mode
   (window-divider-mode)                 ; Gap between splits
@@ -89,7 +88,6 @@
   ;; Miscellaneous Options
   :custom
   (auto-fill-function 'do-auto-fill)
-  (auto-revert-verbose nil)
   (auto-save-file-name-transforms '((".*" "~/.cache/emacs/saves/" t)))
   (browse-url-browser-function 'browse-url-firefox)
   (backup-directory-alist '(("." . "~/.cache/emacs/backups")))
@@ -111,7 +109,6 @@
   (enable-recursive-minibuffers t)                      ; Recursive mini-buffers
   (epg-pinentry-mode 'loopback)                         ; pinentry on minibuffer
   (fill-column 80)                                      ; 80 width pages
-  (global-auto-revert-non-file-buffers t)               ; Auto-refresh buffers like dired
   (indent-tabs-mode nil)                                ; Use spaces only
   (inhibit-startup-message t)                           ; No startup screen
   (kill-buffer-quit-windows t)
@@ -158,6 +155,13 @@
      (project-eshell "Eshell" ?e)
      (project-vterm "Vterm" ?t)
      (project-any-command "Other" ?o))))
+
+(use-package autorevert
+  :hook (after-init . global-auto-revert-mode)
+  :custom
+  (auto-revert-verbose nil)
+  (global-auto-revert-non-file-buffers t)
+  :diminish)
 
 ;; Diminish minor modes
 (use-package diminish
