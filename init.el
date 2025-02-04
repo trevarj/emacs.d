@@ -375,6 +375,8 @@
 
 ;; Eglot LSP
 (use-package eglot
+  :custom
+  (eglot-code-action-indications '(eldoc-hint))
   :hook
   (c-ts-mode . eglot-ensure)
   (bash-ts-mode . eglot-ensure)
