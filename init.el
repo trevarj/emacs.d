@@ -448,15 +448,6 @@
     (message "erc: hidden fools %s"
              (if (equal '(t) (erc-match-toggle-hidden-fools nil)) "OFF" "ON"))
     (set-buffer-modified-p t))
-
-  (defun erc-track-external-notification ()
-    "Run on `erc-track-list-changed-hook' and silently writes to a named
-fifo /tmp/erc-track.fifo."
-    (when-let* ((fifo "/tmp/erc-track.fifo")
-                (file-exists-p fifo))
-      (write-region
-       (format "%s\n" (or (mapcar 'buffer-name (mapcar #'car erc-modified-channels-alist)) ""))
-       nil fifo t 'quiet)))
   :bind
   (("C-c #" . 'erc-connect)
    :map erc-mode-map
@@ -504,8 +495,7 @@ fifo /tmp/erc-track.fifo."
   (erc-mode . (lambda ()
                 (auto-fill-mode -1)
                 (add-to-list 'completion-at-point-functions 'cape-emoji)))
-  (erc-text-matched . erc-hide-fools)
-  (erc-track-list-changed . erc-track-external-notification))
+  (erc-text-matched . erc-hide-fools))
 
 (use-package elfeed
   :load my-secrets
