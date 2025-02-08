@@ -154,7 +154,9 @@
      (magit-project-status "Magit" ?m)
      (project-eshell "Eshell" ?e)
      (project-vterm "Vterm" ?t)
-     (project-any-command "Other" ?o))))
+     (project-any-command "Other" ?o)))
+  :config
+  (add-to-list 'project-kill-buffer-conditions '(major-mode . vterm-mode)))
 
 (use-package autorevert
   :hook (after-init . global-auto-revert-mode)
@@ -363,7 +365,6 @@
           (pop-to-buffer vterm-buffer (bound-and-true-p display-comint-buffer-action))
         (vterm))))
   :config
-  (add-to-list 'project-kill-buffer-conditions '(major-mode . vterm-mode))
   (setq vterm-copy-exclude-prompt t)
   (setq vterm-max-scrollback 100000)
   (setq vterm-tramp-shells '(("ssh" "/bin/bash"))))
