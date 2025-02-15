@@ -400,9 +400,7 @@
           (rust-ts-mode . ("rust-analyzer"
                            :initializationOptions
                            (:check
-                            (:command "clippy")
-                            :procMacro
-                            (:enable :json-false))))
+                            (:command "clippy"))))
           ((c-ts-mode c++-ts-mode) . ("clangd"))))
   (defalias 'start-lsp-server #'eglot))
 
