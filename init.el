@@ -467,6 +467,7 @@
   (erc-receive-query-display 'bury)
   (erc-server "znc")
   (erc-server-reconnect-function 'erc-server-delayed-check-reconnect)
+  (erc-scrolltobottom-all t)
   (erc-spelling-dictionaries '(("Libera.Chat" "english")))
   (erc-timestamp-format "%H:%M")
   (erc-track-exclude '("#emacs" "#systemcrafters-live" "*status"))
