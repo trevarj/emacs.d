@@ -337,6 +337,7 @@
   :custom
   (magit-define-global-key-bindings 'recommended)
   (magit-diff-refine-hunk t)
+  (magit-blame-echo-style 'headings)
   :hook (git-commit-setup . git-commit-turn-on-flyspell))
 
 ;; Git modes
