@@ -1069,7 +1069,11 @@
   (debbugs-gnu-stale-1 (:foreground yellow))
   (debbugs-gnu-handled (:foreground green))
   (debbugs-gnu-new (:foreground orange))
-  (debbugs-gnu-archived (:inverse-video t))))
+  (debbugs-gnu-archived (:inverse-video t))
+  (dictionary-reference-face (:underline t))
+  (dictionary-button-face (:weight 'bold))
+  (dictionary-word-entry-face (:height 1.2 :weight 'bold))
+  (dictionary-word-definition-face (:foreground fg-alt))))
 
 (provide 'nord-theme)
 ;;; nord-theme.el ends here
