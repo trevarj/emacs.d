@@ -96,6 +96,7 @@
   (custom-file "/tmp/custom.el")                        ; customization file
   (custom-safe-themes t)
   (desktop-load-locked-desktop 'check-pid)              ; load if lock pid doesn't exist
+  (dictionary-server "dict.org")
   (display-buffer-alist                                 ; Prefer right split for matched buffers
    '(("\\*\\(Help\\|helpful\\|Customize\\|info\\|Ibuffer\\|.*eshell\\).*\\*"
       (display-buffer-reuse-window display-buffer-in-side-window)
