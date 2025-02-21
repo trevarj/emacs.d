@@ -372,6 +372,8 @@
   (setq vterm-tramp-shells '(("ssh" "/bin/bash"))))
 
 (use-package flymake
+  :custom
+  (flymake-show-diagnostics-at-end-of-line t)
   :bind
   (:map flymake-mode-map
         ("M-g f" . 'flymake-show-project-diagnostics)))

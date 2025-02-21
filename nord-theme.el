@@ -923,7 +923,7 @@
    (:inherit ('flymake-end-of-line-diagnostics-face 'compilation-warning)))
   (flymake-error-echo-at-eol
    (:inherit ('flymake-end-of-line-diagnostics-face 'compilation-error)))
-  (flymake-end-of-line-diagnostics-face (:height 0.85 :box (:line-width -1)))
+  (flymake-end-of-line-diagnostics-face (:height 0.8))
   (flymake-note-echo (:inherit 'compilation-info))
   (flymake-warning-echo (:inherit 'compilation-warning))
   (flymake-error-echo (:inherit 'compilation-error))
