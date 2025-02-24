@@ -374,6 +374,7 @@
 (use-package flymake
   :custom
   (flymake-show-diagnostics-at-end-of-line t)
+  :hook (prog-mode . flymake-mode)
   :bind
   (:map flymake-mode-map
         ("M-g f" . 'flymake-show-project-diagnostics)))
