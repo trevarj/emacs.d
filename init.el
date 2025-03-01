@@ -89,7 +89,7 @@
   :custom
   (auto-fill-function 'do-auto-fill)
   (auto-save-file-name-transforms '((".*" "~/.cache/emacs/saves/" t)))
-  (browse-url-browser-function 'browse-url-firefox)
+  (browse-url-browser-function 'browse-url-default-gtk-browser)
   (backup-directory-alist '(("." . "~/.cache/emacs/backups")))
   (comment-auto-fill-only-comments t)                   ; Autofill comments only
   (confirm-kill-emacs nil)
