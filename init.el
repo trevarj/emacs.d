@@ -95,6 +95,7 @@
   (confirm-kill-emacs nil)
   (custom-file "/tmp/custom.el")                        ; customization file
   (custom-safe-themes t)
+  (delete-selection-mode t)
   (desktop-load-locked-desktop 'check-pid)              ; load if lock pid doesn't exist
   (dictionary-server "dict.org")
   (display-buffer-alist                                 ; Prefer right split for matched buffers
