@@ -11,13 +11,13 @@
 
 (use-package use-package
   :preface
-  (defun trev/use-package-ensure (name args _state &optional _no-refresh)
+  (defun trev/use-package-ensure (name args state &optional no-refresh)
     "Checks for local package before checking remote archives."
     (if-let* ((not-feature (not (featurep name)))
               (path (locate-library (symbol-name name)))
               (_ (not (package-installed-p name))))
         (package-install-file path)
-      (when not-feature (use-package-ensure-elpa name args _state _no-refresh))))
+      (when not-feature (use-package-ensure-elpa name args state no-refresh))))
   :custom
   (use-package-always-defer t)
   (use-package-always-ensure t)
@@ -54,7 +54,7 @@
    (prog-mode . display-line-numbers-mode))
   :init
   (load-theme 'nord t)
-  (add-to-list 'load-path (concat user-emacs-directory "/lisp"))
+  (add-to-list 'load-path (concat user-emacs-directory "lisp"))
   (save-place-mode)
   (recentf-mode)
   (desktop-save-mode)                   ; Session saving
@@ -348,8 +348,7 @@
 
 (use-package diff-hl
   :hook
-  ((magit-post-refresh . diff-hl-magit-post-refresh)
-   (magit-pre-refresh . diff-hl-magit-pre-refresh))
+  ((magit-post-refresh . diff-hl-magit-post-refresh))
   :config
   (global-diff-hl-mode)
   (diff-hl-flydiff-mode))
@@ -438,10 +437,11 @@
 
 ;; IRC/ERC
 (use-package erc
-  :load my-secrets
+  ;; :load my-secrets
   :preface
   (defun erc-connect ()
     (interactive)
+    (load-library "my-secrets")
     (erc :server erc-server :port erc-port
          :user erc-nick :full-name erc-user-full-name))
 
