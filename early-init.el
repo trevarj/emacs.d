@@ -1,9 +1,18 @@
 ;;; early-init.el --- Trev's Early Init Config -*- lexical-binding: t -*-
 
+;;; Commentary:
+
+;;; Code:
+
 ;; Startup hacks
 (setq gc-cons-threshold most-positive-fixnum
       gc-cons-percentage 0.6
       vc-handled-backends '(Git))
+
+;; Disable site files
+(setq
+ inhibit-default-init t
+ site-run-file nil)
 
 ;; After Emacs has completely started, reset the values to more sensible ones.
 (add-hook
