@@ -79,10 +79,7 @@
   (("C-x K" . 'kill-current-buffer)
    ("C-c b" . 'ibuffer-other-window)
    ("C-c r" . 'recentf-open)
-   ("C-c SPC" . 'project-find-file)
-   ("C-c /" . 'project-find-regexp)
    ("C-'" . 'switch-to-buffer-last)
-   ("C-<return>" . 'occur)
    ("C-c !" . 'open-user-config)
    ("M-o" . 'other-window))
   ;; Miscellaneous Options
@@ -285,6 +282,27 @@
 (use-package cape
   :init (add-to-list 'completion-at-point-functions #'cape-file)
   :custom (text-mode-ispell-word-completion 'cape-dict))
+
+;; Consult functions
+(use-package consult
+  :bind (("C-c /" . consult-ripgrep)
+         ("C-c SPC" . consult-fd)
+         ("C-<return>" . consult-line)
+         ("C-c m" . consult-man)
+         ("C-c i" . consult-info)
+         ([remap Info-search] . consult-info)
+         ("C-x b" . consult-buffer)
+         ("C-x r b" . consult-bookmark)
+         ("C-x p b" . consult-project-buffer)
+         ("M-y" . consult-yank-pop)
+         ("M-g e" . consult-compile-error)
+         ("M-g f" . consult-flymake)
+         ("M-g g" . consult-goto-line)
+         ("M-g M-g" . consult-goto-line))
+  :init
+  ;; Use Consult to select xref locations with preview
+  (setq xref-show-xrefs-function #'consult-xref
+        xref-show-definitions-function #'consult-xref))
 
 (use-package treesit-auto
   :if (treesit-available-p)
