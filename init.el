@@ -78,7 +78,6 @@
   :bind
   (("C-x K" . 'kill-current-buffer)
    ("C-c b" . 'ibuffer-other-window)
-   ("C-c r" . 'recentf-open)
    ("C-'" . 'switch-to-buffer-last)
    ("C-c !" . 'open-user-config)
    ("M-o" . 'other-window))
@@ -287,6 +286,7 @@
 (use-package consult
   :bind (("C-c /" . consult-ripgrep)
          ("C-c SPC" . consult-fd)
+         ("C-c r" . consult-recent-file)
          ("C-<return>" . consult-line)
          ("C-c m" . consult-man)
          ("C-c i" . consult-info)
@@ -393,10 +393,7 @@
 (use-package flymake
   :custom
   (flymake-show-diagnostics-at-end-of-line t)
-  :hook (prog-mode . flymake-mode)
-  :bind
-  (:map flymake-mode-map
-        ("M-g f" . 'flymake-show-project-diagnostics)))
+  :hook (prog-mode . flymake-mode))
 
 ;; Eglot LSP
 (use-package eglot
