@@ -292,6 +292,7 @@
          ("C-c i" . consult-info)
          ([remap Info-search] . consult-info)
          ("C-x b" . consult-buffer)
+         ("C-x 4 b" . consult-buffer-other-window)
          ("C-x r b" . consult-bookmark)
          ("C-x p b" . consult-project-buffer)
          ("M-y" . consult-yank-pop)
