@@ -298,7 +298,6 @@
          ("M-y" . consult-yank-pop)
          ("M-g e" . consult-compile-error)
          ("M-g f" . consult-flymake)
-         ("M-g g" . consult-goto-line)
          ("M-g M-g" . consult-goto-line))
   :init
   ;; Use Consult to select xref locations with preview
