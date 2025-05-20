@@ -6,6 +6,8 @@
 ;;; Code:
 
 (use-package package
+  :custom
+  (package-install-upgrade-built-in t)
   :config
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t))
 
