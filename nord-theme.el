@@ -665,7 +665,7 @@
   (font-lock-doc-face (:foreground base6 :inherit 'font-lock-comment-face))
   (font-lock-string-face (:foreground green))
   (font-lock-comment-delimiter-face (:inherit 'font-lock-comment-face))
-  (font-lock-comment-face (:foreground base5-alt))
+  (font-lock-comment-face (:foreground base6))
   (completions-common-part (:foreground cyan))
   (completions-first-difference (:inherit 'bold))
   (completions-highlight (:inherit 'highlight))
@@ -699,9 +699,14 @@
   (tool-bar
    (:box (:line-width 1 :style 'released-button) :foreground base0 :background
          base7))
-  (mouse nil) (cursor (:background orange)) (border nil) (scroll-bar nil)
-  (fringe (:foreground teal)) (minibuffer-prompt (:foreground blue))
-  (child-frame-border nil) (internal-border nil)
+  (mouse nil)
+  (cursor (:background orange))
+  (border nil)
+  (scroll-bar nil)
+  (fringe (:foreground teal))
+  (minibuffer-prompt (:foreground yellow))
+  (child-frame-border nil)
+  (internal-border (:background bg))
   (window-divider-last-pixel (:inherit 'window-divider))
   (window-divider-first-pixel (:inherit 'window-divider))
   (window-divider (:inherit 'vertical-border))
@@ -716,7 +721,7 @@
   (mode-line-active
    (:box (:line-width '(6 . 6) :color base3) :background base3 :inherit 'mode-line))
   (mode-line
-   (:box (:line-width '(6 . 6) :color base3) :foreground base5-alt2 :background base3))
+   (:box (:line-width '(6 . 6) :color base3) :foreground base7 :background base3))
   (nobreak-hyphen (:foreground yellow))
   (nobreak-space (:underline t :inherit 'escape-glyph))
   (homoglyph (:foreground teal)) (escape-glyph (:foreground cyan))
@@ -725,9 +730,9 @@
   (line-number-minor-tick (:weight 'bold :background base6))
   (line-number-major-tick (:weight 'bold :background base7))
   (line-number-current-line
-   (:weight 'normal :foreground base6))
+   (:weight 'normal :foreground yellow))
   (line-number
-   (:weight 'normal :foreground base4 :inherit 'default))
+   (:weight 'normal :foreground base5-alt :inherit 'default))
   (trailing-whitespace (:background red))
   (secondary-selection (:extend t :background base4))
   (region (:extend t :background base4))
