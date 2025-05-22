@@ -717,11 +717,11 @@
   (mode-line-emphasis (:foreground blue))
   (mode-line-highlight (:inherit 'highlight))
   (mode-line-inactive
-   (:box (:line-width '(6 . 6) :color bg) :foreground base5 :background bg))
+   (:box (:line-width '(6 . 6) :color bg) :foreground base5 :background bg :inherit 'mode-line))
   (mode-line-active
    (:box (:line-width '(6 . 6) :color base3) :background base3 :inherit 'mode-line))
   (mode-line
-   (:box (:line-width '(6 . 6) :color base3) :foreground base7 :background base3))
+   (:box (:line-width '(6 . 6) :color base3) :foreground base6 :background base3 :height 0.9 :weight 'bold))
   (nobreak-hyphen (:foreground yellow))
   (nobreak-space (:underline t :inherit 'escape-glyph))
   (homoglyph (:foreground teal)) (escape-glyph (:foreground cyan))
