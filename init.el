@@ -306,6 +306,22 @@
   (setq xref-show-xrefs-function #'consult-xref
         xref-show-definitions-function #'consult-xref))
 
+;; Embark for collecting completions / results
+(use-package embark
+  :bind
+  (("C-c e" . embark-act)
+   ("M-." . embark-dwim)
+   ("C-h B" . embark-bindings))   ;; alternative for `describe-bindings'
+  :config
+  ;; Hide the mode line of the Embark live/completions buffers
+  (add-to-list 'display-buffer-alist
+               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+                 nil
+                 (window-parameters (mode-line-format . none)))))
+
+(use-package embark-consult
+  :hook (embark-collect-mode . consult-preview-at-point-mode))
+
 (use-package treesit-auto
   :if (treesit-available-p)
   :demand
