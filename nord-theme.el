@@ -26,11 +26,17 @@
 
 (require 'autothemer)
 
-(defun color-lighten-hex (rgb percent)
+(defun color-modify-hex (hex target percent)
   (autothemer-rgb-to-hex
-   (color-blend (autothemer-hex-to-rgb "#FFFFFF")
-                (autothemer-hex-to-rgb rgb)
+   (color-blend (autothemer-hex-to-rgb target)
+                (autothemer-hex-to-rgb hex)
                 percent)))
+
+(defun color-lighten-hex (hex percent)
+  (color-modify-hex hex "#FFFFFF" percent))
+
+(defun color-darken-hex (hex percent)
+  (color-modify-hex hex "#000000" percent))
 
 (autothemer-deftheme
  nord "Nord theme with customizations"
@@ -45,7 +51,7 @@
   (base1      "#242832")
   (base2      "#2C333F")
   (base3      "#373E4C")
-  (base3-alt  (color-lighten-hex base3 0.05))
+  (base3-alt  (color-lighten-hex base2 0.025))
   (base4      "#434C5E")
   (base5      "#4C566A")
   (base5-alt  (color-lighten-hex base5 0.05))
@@ -717,7 +723,7 @@
   (mode-line-emphasis (:foreground blue))
   (mode-line-highlight (:inherit 'highlight))
   (mode-line-inactive
-   (:box (:line-width '(6 . 6) :color bg) :foreground base5 :background bg :inherit 'mode-line))
+   (:box (:line-width '(6 . 6) :color base3-alt) :foreground base5-alt :background base3-alt :inherit 'mode-line))
   (mode-line-active
    (:box (:line-width '(6 . 6) :color base3) :background base3 :inherit 'mode-line))
   (mode-line
