@@ -1084,8 +1084,12 @@
   (dictionary-reference-face (:underline t))
   (dictionary-button-face (:weight 'bold))
   (dictionary-word-entry-face (:height 1.2 :weight 'bold))
-  (dictionary-word-definition-face (:foreground fg-alt))))
+  (dictionary-word-definition-face (:foreground fg-alt))
+  (tab-bar-tab-highlight
+   (:box (:line-width 1 :style 'released-button) :foreground base0 :background
+         fg-alt))))
 
 (provide 'nord-theme)
 ;;; nord-theme.el ends here
+;; Note: emacs 31 change pp to pp-to-string
 ;; (autothemer-generate-templates)
