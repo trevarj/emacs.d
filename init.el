@@ -510,7 +510,6 @@
   (erc-scrolltobottom-all t)
   (erc-spelling-dictionaries '(("Libera.Chat" "english")))
   (erc-timestamp-format "%H:%M")
-  (erc-track-exclude '("#emacs" "#systemcrafters-live" "*status"))
   (erc-track-exclude-server-buffer t)
   (erc-track-exclude-types '("JOIN" "NICK" "QUIT" "MODE" "AWAY" "PART")
                            "353" "324" "332" "329" "333" "477")
