@@ -123,6 +123,7 @@
   (send-mail-function 'message-send-mail-with-sendmail) ; Use sendmail
   (tab-always-indent 'complete)                         ; TAB to complete
   (treesit-font-lock-level 4)                           ; More treesitter faces
+  (trusted-content '("~/Workspace/" "./lisp/"))
   (undo-limit 67108864)                                 ; 64mb.
   (undo-outer-limit 1006632960)                         ; 960mb.
   (undo-strong-limit 100663296)                         ; 96mb.
@@ -422,6 +423,7 @@
   (bash-ts-mode . eglot-ensure)
   (sh-mode . eglot-ensure)
   (rust-ts-mode . eglot-ensure)
+  (typescript-ts-mode . eglot-ensure)
   :bind
   (:map eglot-mode-map
         :prefix-map eglot-prefix-keymap
@@ -440,7 +442,8 @@
                            :initializationOptions
                            (:check
                             (:command "clippy"))))
-          ((c-ts-mode c++-ts-mode) . ("clangd"))))
+          ((c-ts-mode c++-ts-mode) . ("clangd"))
+          (typescript-ts-mode . ("typescript-language-server" "--stdio"))))
   (defalias 'start-lsp-server #'eglot))
 
 ;; Paredit
