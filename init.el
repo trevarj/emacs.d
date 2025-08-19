@@ -443,7 +443,7 @@
                            (:check
                             (:command "clippy"))))
           ((c-ts-mode c++-ts-mode) . ("clangd"))
-          (typescript-ts-mode . ("typescript-language-server" "--stdio"))))
+          ((tsx-ts-mode typescript-ts-mode) . ("typescript-language-server" "--stdio"))))
   (defalias 'start-lsp-server #'eglot))
 
 ;; Paredit
