@@ -132,6 +132,7 @@
   (use-short-answers t)                                 ; y/n
   (user-full-name "Trevor Arjeski")
   (user-mail-address "tmarjeski@gmail.com")
+  (warning-minimum-level :error)
   (window-divider-default-right-width 16))               ; Padding between splits
 
 ;; Ligatures
@@ -360,7 +361,8 @@
   (prog-mode . format-all-ensure-formatter)
   :config
   (setq-default format-all-formatters
-                '(("Shell" (shfmt "-i" "2" "-ci"))))
+                '(("Shell" (shfmt "-i" "2" "-ci"))
+                  ("Rust" (rustfmt "--edition" "2024"))))
   :diminish)
 
 ;; Spelling
