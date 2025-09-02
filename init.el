@@ -516,8 +516,9 @@
   (erc-spelling-dictionaries '(("Libera.Chat" "english")))
   (erc-timestamp-format "%H:%M")
   (erc-track-exclude-server-buffer t)
-  (erc-track-exclude-types '("JOIN" "NICK" "QUIT" "MODE" "AWAY" "PART")
-                           "353" "324" "332" "329" "333" "477")
+  (erc-track-exclude-types '("JOIN" "NICK" "QUIT" "MODE" "AWAY" "PART"
+                             "353" "324" "332" "329" "333" "477"))
+  (erc-track-shorten-start 6)
   (erc-user-full-name user-full-name)
   :config
   (setopt erc-modules (seq-union '(nicks scrolltobottom spelling) erc-modules)
