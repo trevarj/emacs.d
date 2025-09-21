@@ -382,6 +382,9 @@
   (magit-blame-echo-style 'headings)
   :hook (git-commit-setup . git-commit-turn-on-flyspell))
 
+(use-package forge
+  :after magit)
+
 ;; Git modes
 (use-package git-modes)
 
@@ -422,6 +425,7 @@
   (eglot-code-action-indications '(eldoc-hint))
   :hook
   (c-ts-mode . eglot-ensure)
+  (c++-ts-mode . eglot-ensure)
   (bash-ts-mode . eglot-ensure)
   (sh-mode . eglot-ensure)
   (rust-ts-mode . eglot-ensure)
