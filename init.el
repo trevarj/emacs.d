@@ -368,8 +368,8 @@
 ;; Spelling
 (use-package ispell
   :custom
-  (ispell-local-dictionary "english")
-  (ispell-alternate-dictionary "/usr/lib/aspell/english.alias"))
+  (ispell-local-dictionary "american")
+  (ispell-alternate-dictionary "english.alias"))
 
 ;; Colorize hex color codes
 (use-package rainbow-mode)
