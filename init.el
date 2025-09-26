@@ -514,7 +514,7 @@
   (erc-prompt 'erc-prompt-format)
   (erc-prompt-format (propertize "%n:" 'font-lock-face 'erc-input-face))
   (erc-receive-query-display 'bury)
-  (erc-server "znc")
+  (erc-server erc-znc-server)
   (erc-server-reconnect-function 'erc-server-delayed-check-reconnect)
   (erc-scrolltobottom-all t)
   (erc-spelling-dictionaries '(("Libera.Chat" "english")))
