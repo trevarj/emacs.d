@@ -119,6 +119,7 @@
   (quit-restore-window-no-switch 'skip-first)
   (read-extended-command-predicate #'command-completion-default-include-p)
   (ring-bell-function 'ignore)
+  (safe-local-variable-directories '("~/Workspace/guix"))
   (scroll-preserve-screen-position 1)                   ; PgUp/PgDown hold
   (send-mail-function 'message-send-mail-with-sendmail) ; Use sendmail
   (tab-always-indent 'complete)                         ; TAB to complete
@@ -467,6 +468,9 @@
 (use-package geiser-guile
   :config
   (add-to-list 'geiser-guile-load-path "~/Workspace/guix"))
+
+;; Guix
+(use-package guix)
 
 ;; Common Lisp
 (use-package sly :custom (inferior-lisp-program (executable-find "sbcl")))
