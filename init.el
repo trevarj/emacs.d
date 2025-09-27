@@ -287,6 +287,28 @@
   :init (add-to-list 'completion-at-point-functions #'cape-file)
   :custom (text-mode-ispell-word-completion 'cape-dict))
 
+;; Snippets
+(use-package yasnippet
+  :config
+  (add-to-list 'yas-snippet-dirs "~/Workspace/guix/etc/snippets/yas")
+  (yas-global-mode))
+
+(use-package yasnippet-snippets
+  :after yasnippet)
+
+(use-package yasnippet-capf
+  :after cape yasnippet
+  :preface
+  (defun eglot-super-capf-with-yas ()
+    (setq-local completion-at-point-functions
+                (list (cape-capf-super
+		       #'eglot-completion-at-point
+		       #'yasnippet-capf))))
+  :config
+  (add-to-list 'completion-at-point-functions #'yasnippet-capf)
+  :hook
+  (eglot-managed-mode . eglot-super-capf-with-yas))
+
 ;; Consult functions
 (use-package consult
   :bind (("C-c /" . consult-ripgrep)
