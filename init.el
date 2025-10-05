@@ -489,8 +489,11 @@
 
 ;; Guile
 (use-package geiser-guile
+  :custom
+  (geiser-repl-per-project-p t)
   :config
-  (add-to-list 'geiser-guile-load-path "~/Workspace/guix"))
+  (add-to-list 'geiser-guile-load-path "~/Workspace/guix")
+  (add-to-list 'geiser-guile-load-path "~/Workspace/nonguix"))
 
 ;; Guix
 (use-package guix)
