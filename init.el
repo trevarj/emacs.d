@@ -15,7 +15,7 @@
   :preface
   (defun trev/use-package-ensure (name args state &optional no-refresh)
     "Checks for local package before checking remote archives."
-    (if-let* (((not (equal '(nil) args)))
+    (if-let* (((equal '(t) args))
               (not-feature (not (featurep name)))
               (path (locate-library (symbol-name name)))
               (_ (not (package-installed-p name))))
