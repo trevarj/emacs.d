@@ -694,6 +694,8 @@
   (setopt savehist-additional-variables
           (append savehist-additional-variables '(aoc-year aoc-day-level))))
 
+(use-package termbin)
+
 (provide 'init)
 
 ;; Local Variables:
