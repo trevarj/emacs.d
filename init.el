@@ -15,7 +15,8 @@
   :preface
   (defun trev/use-package-ensure (name args state &optional no-refresh)
     "Checks for local package before checking remote archives."
-    (if-let* ((not-feature (not (featurep name)))
+    (if-let* (((not (equal '(nil) args)))
+              (not-feature (not (featurep name)))
               (path (locate-library (symbol-name name)))
               (_ (not (package-installed-p name))))
         (package-install-file path)
@@ -124,7 +125,6 @@
   (scroll-preserve-screen-position 1)                   ; PgUp/PgDown hold
   (send-mail-function 'message-send-mail-with-sendmail) ; Use sendmail
   (tab-always-indent 'complete)                         ; TAB to complete
-  (treesit-font-lock-level 4)                           ; More treesitter faces
   (trusted-content '("~/Workspace/" "./lisp/"))
   (undo-limit 67108864)                                 ; 64mb.
   (undo-outer-limit 1006632960)                         ; 960mb.
@@ -348,14 +348,40 @@
 (use-package embark-consult
   :hook (embark-collect-mode . consult-preview-at-point-mode))
 
-(use-package treesit-auto
-  :if (treesit-available-p)
-  :demand
+(use-package treesit
+  :ensure nil
+  :preface
+  (defun treesit-standard-langs (langs)
+    "Convert a list of LANGS into `treesit-language-source-alist` entries. "
+    (seq-map
+     (lambda (entry)
+       (pcase entry
+         ((pred symbolp)
+          `(,entry ,(format "https://github.com/tree-sitter/tree-sitter-%s" entry)))
+         (`(,lang ,repo . ,rest)
+          `(,lang ,(format "https://github.com/%s" repo) ,@rest))
+         (_ (error "Invalid entry in treesit-standard-langs: %S" entry))))
+     langs))
   :custom
-  (treesit-auto-install 'prompt)
-  (treesit-auto-add-to-auto-mode-alist 'all)
+  (treesit-font-lock-level 4)
+  (treesit-enabled-modes t)
+  (treesit-language-source-alist
+   (treesit-standard-langs
+    '(
+      bash c cmake cpp css go html jsdoc json python rust toml
+      ;; custom repo / branch / src-dir
+      (gomod           "camdencheek/tree-sitter-go-mod")
+      (javascript      "tree-sitter/tree-sitter-javascript" "master" "src")
+      (typescript      "tree-sitter/tree-sitter-typescript" "master" "typescript/src")
+      (tsx             "tree-sitter/tree-sitter-typescript" "master" "tsx/src")
+      (lua             "tree-sitter-grammars/tree-sitter-lua")
+      (yaml            "tree-sitter-grammars/tree-sitter-yaml")
+      (markdown        "tree-sitter-grammars/tree-sitter-markdown" "split_parser" "tree-sitter-markdown/src")
+      (markdown-inline "tree-sitter-grammars/tree-sitter-markdown" "split_parser" "tree-sitter-markdown-inline/src"))))
   :config
-  (global-treesit-auto-mode))
+  (dolist (lang (seq-map #'car treesit-language-source-alist))
+    (unless (treesit-language-available-p lang)
+      (treesit-install-language-grammar lang))))
 
 ;; Whitespace handling
 (use-package ws-butler :demand 2 :config (ws-butler-global-mode) :diminish)
@@ -492,7 +518,7 @@
   :custom
   (geiser-repl-per-project-p t)
   :config
-  (add-to-list 'geiser-guile-load-path "~/Workspace/guix")
+  ;; (add-to-list 'geiser-guile-load-path "~/Workspace/guix")
   (add-to-list 'geiser-guile-load-path "~/Workspace/nonguix"))
 
 ;; Guix
