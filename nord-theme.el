@@ -712,9 +712,7 @@ For instance:
    (:weight 'bold :inherit ('help-key-binding 'underline)))
   (success (:foreground green)) (warning (:foreground yellow))
   (error (:foreground red)) (glyphless-char (:height 0.6))
-  (help-key-binding
-   (:box (:line-width 1 :color bg-alt) :foreground orange :background bg-alt
-         :weight 'bold :inherit 'fixed-pitch))
+  (help-key-binding (:foreground orange :background bg :weight 'bold :inherit 'fixed-pitch))
   (help-argument-name (:inherit 'italic)) (menu (:inverse-video t))
   (tab-line (:box nil :foreground blue :background bg-alt))
   (tab-bar (:box nil :foreground blue :background bg-alt))
@@ -764,7 +762,7 @@ For instance:
   (shadow (:foreground base5))
   (variable-pitch-text (:height 1.1 :inherit 'variable-pitch))
   (variable-pitch (:family "Noto Sans"))
-  (fixed-pitch-serif (:family "Monospace Serif"))
+  (fixed-pitch-serif (:family "Monospace"))
   (fixed-pitch (:family "Monospace")) (underline (:underline t))
   (bold-italic (:inherit ('bold 'italic))) (italic (:slant 'italic))
   (bold (:weight 'bold))
