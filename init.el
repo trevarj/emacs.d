@@ -555,7 +555,8 @@
   :bind
   (("C-c #" . 'erc-connect)
    :map erc-mode-map
-   ("C-c -" . 'erc-toggle-fools))
+   ("C-c -" . 'erc-toggle-fools)
+   ("C-c g" . 'erc-track-clear))
   :custom
   (erc-current-nick-highlight-type 'all)
   (erc-fill-function 'erc-fill-static)
