@@ -540,8 +540,8 @@
   (defun erc-connect ()
     (interactive)
     (load-library "my-secrets")
-    (erc :server erc-server :port erc-port
-         :user erc-nick :full-name erc-user-full-name))
+    (erc-tls :server erc-server :port erc-port
+             :user erc-nick :full-name erc-user-full-name))
 
   (defun erc-clear-query-buffer ()
     (when (erc-query-buffer-p)
