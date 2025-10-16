@@ -1230,7 +1230,24 @@
     (package-mode-line-total nil)
     (package-mark-delete-line (:extend t :background red))
     (package-mark-install-line (:extend t :background green))
-    (minibuffer-nonselected (:weight 'heavy :foreground bg :background red)))))
+    (minibuffer-nonselected (:weight 'heavy :foreground bg :background red))
+    (whitespace-page-delimiter
+     (:height 0.1 :underline (:color 'foreground-color :style 'double-line) :extend t :inherit 'shadow))
+    (whitespace-space-after-tab (:foreground red :background yellow))
+    (whitespace-empty (:extend t :foreground red :background yellow))
+    (whitespace-missing-newline-at-eof (:foreground base0 :background yellow))
+    (whitespace-big-indent (:foreground red :background orange))
+    (whitespace-indentation (:foreground red :background yellow))
+    (whitespace-space-before-tab (:foreground red :background orange))
+    (whitespace-line (:foreground magenta :background bg-alt))
+    (whitespace-trailing (:weight 'bold :foreground yellow :background orange))
+    (whitespace-newline (:weight 'normal :foreground base6))
+    (whitespace-tab (:foreground base6 :background base3-alt))
+    (whitespace-hspace (:foreground base6 :background base3-alt))
+    (whitespace-space (:foreground base6 :background bg-alt))
+    (yas--field-debug-face nil)
+    (yas-field-highlight-face (:inherit 'region)))))
+
 
 (provide 'nord-theme)
 ;;; nord-theme.el ends here
