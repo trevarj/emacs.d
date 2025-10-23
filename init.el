@@ -582,7 +582,7 @@
   (erc-track-shorten-start 6)
   (erc-user-full-name user-full-name)
   :config
-  (setopt erc-modules (seq-union '(nicks scrolltobottom spelling) erc-modules)
+  (setopt erc-modules (seq-union '(nicks spelling) erc-modules)
           erc-track-faces-priority-list
           (seq-remove
            (lambda (elt) (and (listp elt) (seq-contains-p elt 'erc-default-face)))
