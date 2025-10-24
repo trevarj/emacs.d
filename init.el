@@ -292,7 +292,8 @@
 (use-package yasnippet
   :hook (after-init . yas-global-mode)
   :config
-  (add-to-list 'yas-snippet-dirs "~/Workspace/guix/etc/snippets/yas"))
+  (add-to-list 'yas-snippet-dirs "~/Workspace/guix/etc/snippets/yas")
+  :diminish (yas-minor-mode . "ys"))
 
 (use-package yasnippet-snippets
   :after yasnippet)
