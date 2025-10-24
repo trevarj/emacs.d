@@ -293,7 +293,7 @@
   :hook (after-init . yas-global-mode)
   :config
   (add-to-list 'yas-snippet-dirs "~/Workspace/guix/etc/snippets/yas")
-  :diminish (yas-minor-mode . "ys"))
+  :diminish 'yas-minor-mode)
 
 (use-package yasnippet-snippets
   :after yasnippet)
