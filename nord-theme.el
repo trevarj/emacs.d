@@ -785,7 +785,7 @@
     (link (:weight 'bold :underline t :foreground blue))
     (shadow (:foreground base5))
     (variable-pitch-text (:height 1.1 :inherit 'variable-pitch))
-    (variable-pitch (:family "Noto Sans"))
+    (variable-pitch (:family "Sans"))
     (fixed-pitch-serif (:family "Monospace"))
     (fixed-pitch (:family "Monospace"))
     (underline (:underline t))
