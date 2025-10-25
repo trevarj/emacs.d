@@ -68,7 +68,6 @@
   (put 'suspend-frame 'disabled t)      ; Disable suspend-frame
   ;; Fonts
   (set-face-attribute 'default nil :family "Iosevka JBM" :height 168 :weight 'medium)
-  (set-face-attribute 'fixed-pitch nil :family "Iosevka JBM" :height 168 :weight 'medium)
   (set-face-attribute 'variable-pitch nil :family "Iosevka JBM Sans" :height 180)
   ;; https://github.com/ryanoasis/nerd-fonts/wiki/Glyph-Sets-and-Code-Points
   (dolist (code-point
