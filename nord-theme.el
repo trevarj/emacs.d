@@ -58,8 +58,8 @@
     (base5-alt  "#555E71")              ; (color-lighten-hex "#4C566A" 0.05)
     (base5-alt2 "#79808F")              ; (color-lighten-hex "#4C566A" 0.25)
     (base6      "#9099AB")
-    (base7      "#D8DEE9")
-    (base8      "#F0F4FC")
+    (base7      "#BDBFC3")
+    (base8      "#D8DEE9")
     (fg         "#ECEFF4")
     (fg-alt     "#E5E9F0")
 
