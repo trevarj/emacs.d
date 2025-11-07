@@ -18,12 +18,9 @@
 ;; After Emacs has completely started, reset the values to more sensible ones.
 (add-hook
  'emacs-startup-hook
- (let ((orig-file-name-handler-alist file-name-handler-alist))
-   (setq file-name-handler-alist nil)
-   (lambda ()
-     (setq gc-cons-threshold (* 16 1024 1024) ; 16mb
-           gc-cons-percentage 0.1
-           file-name-handler-alist orig-file-name-handler-alist))))
+ (lambda ()
+   (setq gc-cons-threshold (* 16 1024 1024) ; 16mb
+         gc-cons-percentage 0.1)))
 
 (scroll-bar-mode -1)                        ; Disable visible scrollbar
 (tool-bar-mode -1)                          ; Disable the toolbar
