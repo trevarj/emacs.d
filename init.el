@@ -562,7 +562,7 @@
     (autothemer-let-palette
      (let ((inhibit-read-only t)
            (new-face (if (equal erc--last-message-face 'erc-default-face)
-                         `(:foreground ,base7)
+                         `(:foreground ,base8)
                        'erc-default-face)))
        (save-excursion
          (goto-char (point-min))
