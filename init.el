@@ -110,6 +110,7 @@
   (eldoc-echo-area-use-multiline-p nil)
   (enable-recursive-minibuffers t)                      ; Recursive mini-buffers
   (epg-pinentry-mode 'loopback)                         ; pinentry on minibuffer
+  (eval-expression-print-length 30)
   (fill-column 80)                                      ; 80 width pages
   (indent-tabs-mode nil)                                ; Use spaces only
   (inhibit-startup-message t)                           ; No startup screen
