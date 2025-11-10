@@ -154,8 +154,8 @@
 (use-package project
   :custom
   (project-switch-commands
-   '((project-find-file "Find file" ?f)
-     (project-find-regexp "Find regexp" ?g)
+   '((consult-fd "Find file" ?f)
+     (consult-ripgrep "Find regexp" ?g)
      (magit-project-status "Magit" ?m)
      (project-eshell "Eshell" ?e)
      (project-vterm "Vterm" ?t)
@@ -313,6 +313,9 @@
 
 ;; Consult functions
 (use-package consult
+  :custom
+  (consult-fd-args '((if (executable-find "fdfind" 'remote) "fdfind" "fd")
+                     "--full-path --color=never -H"))
   :bind (("C-c /" . consult-ripgrep)
          ("C-c SPC" . consult-fd)
          ("C-c r" . consult-recent-file)
