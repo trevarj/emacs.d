@@ -372,7 +372,7 @@
   (treesit-language-source-alist
    (treesit-standard-langs
     '(
-      bash c cmake cpp css go html jsdoc json python rust toml
+      bash c cpp css go html jsdoc json python rust toml
       ;; custom repo / branch / src-dir
       (gomod           "camdencheek/tree-sitter-go-mod")
       (javascript      "tree-sitter/tree-sitter-javascript" "master" "src")
