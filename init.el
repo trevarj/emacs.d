@@ -91,51 +91,51 @@
   (browse-url-browser-function 'browse-url-generic)
   (browse-url-generic-program "xdg-open")
   (backup-directory-alist '(("." . "~/.cache/emacs/backups")))
-  (comment-auto-fill-only-comments t)                   ; Autofill comments only
+  (comment-auto-fill-only-comments t)
   (confirm-kill-emacs nil)
-  (custom-file "/tmp/custom.el")                        ; customization file
+  (custom-file "/tmp/custom.el")
   (custom-safe-themes t)
   (delete-selection-mode t)
-  (desktop-load-locked-desktop 'check-pid)              ; load if lock pid doesn't exist
+  (desktop-load-locked-desktop 'check-pid)
   (dictionary-server "dict.org")
-  (display-buffer-alist                                 ; Prefer right split for matched buffers
+  (display-buffer-alist
    '(("\\*\\(Help\\|helpful\\|Customize\\|info\\|Ibuffer\\|.*eshell\\).*\\*"
       (display-buffer-reuse-window display-buffer-in-side-window)
       (side . right) (slot . 0) (window-width . .5))
      ("\\*\\(xref\\|Occur\\|.*diagnostics\\|.*vterm\\).*\\*"
       (display-buffer-below-selected display-buffer-at-bottom)
       (window-height . .2))))
-  (display-line-numbers-grow-only t)                    ; Never shrink the linum width
-  (display-line-numbers-width-start t)                  ; Calculate linum width at start
+  (display-line-numbers-grow-only t)
+  (display-line-numbers-width-start t)
   (eldoc-echo-area-use-multiline-p nil)
-  (enable-recursive-minibuffers t)                      ; Recursive mini-buffers
-  (epg-pinentry-mode 'loopback)                         ; pinentry on minibuffer
+  (enable-recursive-minibuffers t)
+  (epg-pinentry-mode 'loopback)
   (eval-expression-print-length 30)
-  (fill-column 80)                                      ; 80 width pages
-  (indent-tabs-mode nil)                                ; Use spaces only
-  (inhibit-startup-message t)                           ; No startup screen
+  (fill-column 80)
+  (indent-tabs-mode nil)
+  (inhibit-startup-message t)
   (kill-buffer-quit-windows t)
   (mode-line-end-spaces nil)
-  (mode-line-front-space nil)                           ; Nicer -nw mode line
+  (mode-line-front-space nil)
   (mouse-wheel-progressive-speed nil)
   (quit-restore-window-no-switch 'skip-first)
   (read-extended-command-predicate #'command-completion-default-include-p)
   (ring-bell-function 'ignore)
   (safe-local-variable-directories '("~/Workspace/guix"))
-  (scroll-preserve-screen-position 1)                   ; PgUp/PgDown hold
-  (send-mail-function 'message-send-mail-with-sendmail) ; Use sendmail
-  (tab-always-indent 'complete)                         ; TAB to complete
+  (scroll-preserve-screen-position 1)
+  (send-mail-function 'message-send-mail-with-sendmail)
+  (tab-always-indent 'complete)
   (trusted-content '("~/Workspace/" "./lisp/"))
-  (undo-limit 67108864)                                 ; 64mb.
-  (undo-outer-limit 1006632960)                         ; 960mb.
-  (undo-strong-limit 100663296)                         ; 96mb.
-  (use-default-font-for-symbols nil)                    ; For nerd fonts
-  (use-dialog-box nil)                                  ; Bye
-  (use-short-answers t)                                 ; y/n
+  (undo-limit 67108864)
+  (undo-outer-limit 1006632960)
+  (undo-strong-limit 100663296)
+  (use-default-font-for-symbols nil)
+  (use-dialog-box nil)
+  (use-short-answers t)
   (user-full-name "Trevor Arjeski")
   (user-mail-address "tmarjeski@gmail.com")
   (warning-minimum-level :error)
-  (window-divider-default-right-width 16))               ; Padding between splits
+  (window-divider-default-right-width 16))
 
 ;; Ligatures
 (use-package ligature
