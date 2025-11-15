@@ -137,6 +137,14 @@
   (warning-minimum-level :error)
   (window-divider-default-right-width 16))
 
+(use-package fringe
+  :custom (fringes-outside-margins t)
+  :init
+  (define-fringe-bitmap 'right-curly-arrow
+    [0 0 0 0 28672 30720 15360 7680 3840 52992 65280 65024 64512 64512 65024 65024])
+  (define-fringe-bitmap 'left-curly-arrow
+    [0 0 0 0 14 30 60 120 240 243 255 127 63 63 127 127]))
+
 ;; Ligatures
 (use-package ligature
   :hook (prog-mode . ligature-mode)
@@ -443,8 +451,18 @@
 (use-package git-modes)
 
 (use-package diff-hl
+  :preface
+  (define-fringe-bitmap 'vertical-bar-large (make-vector 60 #xf0))
+  (define-fringe-bitmap 'horizontal-bar-large (make-vector 4 #xff) nil nil 'top)
+  (defun diff-hl-bmp-fn-override (type _pos)
+    "Override diff-hl bitmaps."
+    (pcase type
+      ('delete 'horizontal-bar-large)
+      (_ 'vertical-bar-large)))
+  :custom
+  (diff-hl-fringe-bmp-function #'diff-hl-bmp-fn-override)
   :hook
-  ((magit-post-refresh . diff-hl-magit-post-refresh))
+  (magit-post-refresh . diff-hl-magit-post-refresh)
   :config
   (global-diff-hl-mode)
   (diff-hl-flydiff-mode))
@@ -470,6 +488,7 @@
 
 (use-package flymake
   :custom
+  (flymake-fringe-indicator-position nil)
   (flymake-show-diagnostics-at-end-of-line t)
   :hook (prog-mode . flymake-mode))
 
