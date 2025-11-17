@@ -266,7 +266,7 @@
     (consult-highlight-mark (:inherit 'consult-highlight-match))
     (consult-highlight-match (:inherit 'match))
     (consult-preview-line (:extend t :inherit 'consult-preview-insertion))
-    (bookmark-face (:extend t :background base3))
+    (bookmark-face (:extend t :foreground magenta))
     (bookmark-menu-bookmark (:weight 'bold))
     (gnus-server-offline (:weight 'bold :foreground yellow))
     (gnus-server-denied (:weight 'bold :foreground magenta))
