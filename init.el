@@ -294,6 +294,7 @@
 ;; Completion-at-point helper
 (use-package cape
   :init (add-to-list 'completion-at-point-functions #'cape-file)
+  :bind ("C-c p" . cape-prefix-map)
   :custom (text-mode-ispell-word-completion 'cape-dict))
 
 ;; Snippets
@@ -430,8 +431,11 @@
 ;; Spelling
 (use-package ispell
   :custom
-  (ispell-local-dictionary "american")
+  (ispell-local-dictionary "english")
   (ispell-alternate-dictionary "english.alias"))
+
+(use-package flyspell
+  :hook (message-mode . flyspell-mode))
 
 ;; Colorize hex color codes
 (use-package rainbow-mode)
