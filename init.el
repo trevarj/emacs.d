@@ -161,6 +161,7 @@
 ;; Project.el
 (use-package project
   :custom
+  (project-mode-line t)
   (project-switch-commands
    '((consult-fd "Find file" ?f)
      (consult-ripgrep "Find regexp" ?g)
