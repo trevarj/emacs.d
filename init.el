@@ -322,6 +322,11 @@
 
 ;; Consult functions
 (use-package consult
+  :preface
+  (defun consult-flymake-project ()
+    "Jump to project Flymake diagnostics."
+    (interactive)
+    (consult-flymake t))
   :custom
   (consult-fd-args '((if (executable-find "fdfind" 'remote) "fdfind" "fd")
                      "--full-path --color=never -H"))
@@ -338,7 +343,7 @@
          ("C-x p b" . consult-project-buffer)
          ("M-y" . consult-yank-pop)
          ("M-g e" . consult-compile-error)
-         ("M-g f" . consult-flymake)
+         ("M-g f" . consult-flymake-project)
          ("M-g M-g" . consult-goto-line))
   :init
   ;; Use Consult to select xref locations with preview
@@ -350,7 +355,7 @@
   :bind
   (("C-c e" . embark-act)
    ("M-." . embark-dwim)
-   ("C-h B" . embark-bindings))   ;; alternative for `describe-bindings'
+   ("C-h B" . embark-bindings))
   :config
   ;; Hide the mode line of the Embark live/completions buffers
   (add-to-list 'display-buffer-alist
@@ -499,6 +504,7 @@
 ;; Eglot LSP
 (use-package eglot
   :custom
+  (eglot-extend-to-xref t)
   (eglot-code-action-indications '(eldoc-hint))
   :hook
   (c-ts-mode . eglot-ensure)
