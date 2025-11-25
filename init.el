@@ -246,7 +246,7 @@
 ;; Minibuffer
 (use-package vertico
   :custom
-  (vertico-count 10)
+  (vertico-count 6)
   (vertico-cycle t)
   (vertico-scroll-margin 5)
   :init (vertico-mode))
