@@ -41,8 +41,7 @@
   "Customization variables for Advent of Code (aoc.el).")
 
 (defcustom aoc-session-cookie ""
-  "The session cookie found within the browser on adventofcode.com after you
-login."
+  "The session cookie found within the browser on adventofcode.com."
   :group 'aoc
   :type 'string)
 
@@ -53,16 +52,19 @@ login."
 
 (defcustom aoc-year (string-to-number
                      (format-time-string "%Y"))
-  "The year of AoC being worked on. Defaults to current year."
+  "The year of AoC being worked on.
+Defaults to current year."
   :group 'aoc
   :type 'number)
 
 (defcustom aoc-day-level '(1 . 1)
-  "The day and level of AoC being worked on. Increments on correct solution."
+  "The day and level of AoC being worked on.
+Increments on correct solution."
   :group 'aoc
   :type '(cons number number))
 
 (cl-defun aoc--fetch-input-error (&key status &allow-other-keys)
+  "Error STATUS of fetching input file."
   (message "Could not fetch input file: %s" status))
 
 (defun aoc--increment-day-level ()
@@ -74,6 +76,7 @@ login."
           (`(,day . 1) (cons day 2)))))
 
 (cl-defun aoc--check-submit-response (&key data &allow-other-keys)
+  "Checks DATA for the success phrase."
   (cond
    ((cl-search "That's the right answer!" data)
     (aoc--increment-day-level)
@@ -83,11 +86,13 @@ login."
       (aoc--render-data-to-help-buffer data "*aoc submission*"))))
 
 (cl-defun aoc--submit-error (&key status &allow-other-keys)
+  "Error STATUS for submitting answer."
   (message "Could not submit answer: %s" status))
 
 ;;;###autoload
 (defun aoc-fetch-input (year day &optional force)
-  "Fetches input file for given year and day."
+  "Fetches input file for given YEAR and DAY.
+Can provide FORCE to overwrite existing file."
   (interactive (list (read-number "Year: " aoc-year)
                      (read-number "Day: " (car aoc-day-level))))
   (if (string-empty-p aoc-session-cookie)
@@ -110,7 +115,7 @@ login."
 
 ;;;###autoload
 (defun aoc-view-problem (year day)
-  "View AoC problem for given year and day."
+  "View AoC problem for given YEAR and DAY."
   (interactive (list (read-number "Year: " aoc-year)
                      (read-number "Day: " (car aoc-day-level))))
   (unless (assoc ".adventofcode.com" url-cookie-secure-storage)
@@ -119,7 +124,7 @@ login."
 
 ;;;###autoload
 (defun aoc-submit-answer (year day level answer)
-  "Submit a solution for given year, day and level."
+  "Submit an ANSWER for LEVEL of given YEAR, DAY."
   (interactive (list (read-number "Year: " aoc-year)
                      (read-number "Day: " (car aoc-day-level))
                      (read-number "Level: " (cdr aoc-day-level))
