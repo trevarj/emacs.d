@@ -75,15 +75,28 @@ Increments on correct solution."
           (`(,day . 2) (cons (1+ day) 1))
           (`(,day . 1) (cons day 2)))))
 
+(defun aoc--render-data-to-help-buffer (data buffer)
+  "Render HTML DATA (if non-nil) and open it in a help BUFFER."
+  (when data
+    (with-temp-buffer
+      (insert data)
+      (let ((dom (libxml-parse-html-region (point-min) (point-max))))
+        (with-help-window buffer
+          (shr-insert-document dom)
+          (pop-to-buffer (current-buffer)))))))
+
 (cl-defun aoc--check-submit-response (&key data &allow-other-keys)
   "Checks DATA for the success phrase."
   (cond
+   ((cl-search "That's not the right answer" data)
+    (message "Incorrect answer. : %s" data))
+   ((cl-search "You gave an answer too recently" data)
+    (message "Submitted too recently. Please wait. %s" data))
    ((cl-search "That's the right answer!" data)
     (aoc--increment-day-level)
-    (aoc--render-data-to-help-buffer data "*aoc submission*")
     (message "Answer submitted successfully."))
-   (t (message "Submission failed.")
-      (aoc--render-data-to-help-buffer data "*aoc submission*"))))
+   (t (message "Submittion failed.")))
+  (aoc--render-data-to-help-buffer data "*aoc submission*"))
 
 (cl-defun aoc--submit-error (&key status &allow-other-keys)
   "Error STATUS for submitting answer."
@@ -105,7 +118,8 @@ Can provide FORCE to overwrite existing file."
         (unless (file-directory-p aoc-input-directory)
           (make-directory aoc-input-directory))
         (request (format "https://adventofcode.com/%d/day/%d/input" year day)
-          :headers `(("Cookie" . ,(format "session=%s" aoc-session-cookie)))
+          :headers `(("Cookie" . ,(format "session=%s" aoc-session-cookie))
+                     ("User-Agent" . ,(format "trevarj/emacs.d/lisp/aoc.el")))
           :error #'aoc--fetch-input-error
           :success (cl-function
                     (lambda (&key data &allow-other-keys)

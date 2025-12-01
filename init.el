@@ -514,6 +514,7 @@
   (sh-mode . eglot-ensure)
   (rust-ts-mode . eglot-ensure)
   (typescript-ts-mode . eglot-ensure)
+  (python-ts-mode . eglot-ensure)
   :bind
   (:map eglot-mode-map
         :prefix-map eglot-prefix-keymap
