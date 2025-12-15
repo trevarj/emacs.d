@@ -479,6 +479,7 @@
 
 ;; Terminal
 (use-package vterm
+  :ensure nil
   :bind (:map project-prefix-map
               ("t" . project-vterm))
   :preface
