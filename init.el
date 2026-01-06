@@ -8,6 +8,8 @@
 (use-package package
   :custom
   (package-install-upgrade-built-in t)
+  ;; Don't forget to run `package-quickstart-refresh'!
+  (package-quickstart t)
   :config
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t))
 
@@ -57,7 +59,6 @@
    (prog-mode . display-line-numbers-mode))
   :init
   (load-theme 'nord t)
-  (add-to-list 'load-path (concat user-emacs-directory "lisp"))
   (save-place-mode)
   (recentf-mode)
   (desktop-save-mode)                   ; Session saving
@@ -423,16 +424,13 @@
 (use-package ibuffer :hook (ibuffer-mode . ibuffer-auto-mode))
 
 ;; Formatting
-(use-package format-all
-  :commands format-all-mode
-  :hook
-  (prog-mode . format-all-mode)
-  (prog-mode . format-all-ensure-formatter)
+(use-package apheleia
+  :diminish
   :config
-  (setq-default format-all-formatters
-                '(("Shell" (shfmt "-i" "2" "-ci"))
-                  ("Rust" (rustfmt "--edition" "2024"))))
-  :diminish)
+  (apheleia-global-mode)
+  (dolist (formatter-cmd
+           '((shfmt . ("shfmt" "-i" "2" "-ci" "-kp" "-sr"))))
+    (add-to-list 'apheleia-formatters formatter-cmd)))
 
 ;; Spelling
 (use-package ispell

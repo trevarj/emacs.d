@@ -12,8 +12,7 @@
  ;; Disable site files
  inhibit-default-init t
  site-run-file nil
- ;; Don't forget to run `package-quickstart-refresh'!
- package-quickstart t)
+ user-lisp-directory (concat user-emacs-directory "lisp"))
 
 ;; After Emacs has completely started, reset the values to more sensible ones.
 (add-hook
