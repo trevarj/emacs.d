@@ -118,6 +118,10 @@
   (kill-buffer-quit-windows t)
   (mode-line-end-spaces nil)
   (mode-line-front-space nil)
+  (mode-line-compact 'long)
+  (mode-line-collapse-minor-modes
+   '(auto-revert-mode ws-butler-mode editorconfig-mode apheleia-mode
+                      eldoc-mode yas-minor-mode which-key-mode))
   (mouse-wheel-progressive-speed nil)
   (quit-restore-window-no-switch 'skip-first)
   (read-extended-command-predicate #'command-completion-default-include-p)
@@ -177,15 +181,7 @@
   :hook (after-init . global-auto-revert-mode)
   :custom
   (auto-revert-verbose nil)
-  (global-auto-revert-non-file-buffers t)
-  :diminish)
-
-;; Diminish minor modes
-(use-package diminish
-  :demand
-  :config (diminish 'auto-revert-mode))
-
-(use-package eldoc :diminish)
+  (global-auto-revert-non-file-buffers t))
 
 (use-package xref
   :custom
@@ -198,8 +194,7 @@
   :bind (("C-c K" . 'which-key-show-major-mode))
   :custom
   (which-key-popup-type 'side-window)
-  (which-key-sort-order 'which-key-description-order)
-  :diminish)
+  (which-key-sort-order 'which-key-description-order))
 
 (use-package repeat
   :defer 1
@@ -303,8 +298,7 @@
 (use-package yasnippet
   :hook (after-init . yas-global-mode)
   :config
-  (add-to-list 'yas-snippet-dirs "~/Workspace/guix/etc/snippets/yas")
-  :diminish 'yas-minor-mode)
+  (add-to-list 'yas-snippet-dirs "~/Workspace/guix/etc/snippets/yas"))
 
 (use-package yasnippet-snippets
   :after yasnippet)
@@ -405,16 +399,16 @@
       (treesit-install-language-grammar lang))))
 
 ;; Whitespace handling
-(use-package ws-butler :demand 2 :config (ws-butler-global-mode) :diminish)
+(use-package ws-butler :demand 2 :config (ws-butler-global-mode))
 
 ;; Rainbow delimiters
 (use-package rainbow-delimiters :hook (prog-mode . rainbow-delimiters-mode))
 
 ;; Editorconfig
-(use-package editorconfig :config (editorconfig-mode) :diminish)
+(use-package editorconfig :config (editorconfig-mode))
 
 ;; Buffer specific direnv
-(use-package envrc :diminish :config (envrc-global-mode))
+(use-package envrc :config (envrc-global-mode))
 
 ;; Avy navigation
 (use-package avy
@@ -426,7 +420,6 @@
 
 ;; Formatting
 (use-package apheleia
-  :diminish
   :config
   (apheleia-global-mode)
   (dolist (formatter-cmd
