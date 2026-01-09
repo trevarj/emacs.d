@@ -394,6 +394,7 @@
       (javascript      "tree-sitter/tree-sitter-javascript" "master" "src")
       (typescript      "tree-sitter/tree-sitter-typescript" "master" "typescript/src")
       (tsx             "tree-sitter/tree-sitter-typescript" "master" "tsx/src")
+      (kdl             "tree-sitter-grammars/tree-sitter-kdl")
       (lua             "tree-sitter-grammars/tree-sitter-lua")
       (yaml            "tree-sitter-grammars/tree-sitter-yaml")
       (markdown        "tree-sitter-grammars/tree-sitter-markdown" "split_parser" "tree-sitter-markdown/src")
