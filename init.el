@@ -121,7 +121,7 @@
   (mode-line-compact 'long)
   (mode-line-collapse-minor-modes
    '(auto-revert-mode ws-butler-mode editorconfig-mode apheleia-mode
-                      eldoc-mode yas-minor-mode which-key-mode))
+                      eldoc-mode envrc-mode yas-minor-mode which-key-mode))
   (mouse-wheel-progressive-speed nil)
   (quit-restore-window-no-switch 'skip-first)
   (read-extended-command-predicate #'command-completion-default-include-p)
