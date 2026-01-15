@@ -551,7 +551,7 @@
   (add-to-list 'geiser-guile-load-path "~/Workspace/nonguix"))
 
 ;; Guix
-(use-package guix)
+(use-package guix :ensure nil)
 
 ;; Common Lisp
 (use-package sly :custom (inferior-lisp-program (executable-find "sbcl")))
