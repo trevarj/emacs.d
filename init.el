@@ -61,7 +61,6 @@
   (load-theme 'nord t)
   (save-place-mode)
   (recentf-mode)
-  (desktop-save-mode)                   ; Session saving
   (column-number-mode)                  ; Column number mode
   (electric-pair-mode)                  ; Pair the pairs
   (auto-fill-mode)                      ; Autofill mode
@@ -97,7 +96,6 @@
   (custom-file "/tmp/custom.el")
   (custom-safe-themes t)
   (delete-selection-mode t)
-  (desktop-load-locked-desktop 'check-pid)
   (dictionary-server "dict.org")
   (display-buffer-alist
    '(("\\*\\(Help\\|helpful\\|Customize\\|info\\|Ibuffer\\|.*eshell\\).*\\*"
@@ -141,6 +139,14 @@
   (user-mail-address "tmarjeski@gmail.com")
   (warning-minimum-level :error)
   (window-divider-default-right-width 16))
+
+(use-package desktop
+  :custom
+  (desktop-load-locked-desktop 'check-pid)
+  :config
+  (add-to-list 'desktop-minor-mode-table '(envrc-mode nil))
+  (add-to-list 'desktop-minor-mode-table '(envrc-global-mode nil))
+  :init (desktop-save-mode))
 
 (use-package fringe
   :custom (fringes-outside-margins t)
@@ -405,10 +411,12 @@
 (use-package rainbow-delimiters :hook (prog-mode . rainbow-delimiters-mode))
 
 ;; Editorconfig
-(use-package editorconfig :config (editorconfig-mode))
+(use-package editorconfig
+  :hook (after-init . editorconfig-mode))
 
 ;; Buffer specific direnv
-(use-package envrc :config (envrc-global-mode))
+(use-package envrc
+  :hook (after-init . envrc-global-mode))
 
 ;; Avy navigation
 (use-package avy
