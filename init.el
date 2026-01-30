@@ -303,24 +303,15 @@
 ;; Snippets
 (use-package yasnippet
   :hook (after-init . yas-global-mode)
+  :bind
+  (:map yas-minor-mode-map
+        ("C-c y" . 'yas-insert-snippet)
+        ("C-c y" . 'yas-insert-snippet))
   :config
   (add-to-list 'yas-snippet-dirs "~/Workspace/guix/etc/snippets/yas"))
 
 (use-package yasnippet-snippets
   :after yasnippet)
-
-(use-package yasnippet-capf
-  :after cape yasnippet
-  :preface
-  (defun eglot-super-capf-with-yas ()
-    (setq-local completion-at-point-functions
-                (list (cape-capf-super
-		       #'eglot-completion-at-point
-		       #'yasnippet-capf))))
-  :config
-  (add-to-list 'completion-at-point-functions #'yasnippet-capf)
-  :hook
-  (eglot-managed-mode . eglot-super-capf-with-yas))
 
 ;; Consult functions
 (use-package consult
