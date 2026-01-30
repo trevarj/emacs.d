@@ -11,7 +11,8 @@
   ;; Don't forget to run `package-quickstart-refresh'!
   (package-quickstart t)
   :config
-  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t))
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+  (add-to-list 'package-archives '("melpa-mirror" . "https://www.mirrorservice.org/sites/melpa.org/packages/") t))
 
 (use-package use-package
   :preface
