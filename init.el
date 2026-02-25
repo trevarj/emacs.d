@@ -424,7 +424,8 @@
   :config
   (apheleia-global-mode)
   (dolist (formatter-cmd
-           '((shfmt . ("shfmt" "-i" "2" "-ci" "-kp" "-sr"))))
+           '((shfmt . ("shfmt" "-i" "2" "-ci" "-kp" "-sr"))
+             (rustfmt . ("rustfmt" "--edition" "2024" "--quiet" "--emit" "stdout"))))
     (add-to-list 'apheleia-formatters formatter-cmd)))
 
 ;; Spelling
