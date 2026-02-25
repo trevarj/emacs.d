@@ -306,6 +306,8 @@
   :hook (after-init . yas-global-mode)
   :bind
   (:map yas-minor-mode-map
+        ("TAB" . nil)
+        ("<tab>" . nil)
         ("C-c y" . 'yas-insert-snippet)
         ("C-c y" . 'yas-insert-snippet))
   :config
