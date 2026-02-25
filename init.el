@@ -350,7 +350,6 @@
 (use-package embark
   :bind
   (("C-c e" . embark-act)
-   ("M-." . embark-dwim)
    ("C-h B" . embark-bindings))
   :config
   ;; Hide the mode line of the Embark live/completions buffers
