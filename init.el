@@ -446,7 +446,8 @@
   (magit-define-global-key-bindings 'recommended)
   (magit-diff-refine-hunk t)
   (magit-blame-echo-style 'headings)
-  :hook (git-commit-setup . git-commit-turn-on-flyspell))
+  :hook (git-commit-setup . git-commit-turn-on-flyspell)
+  :config (add-to-list 'magit-git-environment "TZ=UTC"))
 
 (use-package forge
   :after magit)
