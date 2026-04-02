@@ -406,6 +406,7 @@
     '(
       bash c cpp css go html jsdoc json python rust toml
       ;; custom repo / branch / src-dir
+      (dockerfile      "camdencheek/tree-sitter-dockerfile")
       (gomod           "camdencheek/tree-sitter-go-mod")
       (javascript      "tree-sitter/tree-sitter-javascript" "master" "src")
       (typescript      "tree-sitter/tree-sitter-typescript" "master" "typescript/src")
