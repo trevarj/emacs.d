@@ -552,7 +552,9 @@
           (rust-ts-mode . ("rust-analyzer"
                            :initializationOptions
                            (:check
-                            (:command "clippy"))))
+                            (:command "clippy")
+                            :cargo
+                            (:features "all"))))
           ((c-ts-mode c++-ts-mode) . ("clangd"))
           ((tsx-ts-mode typescript-ts-mode) . ("typescript-language-server" "--stdio"))
           (python-ts-mode . ("pylsp"))))
