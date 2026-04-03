@@ -200,6 +200,7 @@
   (project-switch-commands
    '((consult-fd "Find file" ?f)
      (consult-ripgrep "Find regexp" ?g)
+     (consult-project-buffer "Buffers" ?b)
      (magit-project-status "Magit" ?m)
      (project-eshell "Eshell" ?e)
      (project-vterm "Vterm" ?t)
