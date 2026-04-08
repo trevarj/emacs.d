@@ -135,9 +135,11 @@
   (epg-pinentry-mode 'loopback)
   (eval-expression-print-length 30)
   (fill-column 80)
+  (help-window-select t)
   (indent-tabs-mode nil)
   (inhibit-startup-message t)
   (kill-buffer-quit-windows t)
+  (kill-do-not-save-duplicates t)
   (mode-line-end-spaces nil)
   (mode-line-front-space nil)
   (mode-line-compact 'long)
@@ -148,6 +150,7 @@
   (quit-restore-window-no-switch 'skip-first)
   (read-extended-command-predicate #'command-completion-default-include-p)
   (ring-bell-function 'ignore)
+  (save-interprogram-paste-before-kill t)
   (safe-local-variable-directories '("~/Workspace/guix"))
   (scroll-preserve-screen-position 1)
   (send-mail-function 'message-send-mail-with-sendmail)
@@ -162,6 +165,7 @@
   (user-full-name "Trevor Arjeski")
   (user-mail-address "tmarjeski@gmail.com")
   (warning-minimum-level :error)
+  (window-combination-resize t)
   (window-divider-default-right-width 16))
 
 (use-package desktop
