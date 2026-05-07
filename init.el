@@ -122,7 +122,10 @@
   (delete-selection-mode t)
   (dictionary-server "dict.org")
   (display-buffer-alist
-   '(("\\*\\(Help\\|helpful\\|Customize\\|info\\|Ibuffer\\|.*eshell\\).*\\*"
+   '(((category . xref-jump)
+      (display-buffer-reuse-window display-buffer-use-some-window)
+      (some-window . mru))
+     ("\\*\\(Help\\|helpful\\|Customize\\|info\\|Ibuffer\\|.*eshell\\).*\\*"
       (display-buffer-reuse-window display-buffer-in-side-window)
       (side . right) (slot . 0) (window-width . .5))
      ("\\*\\(xref\\|Occur\\|.*diagnostics\\|.*vterm\\).*\\*"
@@ -164,7 +167,6 @@
   (use-short-answers t)
   (user-full-name "Trevor Arjeski")
   (user-mail-address "tmarjeski@gmail.com")
-  (warning-minimum-level :error)
   (window-combination-resize t)
   (window-divider-default-right-width 16))
 
@@ -200,11 +202,12 @@
 ;; Project.el
 (use-package project
   :custom
-  (project-mode-line t)
+  (project-mode-line 'non-remote)
   (project-switch-commands
    '((consult-fd "Find file" ?f)
      (consult-ripgrep "Find regexp" ?g)
      (consult-project-buffer "Buffers" ?b)
+     (project-find-matching-buffer "Matching buffer" ?B)
      (magit-project-status "Magit" ?m)
      (project-eshell "Eshell" ?e)
      (project-vterm "Vterm" ?t)
@@ -219,9 +222,22 @@
   (global-auto-revert-non-file-buffers t))
 
 (use-package xref
+  :init (global-xref-mouse-mode)
   :custom
   (xref-auto-jump-to-first-definition 'show)
   (xref-search-program 'ripgrep))
+
+(use-package eldoc
+  :custom (eldoc-help-at-pt t))
+
+(use-package elisp-mode
+  :ensure nil
+  :preface
+  (defun trev/elisp-enable-docstring-eldoc ()
+    "Show Emacs Lisp function docstrings in ElDoc."
+    (add-hook 'eldoc-documentation-functions
+              #'elisp-eldoc-funcall-with-docstring nil t))
+  :hook (emacs-lisp-mode . trev/elisp-enable-docstring-eldoc))
 
 ;; Keybinding
 (use-package which-key
@@ -268,6 +284,7 @@
     (ibuffer-mark-special-buffers)
     (ibuffer-mark-read-only-buffers)
     (ibuffer-change-marks ?> ?D))
+  :hook (ibuffer-mode . ibuffer-auto-mode)
   :bind
   (:map ibuffer-mode-map
         ("* D" . #'ibuffer-mark-unimportant-for-delete)))
@@ -285,8 +302,8 @@
 (use-package orderless
   :custom
   (completion-category-defaults nil)
-  (completion-category-overrides '((file (styles partial-completion))))
-  (completion-styles '(orderless emacs22)))
+  (completion-category-overrides '((file (styles basic partial-completion))))
+  (completion-styles '(orderless basic)))
 
 ;; Save minibuffer history between restarts
 (use-package savehist :init (savehist-mode))
@@ -318,11 +335,6 @@
   (corfu-popupinfo-mode)
   (add-to-list 'corfu--frame-parameters '(internal-border-width . 4)))
 
-(use-package orderless
-  :custom
-  (completion-styles '(orderless basic))
-  (completion-category-overrides '((file (styles basic partial-completion)))))
-
 ;; Completion-at-point helper
 (use-package cape
   :init (add-to-list 'completion-at-point-functions #'cape-file)
@@ -336,7 +348,6 @@
   (:map yas-minor-mode-map
         ("TAB" . nil)
         ("<tab>" . nil)
-        ("C-c y" . 'yas-insert-snippet)
         ("C-c y" . 'yas-insert-snippet))
   :config
   (add-to-list 'yas-snippet-dirs "~/Workspace/guix/etc/snippets/yas"))
@@ -393,7 +404,7 @@
   :ensure nil
   :preface
   (defun treesit-standard-langs (langs)
-    "Convert a list of LANGS into `treesit-language-source-alist` entries. "
+    "Convert LANGS into `treesit-language-source-alist' entries."
     (seq-map
      (lambda (entry)
        (pcase entry
@@ -403,7 +414,9 @@
           `(,lang ,(format "https://github.com/%s" repo) ,@rest))
          (_ (error "Invalid entry in treesit-standard-langs: %S" entry))))
      langs))
+
   :custom
+  (treesit-auto-install-grammar 'ask)
   (treesit-font-lock-level 4)
   (treesit-enabled-modes t)
   (treesit-language-source-alist
@@ -413,18 +426,19 @@
       ;; custom repo / branch / src-dir
       (dockerfile      "camdencheek/tree-sitter-dockerfile")
       (gomod           "camdencheek/tree-sitter-go-mod")
-      (javascript      "tree-sitter/tree-sitter-javascript" "master" "src")
-      (typescript      "tree-sitter/tree-sitter-typescript" "master" "typescript/src")
-      (tsx             "tree-sitter/tree-sitter-typescript" "master" "tsx/src")
+      (javascript      "tree-sitter/tree-sitter-javascript"
+                       :revision "master" :source-dir "src")
+      (typescript      "tree-sitter/tree-sitter-typescript"
+                       :revision "master" :source-dir "typescript/src")
+      (tsx             "tree-sitter/tree-sitter-typescript"
+                       :revision "master" :source-dir "tsx/src")
       (kdl             "tree-sitter-grammars/tree-sitter-kdl")
       (lua             "tree-sitter-grammars/tree-sitter-lua")
       (yaml            "tree-sitter-grammars/tree-sitter-yaml")
-      (markdown        "tree-sitter-grammars/tree-sitter-markdown" "split_parser" "tree-sitter-markdown/src")
-      (markdown-inline "tree-sitter-grammars/tree-sitter-markdown" "split_parser" "tree-sitter-markdown-inline/src"))))
-  :config
-  (dolist (lang (seq-map #'car treesit-language-source-alist))
-    (unless (treesit-language-available-p lang)
-      (treesit-install-language-grammar lang))))
+      (markdown        "tree-sitter-grammars/tree-sitter-markdown"
+                       :revision "split_parser" :source-dir "tree-sitter-markdown/src")
+      (markdown-inline "tree-sitter-grammars/tree-sitter-markdown"
+                       :revision "split_parser" :source-dir "tree-sitter-markdown-inline/src")))))
 
 ;; Whitespace handling
 (use-package ws-butler :demand 2 :config (ws-butler-global-mode))
@@ -445,8 +459,6 @@
   :bind
   (("C-c w" . #'avy-goto-word-0)
    ("C-c s" . #'avy-goto-char-timer)))
-
-(use-package ibuffer :hook (ibuffer-mode . ibuffer-auto-mode))
 
 ;; Formatting
 (use-package apheleia
@@ -549,7 +561,7 @@
         ("r" . eglot-rename)
         ("f" . eglot-format)
         ("d" . eglot-find-declaration)
-        ("r" . eglot-find-implementation)
+        ("i" . eglot-find-implementation)
         ("t" . eglot-find-typeDefinition))
   :config
   (setf eglot-server-programs
@@ -598,7 +610,7 @@
 
 ;; IRC/ERC
 (use-package erc
-  ;; :load my-secrets
+  :load my-secrets
   :preface
   (defun erc-connect ()
     (interactive)
