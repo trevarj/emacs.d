@@ -16,13 +16,27 @@
 
 (use-package use-package
   :preface
+  (defun trev/local-elisp-package-file (name)
+    "Return the local source package file for NAME, if it exists."
+    (when-let* ((path (locate-library (symbol-name name)))
+                ;; `locate-library' prefers .elc files; normalize to source
+                ;; when checking whether this is one of our local packages.
+                (source (if (string-suffix-p ".elc" path)
+                            (concat (file-name-sans-extension path) ".el")
+                          path))
+                (_ (string-suffix-p ".el" source))
+                (_ (file-exists-p source))
+                (_ (file-in-directory-p source user-lisp-directory)))
+      source))
+
   (defun trev/use-package-ensure (name args state &optional no-refresh)
     "Checks for local package before checking remote archives."
     (if-let* (((equal '(t) args))
               (not-feature (not (featurep name)))
-              (path (locate-library (symbol-name name)))
+              (path (trev/local-elisp-package-file name))
               (_ (not (package-installed-p name))))
-        (package-install-file path)
+        ;; Local packages are loaded directly from `user-lisp-directory'.
+        nil
       (when not-feature (use-package-ensure-elpa name args state no-refresh))))
   :custom
   (use-package-always-defer t)
@@ -167,6 +181,7 @@
   (use-short-answers t)
   (user-full-name "Trevor Arjeski")
   (user-mail-address "tmarjeski@gmail.com")
+  (warning-minimum-level :error)
   (window-combination-resize t)
   (window-divider-default-right-width 16))
 
