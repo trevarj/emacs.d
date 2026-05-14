@@ -732,6 +732,24 @@
 ;; GNU Bug tracker
 (use-package debbugs)
 
+(use-package org
+  :custom
+  (org-directory "~/.local/share/org/")
+  (org-default-notes-file "~/.local/share/org/notes.org")
+  (org-agenda-files '("~/.local/share/org/notes.org"))
+  (org-capture-templates
+   '(("n" "Note" entry (file+headline "~/.local/share/org/notes.org" "Notes")
+      "* %U %?\n")))
+  :bind
+  (("C-c a" . org-agenda)
+   ("C-c c" . org-capture)
+   ("C-c n" . (lambda ()
+                (interactive)
+                (find-file org-default-notes-file)))
+   ("C-c N" . consult-org-heading))
+  :config
+  (make-directory org-directory t))
+
 (use-package trev-gnus
   :ensure nil
   :defer t
