@@ -33,7 +33,8 @@
 ;; larger than the system default.
 (setq
  frame-inhibit-implied-resize t
- frame-resize-pixelwise t)
+ frame-resize-pixelwise t
+ window-resize-pixelwise t)
 
 ;; Other performance tweaks
 ;; https://emacsredux.com/blog/2026/04/07/stealing-from-the-best-emacs-configs/
