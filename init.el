@@ -780,6 +780,9 @@
   (message-setup . mml-secure-message-encrypt)
   :custom
   (gnus-agent nil)
+  (gnus-asynchronous t)
+  (gnus-use-article-prefetch 30)
+  (gnus-use-header-prefetch t)
   (gnus-check-new-newsgroups nil)
   (gnus-group-line-format "%M%S%p%P%B%(%G%) (%y)\n")
   (gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
