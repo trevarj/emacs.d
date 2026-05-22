@@ -44,6 +44,12 @@
   (use-package-ensure-function #'trev/use-package-ensure)
   (use-package-expand-minimally t))
 
+(use-package auth-source
+  :ensure nil
+  :custom
+  ;; Avoid parsing missing plaintext auth files from the default list.
+  (auth-sources '("~/.authinfo.gpg")))
+
 (use-package autothemer)
 
 (use-package emacs
