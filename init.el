@@ -51,7 +51,107 @@
   (auth-sources '("~/.authinfo.gpg")))
 
 (use-package autothemer
+  :disabled t
   :demand t)
+
+(use-package standard-themes
+  :demand t
+  :preface
+  (defconst trev/standard-theme-cache-file
+    (expand-file-name
+     "emacs/standard-theme.el"
+     (or (getenv "XDG_CACHE_HOME")
+         (expand-file-name ".cache" "~")))
+    "File where the last selected Standard theme is persisted.")
+
+  (defun trev/standard-theme-valid-p (theme)
+    "Return non-nil when THEME belongs to the Standard themes collection."
+    (and (boundp 'standard-themes-items)
+         (memq theme standard-themes-items)))
+
+  (defun trev/standard-theme-read-cache ()
+    "Return the cached Standard theme, or nil if the cache is invalid."
+    (when (file-readable-p trev/standard-theme-cache-file)
+      (with-temp-buffer
+        (insert-file-contents trev/standard-theme-cache-file)
+        (condition-case nil
+            (let ((theme (read (current-buffer))))
+              (when (trev/standard-theme-valid-p theme)
+                theme))
+          (error nil)))))
+
+  (defun trev/standard-theme-save-current ()
+    "Persist the active Standard theme."
+    (when-let* ((theme (car custom-enabled-themes))
+                (_ (trev/standard-theme-valid-p theme)))
+      (make-directory (file-name-directory trev/standard-theme-cache-file) t)
+      (with-temp-file trev/standard-theme-cache-file
+        (prin1 theme (current-buffer))
+        (terpri (current-buffer)))))
+
+  (defun trev/standard-theme-load-startup ()
+    "Load the cached Standard theme, falling back to `standard-dark'."
+    (standard-themes-load-theme
+     (or (trev/standard-theme-read-cache) 'standard-dark)))
+
+  (defun trev/standard-theme-set-extra-faces ()
+    "Apply extra face tweaks after Standard theme changes."
+    (modus-themes-with-colors
+      (custom-set-faces
+       `(margin ((,c :background ,bg-main :foreground ,fg-main)))
+       `(diff-hl-insert ((,c :foreground ,bg-added-fringe :background ,bg-main)))
+       `(diff-hl-change ((,c :foreground ,bg-changed-fringe :background ,bg-main)))
+       `(diff-hl-delete ((,c :foreground ,bg-removed-fringe :background ,bg-main))))))
+
+  :bind
+  (("C-c T" . standard-themes-rotate)
+   ("C-c t" . standard-themes-toggle)
+   :repeat-map trev/standard-themes-repeat-map
+   ("T" . standard-themes-rotate)
+   ("t" . standard-themes-toggle))
+  :config
+  (setq standard-themes-to-rotate
+        '(standard-dark standard-light standard-dark-tinted standard-light-tinted)
+        standard-themes-italic-constructs t
+        standard-themes-bold-constructs t
+        standard-themes-variable-pitch-ui nil
+        standard-themes-mixed-fonts t
+        standard-themes-common-palette-overrides
+        '((bg-search-current bg-yellow-intense))
+        standard-themes-headings
+        '((0 . (variable-pitch light 1.9))
+          (1 . (variable-pitch light 1.8))
+          (2 . (variable-pitch regular 1.6))
+          (3 . (variable-pitch regular 1.4))
+          (4 . (variable-pitch semibold 1.25))
+          (5 . (variable-pitch semibold 1.15))
+          (6 . (semibold 1.1))
+          (7 . (semibold 1.05))
+          (t . (semibold))))
+
+  (add-hook 'standard-themes-after-load-theme-hook
+            #'trev/standard-theme-save-current)
+  (add-hook 'standard-themes-after-load-theme-hook
+            #'trev/standard-theme-set-extra-faces)
+  (with-eval-after-load 'diff-hl
+    (trev/standard-theme-set-extra-faces))
+  (trev/standard-theme-load-startup))
+
+(use-package spacious-padding
+  :demand t
+  :bind ("<f8>" . spacious-padding-mode)
+  :config
+  (setq spacious-padding-widths
+        '( :internal-border-width 40
+           :header-line-width 6
+           :mode-line-width 6
+           :custom-button-width 6
+           :tab-width 6
+           :right-divider-width 32
+           :scroll-bar-width 10
+           :fringe-width 12)
+        spacious-padding-subtle-frame-lines nil)
+  (spacious-padding-mode 1))
 
 (use-package emacs
   :preface
@@ -102,7 +202,6 @@
    (buffer-list-update . header-line-file-path)
    (prog-mode . display-line-numbers-mode))
   :init
-  (load-theme 'nord t)
   (save-place-mode)
   (recentf-mode)
   (column-number-mode)                  ; Column number mode

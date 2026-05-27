@@ -25,8 +25,6 @@
 (tool-bar-mode -1)                          ; Disable the toolbar
 (menu-bar-mode -1)                          ; Disable the menubar
 (tooltip-mode -1)                           ; Disable tooltips
-(modify-all-frames-parameters
- '((internal-border-width . 40)))           ; Frame padding
 
 ;; Resizing the Emacs frame can be a terribly expensive part of changing the
 ;; font. By inhibiting this, we easily halve startup times with fonts that are
