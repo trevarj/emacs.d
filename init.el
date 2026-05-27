@@ -210,10 +210,10 @@
   (window-divider-mode)                 ; Gap between splits
   (put 'suspend-frame 'disabled t)      ; Disable suspend-frame
   ;; Fonts
-  (set-face-attribute 'default nil :family "Iosevka JBM" :height 168 :weight 'medium)
-  (set-face-attribute 'fixed-pitch nil :family "Iosevka JBM" :height 168)
-  (set-face-attribute 'fixed-pitch-serif nil :family "Iosevka JBM" :height 168)
-  (set-face-attribute 'variable-pitch nil :family "Iosevka JBM Sans" :height 180)
+  (set-face-attribute 'default nil :family "Iosevka JBM" :height 166 :weight 'medium)
+  (set-face-attribute 'fixed-pitch nil :family "Iosevka JBM" :height 166)
+  (set-face-attribute 'fixed-pitch-serif nil :family "Iosevka JBM" :height 166)
+  (set-face-attribute 'variable-pitch nil :family "Iosevka JBM Sans" :height 166)
   ;; https://github.com/ryanoasis/nerd-fonts/wiki/Glyph-Sets-and-Code-Points
   (dolist (code-point
            '((#xE6FA . #xE6B2) (#xE700 . #xE7C5) (#xF000 . #xF2E0) (#xE200 . #xE2A9)
