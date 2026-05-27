@@ -102,37 +102,37 @@
        `(diff-hl-insert ((,c :foreground ,bg-added-fringe :background ,bg-main)))
        `(diff-hl-change ((,c :foreground ,bg-changed-fringe :background ,bg-main)))
        `(diff-hl-delete ((,c :foreground ,bg-removed-fringe :background ,bg-main))))))
-
+  :hook
+  ((standard-themes-after-load-theme . trev/standard-theme-save-current)
+   (standard-themes-after-load-theme . trev/standard-theme-set-extra-faces))
   :bind
   (("C-c T" . standard-themes-rotate)
    ("C-c t" . standard-themes-toggle)
    :repeat-map trev/standard-themes-repeat-map
    ("T" . standard-themes-rotate)
    ("t" . standard-themes-toggle))
+  :custom
+  (modus-themes-to-rotate
+   '(standard-dark standard-light standard-dark-tinted standard-light-tinted))
+  (modus-themes-to-toggle
+   '(standard-dark-tinted standard-light-tinted))
+  (standard-themes-italic-constructs t)
+  (standard-themes-bold-constructs t)
+  (standard-themes-variable-pitch-ui nil)
+  (standard-themes-mixed-fonts t)
+  (standard-themes-common-palette-overrides
+   '((bg-search-current bg-yellow-intense)))
+  (standard-themes-headings
+   '((0 . (variable-pitch light 1.6))
+     (1 . (variable-pitch light 1.5))
+     (2 . (variable-pitch regular 1.4))
+     (3 . (variable-pitch regular 1.3))
+     (4 . (variable-pitch semibold 1.25))
+     (5 . (variable-pitch semibold 1.15))
+     (6 . (semibold 1.1))
+     (7 . (semibold 1.05))
+     (t . (semibold))))
   :config
-  (setq standard-themes-to-rotate
-        '(standard-dark standard-light standard-dark-tinted standard-light-tinted)
-        standard-themes-italic-constructs t
-        standard-themes-bold-constructs t
-        standard-themes-variable-pitch-ui nil
-        standard-themes-mixed-fonts t
-        standard-themes-common-palette-overrides
-        '((bg-search-current bg-yellow-intense))
-        standard-themes-headings
-        '((0 . (variable-pitch light 1.6))
-          (1 . (variable-pitch light 1.5))
-          (2 . (variable-pitch regular 1.4))
-          (3 . (variable-pitch regular 1.3))
-          (4 . (variable-pitch semibold 1.25))
-          (5 . (variable-pitch semibold 1.15))
-          (6 . (semibold 1.1))
-          (7 . (semibold 1.05))
-          (t . (semibold))))
-
-  (add-hook 'standard-themes-after-load-theme-hook
-            #'trev/standard-theme-save-current)
-  (add-hook 'standard-themes-after-load-theme-hook
-            #'trev/standard-theme-set-extra-faces)
   (with-eval-after-load 'diff-hl
     (trev/standard-theme-set-extra-faces))
   (trev/standard-theme-load-startup))
