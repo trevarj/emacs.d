@@ -119,10 +119,10 @@
         standard-themes-common-palette-overrides
         '((bg-search-current bg-yellow-intense))
         standard-themes-headings
-        '((0 . (variable-pitch light 1.9))
-          (1 . (variable-pitch light 1.8))
-          (2 . (variable-pitch regular 1.6))
-          (3 . (variable-pitch regular 1.4))
+        '((0 . (variable-pitch light 1.6))
+          (1 . (variable-pitch light 1.5))
+          (2 . (variable-pitch regular 1.4))
+          (3 . (variable-pitch regular 1.3))
           (4 . (variable-pitch semibold 1.25))
           (5 . (variable-pitch semibold 1.15))
           (6 . (semibold 1.1))
@@ -724,9 +724,6 @@
 
 ;; Common Lisp
 (use-package sly :custom (inferior-lisp-program (executable-find "sbcl")))
-
-;; Markdown
-(use-package markdown-mode)
 
 ;; Secrets
 (use-package my-secrets
