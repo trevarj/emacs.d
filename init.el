@@ -654,29 +654,6 @@
              (if (equal '(t) (erc-match-toggle-hidden-fools nil)) "OFF" "ON"))
     (set-buffer-modified-p t))
 
-  (defun erc-message-toggle-background ()
-    "Toggle the background color of ERC messages."
-    (unless (boundp 'erc--last-message-face)
-      (setq-local erc--last-message-face 'erc-default-face))
-    (unless (boundp 'erc--last-message-nick)
-      (setq-local erc--last-message-nick nil))
-    (autothemer-let-palette
-     (let ((inhibit-read-only t)
-           (new-face (if (equal erc--last-message-face 'erc-default-face)
-                         `(:foreground ,base8)
-                       'erc-default-face)))
-       (save-excursion
-         (goto-char (point-min))
-         (when-let* (((re-search-forward "<\\([^>]+\\)+> " (point-max) t))
-                     (nick (match-string 1))
-                     (message-start (point)))
-           (unless (or (member nick erc-fools)
-                       (string= nick erc--last-message-nick))
-             (setq-local erc--last-message-face new-face)
-             (setq-local erc--last-message-nick nick))
-           (put-text-property message-start (1- (point-max))
-                              'font-lock-face erc--last-message-face))))))
-
   (defvar erc--msg-props)
   (defvar erc-networks--id)
 
@@ -801,8 +778,7 @@
   (erc-mode . (lambda ()
                 (auto-fill-mode -1)
                 (add-to-list 'completion-at-point-functions 'cape-emoji)))
-  (erc-text-matched . erc-hide-fools)
-  (erc-insert-modify . erc-message-toggle-background))
+  (erc-text-matched . erc-hide-fools))
 
 (use-package elfeed
   :load my-secrets
