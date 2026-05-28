@@ -202,7 +202,8 @@
   :hook
   ((emacs-startup . display-startup-time)
    (buffer-list-update . header-line-file-path)
-   (prog-mode . display-line-numbers-mode))
+   ;; (prog-mode . display-line-numbers-mode)
+   )
   :init
   (save-place-mode)
   (recentf-mode)
