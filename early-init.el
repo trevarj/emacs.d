@@ -42,6 +42,7 @@
 (setq read-process-output-max (* 4 1024 1024)) ; 4MB
 (setq-default cursor-in-non-selected-windows nil)
 (setq highlight-nonselected-windows nil)
+(setq pgtk-wait-for-event-timeout nil)
 
 (provide 'early-init)
 
