@@ -199,6 +199,15 @@
      (t
       (keyboard-quit))))
 
+  (define-advice message-make-date
+      (:around (orig-fun &rest args) messages-force-utc-tz)
+    "Force UTC timezone generation for the message date header."
+    (with-environment-variables
+        (("TZ" "Etc/UTC"))
+      (let ((res (apply orig-fun args)))
+        (set-time-zone-rule nil)
+        res)))
+
   :hook
   ((emacs-startup . display-startup-time)
    (buffer-list-update . header-line-file-path)
