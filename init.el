@@ -91,7 +91,7 @@
 
   (defun trev/standard-theme-load-startup ()
     "Load the cached Standard theme, falling back to `standard-dark'."
-    (standard-themes-load-theme
+    (modus-themes-load-theme
      (or (trev/standard-theme-read-cache) 'standard-dark)))
 
   (defun trev/standard-theme-set-extra-faces ()
@@ -103,26 +103,27 @@
        `(diff-hl-change ((,c :foreground ,bg-changed-fringe :background ,bg-main)))
        `(diff-hl-delete ((,c :foreground ,bg-removed-fringe :background ,bg-main))))))
   :hook
-  ((standard-themes-after-load-theme . trev/standard-theme-save-current)
-   (standard-themes-after-load-theme . trev/standard-theme-set-extra-faces))
+  ((modus-themes-after-load-theme . trev/standard-theme-save-current)
+   (modus-themes-after-load-theme . trev/standard-theme-set-extra-faces))
   :bind
-  (("C-c T" . standard-themes-rotate)
-   ("C-c t" . standard-themes-toggle)
+  (("C-c T" . modus-themes-rotate)
+   ("C-c t" . modus-themes-toggle)
    :repeat-map trev/standard-themes-repeat-map
-   ("T" . standard-themes-rotate)
-   ("t" . standard-themes-toggle))
+   ("T" . modus-themes-rotate)
+   ("t" . modus-themes-toggle))
   :custom
+  (standard-themes-take-over-modus-themes-mode t)
   (modus-themes-to-rotate
    '(standard-dark standard-light standard-dark-tinted standard-light-tinted))
   (modus-themes-to-toggle
    '(standard-dark-tinted standard-light-tinted))
-  (standard-themes-italic-constructs t)
-  (standard-themes-bold-constructs t)
-  (standard-themes-variable-pitch-ui nil)
-  (standard-themes-mixed-fonts t)
-  (standard-themes-common-palette-overrides
+  (modus-themes-italic-constructs t)
+  (modus-themes-bold-constructs t)
+  (modus-themes-variable-pitch-ui nil)
+  (modus-themes-mixed-fonts t)
+  (modus-themes-common-palette-overrides
    '((bg-search-current bg-yellow-intense)))
-  (standard-themes-headings
+  (modus-themes-headings
    '((0 . (variable-pitch light 1.6))
      (1 . (variable-pitch light 1.5))
      (2 . (variable-pitch regular 1.4))
@@ -750,6 +751,24 @@
              (if (equal '(t) (erc-match-toggle-hidden-fools nil)) "OFF" "ON"))
     (set-buffer-modified-p t))
 
+  (defun trev/erc-nicks-refresh-buffers ()
+    "Refresh ERC nick colors against the current theme background."
+    (setq erc-nicks-bg-color (face-background 'default nil t))
+    (when (fboundp 'erc-nicks-refresh)
+      (dolist (buffer (buffer-list))
+        (with-current-buffer buffer
+          (when (and (derived-mode-p 'erc-mode)
+                     (bound-and-true-p erc-nicks-mode))
+            (erc-with-server-buffer
+              (setq erc-nicks--bg-luminance nil
+                    erc-nicks--bg-mode-value nil
+                    erc-nicks--fg-rgb
+                    (or (color-name-to-rgb
+                         (face-foreground 'erc-default-face nil 'default))
+                        (color-name-to-rgb
+                         (readable-foreground-color erc-nicks-bg-color)))))
+            (erc-nicks-refresh nil))))))
+
   (defvar erc--msg-props)
   (defvar erc-networks--id)
 
@@ -832,6 +851,11 @@
   (erc-nick "trev")
   (erc-nicks-track-faces t)
   (erc-nicks-colors 'font-lock)
+  (erc-nicks-color-adjustments
+   '(erc-nicks-invert erc-nicks-add-contrast erc-nicks-cap-contrast
+     erc-nicks-ensaturate))
+  (erc-nicks-contrast-range '(7.0 . 18.0))
+  (erc-nicks-saturation-range '(0.35 . 0.85))
   (erc-port 7777)
   (erc-prompt 'erc-prompt-format)
   (erc-prompt-format (propertize "%n:" 'font-lock-face 'erc-input-face))
@@ -874,7 +898,8 @@
   (erc-mode . (lambda ()
                 (auto-fill-mode -1)
                 (add-to-list 'completion-at-point-functions 'cape-emoji)))
-  (erc-text-matched . erc-hide-fools))
+  (erc-text-matched . erc-hide-fools)
+  (modus-themes-after-load-theme . trev/erc-nicks-refresh-buffers))
 
 (use-package elfeed
   :load my-secrets
