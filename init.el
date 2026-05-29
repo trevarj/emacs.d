@@ -1,7 +1,7 @@
 ;;; init.el --- Trev's Emacs Config -*- lexical-binding: t -*-
 ;;;
 ;;; Commentary:
-;;; A minimalistic development environment
+;;; My living Emacs config.  Mostly for development, IRC and GNUs.
 ;;;
 ;;; Code:
 
