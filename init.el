@@ -102,7 +102,8 @@
        `(diff-hl-insert ((,c :foreground ,bg-added-fringe :background ,bg-main)))
        `(diff-hl-change ((,c :foreground ,bg-changed-fringe :background ,bg-main)))
        `(diff-hl-delete ((,c :foreground ,bg-removed-fringe :background ,bg-main)))
-       `(modus-themes-ui-variable-pitch ((,c :height 0.9))))))
+       `(modus-themes-ui-variable-pitch ((,c :height 0.9)))
+       `(erc-current-nick-face ((,c :foreground ,red-intense :background ,bg-main))))))
   :hook
   ((modus-themes-after-load-theme . trev/modus-theme-save-current)
    (modus-themes-after-load-theme . trev/modus-theme-set-extra-faces))
