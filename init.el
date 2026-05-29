@@ -54,48 +54,48 @@
   :disabled t
   :demand t)
 
-(use-package standard-themes
+(use-package modus-themes
   :demand t
   :preface
-  (defconst trev/standard-theme-cache-file
+  (defconst trev/modus-theme-cache-file
     (expand-file-name
-     "emacs/standard-theme.el"
+     "emacs/modus-theme.el"
      (or (getenv "XDG_CACHE_HOME")
          (expand-file-name ".cache" "~")))
-    "File where the last selected Standard theme is persisted.")
+    "File where the last selected Modus theme is persisted.")
 
-  (defun trev/standard-theme-valid-p (theme)
-    "Return non-nil when THEME belongs to the Standard themes collection."
-    (and (boundp 'standard-themes-items)
-         (memq theme standard-themes-items)))
+  (defun trev/modus-theme-valid-p (theme)
+    "Return non-nil when THEME belongs to the Modus themes collection."
+    (and (boundp 'modus-themes-items)
+         (memq theme modus-themes-items)))
 
-  (defun trev/standard-theme-read-cache ()
-    "Return the cached Standard theme, or nil if the cache is invalid."
-    (when (file-readable-p trev/standard-theme-cache-file)
+  (defun trev/modus-theme-read-cache ()
+    "Return the cached Modus theme, or nil if the cache is invalid."
+    (when (file-readable-p trev/modus-theme-cache-file)
       (with-temp-buffer
-        (insert-file-contents trev/standard-theme-cache-file)
+        (insert-file-contents trev/modus-theme-cache-file)
         (condition-case nil
             (let ((theme (read (current-buffer))))
-              (when (trev/standard-theme-valid-p theme)
+              (when (trev/modus-theme-valid-p theme)
                 theme))
           (error nil)))))
 
-  (defun trev/standard-theme-save-current ()
-    "Persist the active Standard theme."
+  (defun trev/modus-theme-save-current ()
+    "Persist the active Modus theme."
     (when-let* ((theme (car custom-enabled-themes))
-                (_ (trev/standard-theme-valid-p theme)))
-      (make-directory (file-name-directory trev/standard-theme-cache-file) t)
-      (with-temp-file trev/standard-theme-cache-file
+                (_ (trev/modus-theme-valid-p theme)))
+      (make-directory (file-name-directory trev/modus-theme-cache-file) t)
+      (with-temp-file trev/modus-theme-cache-file
         (prin1 theme (current-buffer))
         (terpri (current-buffer)))))
 
-  (defun trev/standard-theme-load-startup ()
-    "Load the cached Standard theme, falling back to `standard-dark'."
+  (defun trev/modus-theme-load-startup ()
+    "Load the cached Modus theme, falling back to `standard-dark'."
     (modus-themes-load-theme
-     (or (trev/standard-theme-read-cache) 'standard-dark)))
+     (or (trev/modus-theme-read-cache) 'standard-dark)))
 
-  (defun trev/standard-theme-set-extra-faces ()
-    "Apply extra face tweaks after Standard theme changes."
+  (defun trev/modus-theme-set-extra-faces ()
+    "Apply extra face tweaks after Modus theme changes."
     (modus-themes-with-colors
       (custom-set-faces
        `(margin ((,c :background ,bg-main :foreground ,fg-main)))
@@ -104,20 +104,17 @@
        `(diff-hl-delete ((,c :foreground ,bg-removed-fringe :background ,bg-main)))
        `(modus-themes-ui-variable-pitch ((,c :height 0.9))))))
   :hook
-  ((modus-themes-after-load-theme . trev/standard-theme-save-current)
-   (modus-themes-after-load-theme . trev/standard-theme-set-extra-faces))
+  ((modus-themes-after-load-theme . trev/modus-theme-save-current)
+   (modus-themes-after-load-theme . trev/modus-theme-set-extra-faces))
   :bind
-  (("C-c T" . modus-themes-rotate)
+  (("C-c T" . modus-themes-select)
    ("C-c t" . modus-themes-toggle)
-   :repeat-map trev/standard-themes-repeat-map
-   ("T" . modus-themes-rotate)
+   :repeat-map trev/modus-themes-repeat-map
    ("t" . modus-themes-toggle))
   :custom
-  (standard-themes-take-over-modus-themes-mode t)
-  (modus-themes-to-rotate
-   '(standard-dark standard-light standard-dark-tinted standard-light-tinted))
+  (modus-themes-include-derivatives-mode t)
   (modus-themes-to-toggle
-   '(standard-dark-tinted standard-light-tinted))
+   '(modus-vivendi-deuteranopia modus-operandi-tinted))
   (modus-themes-italic-constructs t)
   (modus-themes-bold-constructs t)
   (modus-themes-variable-pitch-ui nil)
@@ -136,8 +133,10 @@
      (t . (semibold))))
   :config
   (with-eval-after-load 'diff-hl
-    (trev/standard-theme-set-extra-faces))
-  (trev/standard-theme-load-startup))
+    (trev/modus-theme-set-extra-faces))
+  (trev/modus-theme-load-startup))
+
+(use-package standard-themes :demand t)
 
 (use-package spacious-padding
   :demand t
