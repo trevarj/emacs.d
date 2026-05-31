@@ -177,25 +177,21 @@
     "Toggles back to previously visited buffer"
     (interactive) (switch-to-buffer nil))
 
-  (defun prot-simple-keyboard-quit-dwim ()
-    "https://github.com/protesilaos/dotfiles/blob/8e5bc152054626e26512c5b5d2fca5d55899dab5/emacs/.emacs.d/prot-lisp/prot-simple.el#L111"
+  (defun trev/keyboard-quit-dwim ()
+    "Do-What-I-Mean behavior for `keyboard-quit'."
     (interactive)
     (cond
      ((region-active-p)
       (keyboard-quit))
-     ((and (derived-mode-p 'completion-list-mode 'special-mode)
+     ((derived-mode-p 'completion-list-mode)
+      (delete-completion-window))
+     ((get-buffer-window "*Completions*" 0)
+      (delete-completion-window))
+     ((active-minibuffer-window)
+      (abort-recursive-edit))
+     ((and (derived-mode-p 'special-mode)
            (not (one-window-p)))
       (quit-window))
-     ((when-let* ((_ (not (one-window-p)))
-                  (windows (seq-filter
-                            (lambda (window)
-                              (with-selected-window window
-                                (derived-mode-p 'completion-list-mode 'special-mode)))
-                            (window-list))))
-        (dolist (window windows)
-          (quit-window nil window))))
-     ((> (minibuffer-depth) 0)
-      (abort-recursive-edit))
      (t
       (keyboard-quit))))
 
@@ -241,7 +237,7 @@
    ("C-'" . 'switch-to-buffer-last)
    ("C-c !" . 'open-user-config)
    ("M-o" . 'other-window)
-   ("C-g" . 'prot-simple-keyboard-quit-dwim))
+   ("C-g" . 'trev/keyboard-quit-dwim))
   ;; Miscellaneous Options
   :custom
   (auto-fill-function 'do-auto-fill)
