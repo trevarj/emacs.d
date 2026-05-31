@@ -942,6 +942,7 @@
   (make-directory org-directory t))
 
 (use-package gnus
+  :defer 5
   ;; Gmail integration taken from https://github.com/kensanata/ggg
   :preface
   (defun gmail-archive ()
