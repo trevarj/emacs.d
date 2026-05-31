@@ -90,11 +90,11 @@
         (terpri (current-buffer)))))
 
   (defun trev/modus-theme-load-startup ()
-    "Load the cached Modus theme, falling back to `standard-dark'."
+    "Load the cached Modus theme, falling back to a dark Modus variant."
     (modus-themes-load-theme
-     (or (trev/modus-theme-read-cache) 'standard-dark)))
+     (or (trev/modus-theme-read-cache) 'modus-vivendi-deuteranopia)))
 
-  (defun trev/modus-theme-set-extra-faces ()
+  (defun trev/modus-theme-set-extra-faces (&rest _)
     "Apply extra face tweaks after Modus theme changes."
     (modus-themes-with-colors
       (custom-set-faces
@@ -153,6 +153,7 @@
            :scroll-bar-width 10
            :fringe-width 12)
         spacious-padding-subtle-frame-lines nil)
+  (advice-add #'spacious-padding-set-faces :after #'trev/modus-theme-set-extra-faces)
   (spacious-padding-mode 1))
 
 (use-package emacs
