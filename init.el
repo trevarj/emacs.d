@@ -984,6 +984,18 @@
    `(,(face-attribute font-lock-builtin-face :foreground)
      ,(face-attribute font-lock-keyword-face :foreground)))
   (gnus-message-archive-group nil)
+  (gnus-parameters
+   '(("^nntp\\+news\\.gmane\\.io:gmane\\.emacs\\.devel$"
+      (to-address . "emacs-devel@gnu.org")
+      (to-list . "emacs-devel@gnu.org"))
+     ("^nntp\\+news\\.gmane\\.io:gmane\\.emacs\\.bugs$"
+      (to-list . "bug-gnu-emacs@gnu.org"))
+     ("^nntp\\+news\\.gmane\\.io:gmane\\.comp\\.gnu\\.guix\\.devel$"
+      (to-address . "guix-devel@gnu.org")
+      (to-list . "guix-devel@gnu.org"))
+     ("^nntp\\+news\\.gmane\\.io:gmane\\.comp\\.gnu\\.guix\\.user$"
+      (to-address . "help-guix@gnu.org")
+      (to-list . "help-guix@gnu.org"))))
   (gnus-secondary-select-methods
    '((nntp "news.gmane.io"
            (nntp-connection-timeout 5))))
