@@ -376,6 +376,7 @@
   :init (which-key-mode)
   :bind (("C-c K" . 'which-key-show-major-mode))
   :custom
+  (which-key-max-description-length nil)
   (which-key-popup-type 'side-window)
   (which-key-sort-order 'which-key-description-order))
 
