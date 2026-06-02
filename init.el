@@ -730,7 +730,10 @@
   (add-to-list 'geiser-guile-load-path "~/Workspace/nonguix"))
 
 ;; Guix
-(use-package guix :ensure nil)
+(use-package guix
+  :mode
+  (("/home/trev/Workspace/trev-guix/.*\\.scm\\'" . guix-scheme-mode)
+   ("/home/trev/Workspace/guix/.*\\.scm\\'" . guix-scheme-mode)))
 
 ;; Common Lisp
 (use-package sly :custom (inferior-lisp-program (executable-find "sbcl")))
