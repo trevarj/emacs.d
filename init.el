@@ -946,6 +946,53 @@
   :config
   (make-directory org-directory t))
 
+(use-package notmuch
+  :defer t
+  :preface
+  (defun trev/notmuch-search-mark-read ()
+    "Mark all messages in the current search as read."
+    (interactive)
+    (let ((query notmuch-search-query-string))
+      (when (yes-or-no-p (format "Mark search [%s] read?" query))
+        (notmuch-tag query '("-unread"))
+        (notmuch-search-refresh-view))))
+  :bind
+  (("C-c m" . notmuch)
+   :map notmuch-search-mode-map
+   ("M" . trev/notmuch-search-mark-read))
+  :custom
+  (message-send-mail-function 'smtpmail-send-it)
+  (notmuch-archive-tags '("-inbox" "-unread"))
+  (notmuch-fcc-dirs nil)
+  (notmuch-identities '("tmarjeski@gmail.com"))
+  (notmuch-saved-searches
+   '((:name "inbox [i]" :query "path:main/INBOX/** and tag:unread" :key "i")
+     (:name "lists-inbox [I]" :query "path:lists/INBOX/** and tag:unread and not tag:lists" :key "I")
+     (:name "guix-devel [g]" :query "tag:guix-devel and tag:unread" :key "g" :search-type 'tree)
+     (:name "guix-help [h]" :query "tag:guix-help and tag:unread" :key "h" :search-type 'tree)
+     (:name "emacs-devel [e]" :query "tag:emacs-devel and tag:unread" :key "e" :search-type 'tree)
+     (:name "emacs-bugs [b]" :query "tag:emacs-bugs and tag:unread" :key "b" :search-type 'tree)
+     (:name "github [G]" :query "tag:github and tag:unread" :key "G")
+     (:name "codeberg [C]" :query "tag:codeberg and tag:unread" :key "C")
+     (:name "all-mail-6m [a]" :query "date:6M.." :key "a")))
+  (notmuch-hello-sections
+   '(notmuch-hello-insert-header notmuch-hello-insert-saved-searches))
+  (notmuch-hello-auto-refresh t)
+  (notmuch-hello-indent 0)
+  (notmuch-column-control 1.0)
+  (notmuch-search-oldest-first nil)
+  (notmuch-show-logo nil)
+  (notmuch-show-relative-dates t)
+  (notmuch-show-indent-messages-width 0)
+  (notmuch-show-indent-multipart nil)
+  (notmuch-message-headers '("To" "Cc" "Subject" "Date"))
+  (notmuch-message-headers-visible t)
+  (notmuch-wash-wrap-lines-length 120)
+  (smtpmail-smtp-server "smtp.gmail.com")
+  (smtpmail-smtp-service 587)
+  (smtpmail-smtp-user "tmarjeski@gmail.com")
+  :hook ((notmuch-mua-send . notmuch-mua-attachment-check)))
+
 (use-package gnus
   :defer 5
   ;; Gmail integration taken from https://github.com/kensanata/ggg
