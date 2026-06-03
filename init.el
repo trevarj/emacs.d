@@ -44,11 +44,7 @@
   (use-package-ensure-function #'trev/use-package-ensure)
   (use-package-expand-minimally t))
 
-(use-package auth-source
-  :ensure nil
-  :custom
-  ;; Avoid parsing missing plaintext auth files from the default list.
-  (auth-sources '("~/.authinfo.gpg")))
+(use-package auth-source :ensure nil :custom (auth-sources '("~/.authinfo.gpg")))
 
 (use-package autothemer
   :disabled t
@@ -346,6 +342,18 @@
      (project-any-command "Other" ?o)))
   :config
   (add-to-list 'project-kill-buffer-conditions '(major-mode . vterm-mode)))
+
+(use-package dired
+  :custom
+  (dired-kill-when-opening-new-dired-buffer t)
+  (dired-auto-revert-buffer #'dired-directory-changed-p)
+  (dired-clean-up-buffers-too t)
+  (dired-clean-confirm-killing-deleted-buffers t)
+  (dired-recursive-copies 'always)
+  (dired-recursive-deletes 'always)
+  (dired-create-destination-dirs 'ask)
+  (dired-create-destination-dirs-on-trailing-dirsep t)
+  (wdired-create-parent-directories t))
 
 (use-package autorevert
   :hook (after-init . global-auto-revert-mode)
