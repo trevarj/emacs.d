@@ -1,7 +1,7 @@
 ;;; init.el --- Trev's Emacs Config -*- lexical-binding: t -*-
 ;;;
 ;;; Commentary:
-;;; My living Emacs config.  Mostly for development, IRC and GNUs.
+;;; My living Emacs config.
 ;;;
 ;;; Code:
 
@@ -1002,91 +1002,6 @@
   (smtpmail-smtp-service 587)
   (smtpmail-smtp-user "tmarjeski@gmail.com")
   :hook ((notmuch-mua-send . notmuch-mua-attachment-check)))
-
-(use-package gnus
-  :defer 5
-  ;; Gmail integration taken from https://github.com/kensanata/ggg
-  :preface
-  (defun gmail-archive ()
-    (interactive)
-    (gnus-summary-move-article nil "nnimap+imap.gmail.com:[Gmail]/All Mail"))
-
-  (defun gmail-trash ()
-    (interactive)
-    (gnus-summary-move-article nil "nnimap+imap.gmail.com:[Gmail]/Trash"))
-
-  (defun gmail-report-spam ()
-    (interactive)
-    (gnus-summary-move-article nil "nnimap+imap.gmail.com:[Gmail]/Spam"))
-  :bind
-  (:map
-   gnus-article-mode-map
-   (("q" . 'kill-current-buffer)))
-  (:map
-   gnus-summary-mode-map
-   :prefix-map gmail-prefix-map
-   :prefix "C-c"
-   (("y" . 'gmail-archive)
-    ("d" . 'gmail-trash)
-    ("$" . 'gmail-report-spam)))
-  :hook
-  ;; Encrypt all messages
-  (message-setup . mml-secure-message-encrypt)
-  :custom
-  (gnus-agent nil)
-  (gnus-asynchronous t)
-  (gnus-use-article-prefetch 30)
-  (gnus-use-header-prefetch t)
-  (gnus-check-new-newsgroups nil)
-  (gnus-group-line-format "%M%S%p%P%B%(%G%) (%y)\n")
-  (gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
-  (gnus-init-file nil)
-  (gnus-logo-colors
-   `(,(face-attribute font-lock-builtin-face :foreground)
-     ,(face-attribute font-lock-keyword-face :foreground)))
-  (gnus-message-archive-group nil)
-  (gnus-parameters
-   '(("^nntp\\+news\\.gmane\\.io:gmane\\.emacs\\.devel$"
-      (to-address . "emacs-devel@gnu.org")
-      (to-list . "emacs-devel@gnu.org"))
-     ("^nntp\\+news\\.gmane\\.io:gmane\\.emacs\\.bugs$"
-      (to-list . "bug-gnu-emacs@gnu.org"))
-     ("^nntp\\+news\\.gmane\\.io:gmane\\.comp\\.gnu\\.guix\\.devel$"
-      (to-address . "guix-devel@gnu.org")
-      (to-list . "guix-devel@gnu.org"))
-     ("^nntp\\+news\\.gmane\\.io:gmane\\.comp\\.gnu\\.guix\\.user$"
-      (to-address . "help-guix@gnu.org")
-      (to-list . "help-guix@gnu.org"))))
-  (gnus-secondary-select-methods
-   '((nntp "news.gmane.io"
-           (nntp-connection-timeout 5))))
-  (gnus-select-method
-   '(nnimap "gmail"
-            (nnimap-address "imap.gmail.com")
-            (nnimap-server-port 993)
-            (nnimap-stream ssl)))
-  (gnus-sum-thread-tree-false-root "◌ ")
-  (gnus-sum-thread-tree-indent "  ")
-  (gnus-sum-thread-tree-leaf-with-other "├─ ")
-  (gnus-sum-thread-tree-root "● ")
-  (gnus-sum-thread-tree-single-leaf "╰─ ")
-  (gnus-sum-thread-tree-vertical "│ ")
-  (gnus-summary-line-format "%U%R%z%* %([%&user-date;] %-20,20f%) %B%s\n")
-  (gnus-summary-thread-gathering-function 'gnus-gather-threads-by-references)
-  (gnus-thread-hide-subtree t)
-  (gnus-thread-ignore-subject t)
-  (gnus-thread-indent-level 2)
-  (gnus-thread-sort-functions '(gnus-thread-sort-by-most-recent-date))
-  (gnus-use-dribble-file nil)
-  (gnus-user-date-format-alist
-   '(((gnus-seconds-today) . "Today %10R")
-     ((+ (* 60 60 24) (gnus-seconds-today)) . "Yesterday %6R")
-     (t . "%Y-%m-%d %R")))
-  (message-send-mail-function 'smtpmail-send-it)
-  (mml-secure-openpgp-encrypt-to-self t)
-  (mml-secure-openpgp-signers '("A52D68794EBED758"))
-  (smtpmail-smtp-server "smtp.gmail.com")
-  (smtpmail-smtp-service 587))
 
 ;;; Local Packages
 
