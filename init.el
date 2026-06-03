@@ -598,9 +598,11 @@
   :config
   (apheleia-global-mode)
   (dolist (formatter-cmd
-           '((shfmt . ("shfmt" "-i" "2" "-ci" "-kp" "-sr"))
+           '((guix-style . ("guix" "style" "-f" inplace))
+             (shfmt . ("shfmt" "-i" "2" "-ci" "-kp" "-sr"))
              (rustfmt . ("rustfmt" "--edition" "2024" "--quiet" "--emit" "stdout"))))
-    (add-to-list 'apheleia-formatters formatter-cmd)))
+    (add-to-list 'apheleia-formatters formatter-cmd))
+  (add-to-list 'apheleia-mode-alist '(guix-scheme-mode . guix-style)))
 
 ;; Spelling
 (use-package ispell
