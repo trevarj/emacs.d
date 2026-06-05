@@ -226,10 +226,7 @@
   (delete-selection-mode)
   (electric-pair-mode)                  ; Pair the pairs
   (auto-fill-mode)                      ; Autofill mode
-  (window-divider-mode)                 ; Gap between splits
   (put 'suspend-frame 'disabled t)      ; Disable suspend-frame
-  ;; These are simple variables, so avoid the heavier Custom setter path during
-  ;; init.  Modes with activation side effects are enabled explicitly above.
   (setq auto-fill-function 'do-auto-fill
         auto-save-file-name-transforms '((".*" "~/.cache/emacs/saves/" t))
         browse-url-browser-function 'browse-url-generic
@@ -288,7 +285,9 @@
         user-mail-address "tmarjeski@gmail.com"
         warning-minimum-level :error
         window-combination-resize t
-        window-divider-default-right-width 16)
+        window-divider-default-right-width
+        (or (plist-get trev/spacious-padding-widths :right-divider-width) 30))
+  (window-divider-mode)                 ; Gap between splits
   ;; Fonts
   (set-face-attribute 'default nil :family "Iosevka JBM" :height 166 :weight 'medium)
   (set-face-attribute 'fixed-pitch nil :family "Iosevka JBM" :height 166)
