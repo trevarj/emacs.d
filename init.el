@@ -16,28 +16,31 @@
 
 (use-package use-package
   :preface
-  (defun trev/local-elisp-package-file (name)
-    "Return the local source package file for NAME, if it exists."
-    (when-let* ((path (locate-library (symbol-name name)))
-                ;; `locate-library' prefers .elc files; normalize to source
-                ;; when checking whether this is one of our local packages.
-                (source (if (string-suffix-p ".elc" path)
-                            (concat (file-name-sans-extension path) ".el")
-                          path))
-                (_ (string-suffix-p ".el" source))
-                (_ (file-exists-p source))
-                (_ (file-in-directory-p source user-lisp-directory)))
-      source))
+  (defun trev/use-package-trusted-loadable-p (name)
+    "Return non-nil if NAME is available from a trusted local source."
+    (or (package-installed-p name)
+        (package-built-in-p name)
+        (when-let* ((path (locate-library (symbol-name name)))
+                    (file (expand-file-name path)))
+          (or (and (boundp 'user-lisp-directory)
+                   (file-in-directory-p file user-lisp-directory))
+              (and (boundp 'lisp-directory)
+                   (file-in-directory-p file lisp-directory))
+              (string-match-p "/share/emacs/site-lisp/" file)
+              (file-in-directory-p file (expand-file-name "~/Workspace/"))))))
 
   (defun trev/use-package-ensure (name args state &optional no-refresh)
-    "Checks for local package before checking remote archives."
-    (if-let* (((equal '(t) args))
-              (not-feature (not (featurep name)))
-              (path (trev/local-elisp-package-file name))
-              (_ (not (package-installed-p name))))
-        ;; Local packages are loaded directly from `user-lisp-directory'.
-        nil
-      (when not-feature (use-package-ensure-elpa name args state no-refresh))))
+    "Check installed and loadable packages before checking remote archives."
+    (let ((not-feature (not (featurep name))))
+      (cond
+       ((not not-feature) nil)
+       ((not (equal '(t) args))
+        (use-package-ensure-elpa name args state no-refresh))
+       ((trev/use-package-trusted-loadable-p name)
+        ;; Local, built-in, and site-lisp packages are already in `load-path'.
+        nil)
+       (t
+        (use-package-ensure-elpa name args state no-refresh)))))
   :custom
   (use-package-always-defer t)
   (use-package-always-ensure t)
@@ -137,20 +140,27 @@
 
 (use-package spacious-padding
   :demand t
-  :bind ("<f8>" . spacious-padding-mode)
+  :preface
+  (defvar trev/spacious-padding-faces-enabled nil
+    "Non-nil when spacious face padding is enabled.")
+
+  (defun trev/spacious-padding-toggle-faces ()
+    "Toggle spacious face padding without rewriting frame parameters."
+    (interactive)
+    (if trev/spacious-padding-faces-enabled
+        (progn
+          (spacious-padding-unset-invisible-dividers)
+          (setq trev/spacious-padding-faces-enabled nil))
+      (spacious-padding-set-faces)
+      (setq trev/spacious-padding-faces-enabled t)))
+  :bind ("<f8>" . trev/spacious-padding-toggle-faces)
   :config
-  (setq spacious-padding-widths
-        '( :internal-border-width 40
-           :header-line-width 6
-           :mode-line-width 6
-           :custom-button-width 6
-           :tab-width 6
-           :right-divider-width 32
-           :scroll-bar-width 10
-           :fringe-width 12)
+  (setq spacious-padding-widths trev/spacious-padding-widths
         spacious-padding-subtle-frame-lines nil)
   (advice-add #'spacious-padding-set-faces :after #'trev/modus-theme-set-extra-faces)
-  (spacious-padding-mode 1))
+  (add-hook 'enable-theme-functions #'spacious-padding-set-faces)
+  (spacious-padding-set-faces)
+  (setq trev/spacious-padding-faces-enabled t))
 
 (use-package emacs
   :preface
@@ -208,12 +218,77 @@
    )
   :init
   (save-place-mode)
-  (recentf-mode)
+  ;; `recentf-mode' loads and cleans the recentf file; defer it out of the
+  ;; critical startup path while keeping `consult-recent-file' ready shortly
+  ;; after the first frame appears.
+  (run-with-idle-timer 1 nil #'recentf-mode)
   (column-number-mode)                  ; Column number mode
+  (delete-selection-mode)
   (electric-pair-mode)                  ; Pair the pairs
   (auto-fill-mode)                      ; Autofill mode
   (window-divider-mode)                 ; Gap between splits
   (put 'suspend-frame 'disabled t)      ; Disable suspend-frame
+  ;; These are simple variables, so avoid the heavier Custom setter path during
+  ;; init.  Modes with activation side effects are enabled explicitly above.
+  (setq auto-fill-function 'do-auto-fill
+        auto-save-file-name-transforms '((".*" "~/.cache/emacs/saves/" t))
+        browse-url-browser-function 'browse-url-generic
+        browse-url-generic-program "xdg-open"
+        backup-directory-alist '(("." . "~/.cache/emacs/backups"))
+        comment-auto-fill-only-comments t
+        confirm-kill-emacs nil
+        custom-file "/tmp/custom.el"
+        custom-safe-themes t
+        dictionary-server "dict.org"
+        display-buffer-alist
+        '(((category . xref-jump)
+           (display-buffer-reuse-window display-buffer-use-some-window)
+           (some-window . mru))
+          ("\\*\\(Help\\|helpful\\|Customize\\|info\\|Ibuffer\\|.*eshell\\).*\\*"
+           (display-buffer-reuse-window display-buffer-in-side-window)
+           (side . right) (slot . 0) (window-width . .5))
+          ("\\*\\(xref\\|Occur\\|.*diagnostics\\|.*vterm\\).*\\*"
+           (display-buffer-below-selected display-buffer-at-bottom)
+           (window-height . .2)))
+        display-line-numbers-grow-only t
+        display-line-numbers-width-start t
+        eldoc-echo-area-use-multiline-p nil
+        enable-recursive-minibuffers t
+        epg-pinentry-mode 'loopback
+        eval-expression-print-length 30
+        fill-column 80
+        help-window-select t
+        indent-tabs-mode nil
+        inhibit-startup-message t
+        kill-buffer-quit-windows t
+        kill-do-not-save-duplicates t
+        mode-line-end-spaces nil
+        mode-line-front-space nil
+        mode-line-compact 'long
+        mode-line-collapse-minor-modes
+        '(auto-revert-mode ws-butler-mode editorconfig-mode apheleia-mode
+                           eldoc-mode envrc-mode yas-minor-mode which-key-mode)
+        mouse-wheel-progressive-speed nil
+        quit-restore-window-no-switch 'skip-first
+        read-extended-command-predicate #'command-completion-default-include-p
+        ring-bell-function 'ignore
+        save-interprogram-paste-before-kill t
+        safe-local-variable-directories '("~/Workspace/guix")
+        scroll-preserve-screen-position 1
+        send-mail-function 'message-send-mail-with-sendmail
+        tab-always-indent 'complete
+        trusted-content '("~/Workspace/" "./lisp/")
+        undo-limit 67108864
+        undo-outer-limit 1006632960
+        undo-strong-limit 100663296
+        use-default-font-for-symbols nil
+        use-dialog-box nil
+        use-short-answers t
+        user-full-name "Trevor Arjeski"
+        user-mail-address "tmarjeski@gmail.com"
+        warning-minimum-level :error
+        window-combination-resize t
+        window-divider-default-right-width 16)
   ;; Fonts
   (set-face-attribute 'default nil :family "Iosevka JBM" :height 166 :weight 'medium)
   (set-face-attribute 'fixed-pitch nil :family "Iosevka JBM" :height 166)
@@ -234,69 +309,7 @@
    ("C-'" . 'switch-to-buffer-last)
    ("C-c !" . 'open-user-config)
    ("M-o" . 'other-window)
-   ("C-g" . 'trev/keyboard-quit-dwim))
-  ;; Miscellaneous Options
-  :custom
-  (auto-fill-function 'do-auto-fill)
-  (auto-save-file-name-transforms '((".*" "~/.cache/emacs/saves/" t)))
-  (browse-url-browser-function 'browse-url-generic)
-  (browse-url-generic-program "xdg-open")
-  (backup-directory-alist '(("." . "~/.cache/emacs/backups")))
-  (comment-auto-fill-only-comments t)
-  (confirm-kill-emacs nil)
-  (custom-file "/tmp/custom.el")
-  (custom-safe-themes t)
-  (delete-selection-mode t)
-  (dictionary-server "dict.org")
-  (display-buffer-alist
-   '(((category . xref-jump)
-      (display-buffer-reuse-window display-buffer-use-some-window)
-      (some-window . mru))
-     ("\\*\\(Help\\|helpful\\|Customize\\|info\\|Ibuffer\\|.*eshell\\).*\\*"
-      (display-buffer-reuse-window display-buffer-in-side-window)
-      (side . right) (slot . 0) (window-width . .5))
-     ("\\*\\(xref\\|Occur\\|.*diagnostics\\|.*vterm\\).*\\*"
-      (display-buffer-below-selected display-buffer-at-bottom)
-      (window-height . .2))))
-  (display-line-numbers-grow-only t)
-  (display-line-numbers-width-start t)
-  (eldoc-echo-area-use-multiline-p nil)
-  (enable-recursive-minibuffers t)
-  (epg-pinentry-mode 'loopback)
-  (eval-expression-print-length 30)
-  (fill-column 80)
-  (help-window-select t)
-  (indent-tabs-mode nil)
-  (inhibit-startup-message t)
-  (kill-buffer-quit-windows t)
-  (kill-do-not-save-duplicates t)
-  (mode-line-end-spaces nil)
-  (mode-line-front-space nil)
-  (mode-line-compact 'long)
-  (mode-line-collapse-minor-modes
-   '(auto-revert-mode ws-butler-mode editorconfig-mode apheleia-mode
-                      eldoc-mode envrc-mode yas-minor-mode which-key-mode))
-  (mouse-wheel-progressive-speed nil)
-  (quit-restore-window-no-switch 'skip-first)
-  (read-extended-command-predicate #'command-completion-default-include-p)
-  (ring-bell-function 'ignore)
-  (save-interprogram-paste-before-kill t)
-  (safe-local-variable-directories '("~/Workspace/guix"))
-  (scroll-preserve-screen-position 1)
-  (send-mail-function 'message-send-mail-with-sendmail)
-  (tab-always-indent 'complete)
-  (trusted-content '("~/Workspace/" "./lisp/"))
-  (undo-limit 67108864)
-  (undo-outer-limit 1006632960)
-  (undo-strong-limit 100663296)
-  (use-default-font-for-symbols nil)
-  (use-dialog-box nil)
-  (use-short-answers t)
-  (user-full-name "Trevor Arjeski")
-  (user-mail-address "tmarjeski@gmail.com")
-  (warning-minimum-level :error)
-  (window-combination-resize t)
-  (window-divider-default-right-width 16))
+   ("C-g" . 'trev/keyboard-quit-dwim)))
 
 (use-package desktop
   :custom
@@ -362,7 +375,7 @@
   (global-auto-revert-non-file-buffers t))
 
 (use-package xref
-  :init (global-xref-mouse-mode)
+  :defer t
   :custom
   (xref-auto-jump-to-first-definition 'show)
   (xref-search-program 'ripgrep))
@@ -413,9 +426,10 @@
         ("C-p" . isearch-repeat-backward)))
 
 (use-package grep
-  :custom
-  (grep-use-headings t)
-  (grep-command "rg -nHS0 --no-heading "))
+  :defer t
+  :init
+  (setq grep-use-headings t
+        grep-command "rg -nHS0 --no-heading "))
 
 ;; Ibuffer
 (use-package ibuffer
@@ -750,16 +764,19 @@
 
 ;; Secrets
 (use-package my-secrets
-  :ensure nil
-  :demand t)
+  :ensure nil)
 
 ;; IRC/ERC
 (use-package erc
-  :after my-secrets
-  :demand t
   :preface
+  (defvar erc-znc-server)
+
   (defun erc-connect ()
     (interactive)
+    (require 'my-secrets)
+    (unless (bound-and-true-p erc-znc-server)
+      (user-error "`erc-znc-server' is not set"))
+    (setq erc-server erc-znc-server)
     (erc-tls :server erc-server :port erc-port
              :user erc-nick :full-name erc-user-full-name))
 
@@ -882,7 +899,6 @@
   (erc-prompt 'erc-prompt-format)
   (erc-prompt-format (propertize "%n:" 'font-lock-face 'erc-input-face))
   (erc-receive-query-display 'bury)
-  (erc-server erc-znc-server)
   (erc-server-reconnect-function 'erc-server-delayed-check-reconnect)
   (erc-scrolltobottom-all t)
   (erc-spelling-dictionaries '(("Libera.Chat" "english")))
@@ -924,14 +940,24 @@
   (modus-themes-after-load-theme . trev/erc-nicks-refresh-buffers))
 
 (use-package elfeed
-  :load my-secrets
   :preface
+  (defun trev/elfeed-load-secrets (&rest _)
+    "Load secrets before opening Elfeed."
+    (require 'my-secrets))
+
+  (defun trev/elfeed ()
+    (interactive)
+    (require 'elfeed)
+    (elfeed))
+
   (defun elfeed-show-visit-eww ()
     (interactive)
     (let ((browse-url-browser-function #'eww-browse-url))
       (elfeed-show-visit)))
+  :init
+  (advice-add 'elfeed :before #'trev/elfeed-load-secrets)
   :bind
-  (("C-c @" . #'elfeed)
+  (("C-c @" . #'trev/elfeed)
    :map elfeed-show-mode-map
    ("e" . 'elfeed-show-visit-eww)))
 
@@ -1006,12 +1032,14 @@
 ;;; Local Packages
 
 (use-package aoc
-  :load my-secrets
+  :ensure nil
+  :commands (aoc-fetch-input aoc-view-problem aoc-submit-answer)
   :config
   (setopt savehist-additional-variables
           (append savehist-additional-variables '(aoc-year aoc-day-level))))
 
-(use-package termbin)
+(use-package termbin
+  :ensure nil)
 
 (provide 'init)
 

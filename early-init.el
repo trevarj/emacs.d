@@ -20,6 +20,7 @@
 ;; Keep startup deterministic and avoid scanning site files.
 (setq inhibit-default-init t
       site-run-file nil
+      user-lisp-auto-scrape nil
       user-lisp-directory (expand-file-name "lisp" user-emacs-directory))
 
 ;; Restrict VC work during early startup.
@@ -37,6 +38,47 @@
 (setq frame-inhibit-implied-resize t
       frame-resize-pixelwise t
       window-resize-pixelwise t)
+
+;; Match the frame layout that `spacious-padding' will later use for faces and
+;; hooks, but apply frame parameters before the initial frame is created.
+(defconst trev/spacious-padding-widths
+  '( :internal-border-width 40
+     :header-line-width 6
+     :mode-line-width 6
+     :custom-button-width 6
+     :tab-width 6
+     :right-divider-width 32
+     :scroll-bar-width 10
+     :fringe-width 12)
+  "Spacing values shared with `spacious-padding'.")
+
+(defun trev/spacious-padding-frame-parameters ()
+  "Return frame parameters derived from `trev/spacious-padding-widths'."
+  `((internal-border-width
+     . ,(or (plist-get trev/spacious-padding-widths :internal-border-width) 15))
+    (right-divider-width
+     . ,(or (plist-get trev/spacious-padding-widths :right-divider-width) 30))
+    (left-fringe
+     . ,(or (plist-get trev/spacious-padding-widths :left-fringe-width)
+            (plist-get trev/spacious-padding-widths :fringe-width)
+            8))
+    (right-fringe
+     . ,(or (plist-get trev/spacious-padding-widths :right-fringe-width)
+            (plist-get trev/spacious-padding-widths :fringe-width)
+            8))
+    (scroll-bar-width
+     . ,(or (plist-get trev/spacious-padding-widths :scroll-bar-width) 8))))
+
+(dolist (parameter (trev/spacious-padding-frame-parameters))
+  (add-to-list 'initial-frame-alist parameter)
+  (add-to-list 'default-frame-alist parameter))
+
+(defun trev/spacious-padding-apply-frame-parameters (frame)
+  "Apply spacious frame parameters to FRAME."
+  (modify-frame-parameters frame (trev/spacious-padding-frame-parameters)))
+
+(add-hook 'after-make-frame-functions
+          #'trev/spacious-padding-apply-frame-parameters)
 
 ;;; Responsiveness
 

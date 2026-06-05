@@ -63,6 +63,12 @@ Increments on correct solution."
   :group 'aoc
   :type '(cons number number))
 
+(defun aoc--require-session-cookie ()
+  "Load secrets and require `aoc-session-cookie' to be set."
+  (require 'my-secrets)
+  (when (string-empty-p aoc-session-cookie)
+    (user-error "`aoc-session-cookie' is not set")))
+
 (cl-defun aoc--fetch-input-error (&key status &allow-other-keys)
   "Error STATUS of fetching input file."
   (message "Could not fetch input file: %s" status))
@@ -108,30 +114,30 @@ Increments on correct solution."
 Can provide FORCE to overwrite existing file."
   (interactive (list (read-number "Year: " aoc-year)
                      (read-number "Day: " (car aoc-day-level))))
-  (if (string-empty-p aoc-session-cookie)
-      (message "`aoc-session-cookie' not set.")
-    (let ((input-file-path
-           (expand-file-name (format "%d.txt" day) aoc-input-directory)))
-      (if (and (file-exists-p input-file-path)
-               (not force))
-          (message "Input file for day %d already exists at %s" day input-file-path)
-        (unless (file-directory-p aoc-input-directory)
-          (make-directory aoc-input-directory))
-        (request (format "https://adventofcode.com/%d/day/%d/input" year day)
-          :headers `(("Cookie" . ,(format "session=%s" aoc-session-cookie))
-                     ("User-Agent" . ,(format "trevarj/emacs.d/lisp/aoc.el")))
-          :error #'aoc--fetch-input-error
-          :success (cl-function
-                    (lambda (&key data &allow-other-keys)
-                      (with-temp-file input-file-path
-                        (insert data))
-                      (message "Wrote day %d input file: %s" day input-file-path))))))))
+  (aoc--require-session-cookie)
+  (let ((input-file-path
+         (expand-file-name (format "%d.txt" day) aoc-input-directory)))
+    (if (and (file-exists-p input-file-path)
+             (not force))
+        (message "Input file for day %d already exists at %s" day input-file-path)
+      (unless (file-directory-p aoc-input-directory)
+        (make-directory aoc-input-directory))
+      (request (format "https://adventofcode.com/%d/day/%d/input" year day)
+        :headers `(("Cookie" . ,(format "session=%s" aoc-session-cookie))
+                   ("User-Agent" . ,(format "trevarj/emacs.d/lisp/aoc.el")))
+        :error #'aoc--fetch-input-error
+        :success (cl-function
+                  (lambda (&key data &allow-other-keys)
+                    (with-temp-file input-file-path
+                      (insert data))
+                    (message "Wrote day %d input file: %s" day input-file-path)))))))
 
 ;;;###autoload
 (defun aoc-view-problem (year day)
   "View AoC problem for given YEAR and DAY."
   (interactive (list (read-number "Year: " aoc-year)
                      (read-number "Day: " (car aoc-day-level))))
+  (aoc--require-session-cookie)
   (unless (assoc ".adventofcode.com" url-cookie-secure-storage)
     (url-cookie-store "session" aoc-session-cookie nil ".adventofcode.com" "/" t)  )
   (eww (format "https://adventofcode.com/%d/day/%d" year day)))
@@ -143,6 +149,7 @@ Can provide FORCE to overwrite existing file."
                      (read-number "Day: " (car aoc-day-level))
                      (read-number "Level: " (cdr aoc-day-level))
                      (read-string "Answer: ")))
+  (aoc--require-session-cookie)
   (when (when (not (and (eq year aoc-year)
                         (equal `(,day . ,level) aoc-day-level)))
           (yes-or-no-p
