@@ -33,6 +33,7 @@
 ;; Built-ins
 (require 'cl-lib)
 (require 'shr)
+(require 'url-cookie)
 
 ;; External
 (require 'request)
@@ -88,8 +89,9 @@ Increments on correct solution."
       (insert data)
       (let ((dom (libxml-parse-html-region (point-min) (point-max))))
         (with-help-window buffer
-          (shr-insert-document dom)
-          (pop-to-buffer (current-buffer)))))))
+          (with-current-buffer standard-output
+            (shr-insert-document dom)
+            (pop-to-buffer (current-buffer))))))))
 
 (cl-defun aoc--check-submit-response (&key data &allow-other-keys)
   "Checks DATA for the success phrase."
@@ -121,7 +123,7 @@ Can provide FORCE to overwrite existing file."
              (not force))
         (message "Input file for day %d already exists at %s" day input-file-path)
       (unless (file-directory-p aoc-input-directory)
-        (make-directory aoc-input-directory))
+        (make-directory aoc-input-directory t))
       (request (format "https://adventofcode.com/%d/day/%d/input" year day)
         :headers `(("Cookie" . ,(format "session=%s" aoc-session-cookie))
                    ("User-Agent" . ,(format "trevarj/emacs.d/lisp/aoc.el")))
