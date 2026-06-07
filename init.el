@@ -1083,7 +1083,7 @@
      (:name "emacs-bugs [b]" :query "tag:emacs-bugs and tag:unread" :key "b" :search-type 'tree)
      (:name "github [G]" :query "tag:github and tag:unread" :key "G")
      (:name "codeberg [C]" :query "tag:codeberg and tag:unread" :key "C")
-     (:name "all-mail-6m [a]" :query "date:6M.." :key "a")))
+     (:name "all-mail-6m [a]" :query "tag:account-main and date:6M.." :key "a")))
   (notmuch-hello-sections
    '(notmuch-hello-insert-header notmuch-hello-insert-saved-searches))
   (notmuch-hello-auto-refresh t)
