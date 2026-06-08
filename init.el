@@ -251,7 +251,7 @@
         display-line-numbers-width-start t
         eldoc-echo-area-use-multiline-p nil
         enable-recursive-minibuffers t
-        epg-pinentry-mode 'loopback
+        epg-pinentry-mode 'ask
         eval-expression-print-length 30
         fill-column 80
         help-window-select t
@@ -645,6 +645,14 @@
   (magit-blame-echo-style 'headings)
   :hook (git-commit-setup . git-commit-turn-on-flyspell)
   :config (add-to-list 'magit-git-environment "TZ=UTC"))
+
+(use-package ghub
+  :init
+  (with-eval-after-load 'ghub
+    ;; Guix Home links authinfo.gpg into /gnu/store without suffix; Ghub's
+    ;; symlink cache workaround prevents Auth-Source from finding entries there.
+    (advice-remove #'auth-source-netrc-parse
+                   #'auth-source-netrc-parse@handle-symlink)))
 
 (use-package forge
   :after magit)
