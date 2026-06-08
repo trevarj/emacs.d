@@ -951,19 +951,16 @@
     "Load secrets before opening Elfeed."
     (require 'my-secrets))
 
-  (defun trev/elfeed ()
-    (interactive)
-    (require 'elfeed)
-    (elfeed))
-
   (defun elfeed-show-visit-eww ()
     (interactive)
     (let ((browse-url-browser-function #'eww-browse-url))
       (elfeed-show-visit)))
+  :custom
+  (elfeed-use-libxml t)
   :init
   (advice-add 'elfeed :before #'trev/elfeed-load-secrets)
   :bind
-  (("C-c @" . #'trev/elfeed)
+  (("C-c @" . #'elfeed)
    :map elfeed-show-mode-map
    ("e" . 'elfeed-show-visit-eww)))
 
