@@ -518,7 +518,7 @@
     (consult-flymake t))
   :custom
   (consult-fd-args '((if (executable-find "fdfind" 'remote) "fdfind" "fd")
-                     "--full-path --color=never -H"))
+                     "--full-path --color=never --hidden --no-ignore-vcs"))
   :bind (("C-c /" . consult-ripgrep)
          ("C-c SPC" . consult-fd)
          ("C-c r" . consult-recent-file)
