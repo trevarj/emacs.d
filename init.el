@@ -18,8 +18,7 @@
   :preface
   (defun trev/use-package-trusted-loadable-p (name)
     "Return non-nil if NAME is available from a trusted local source."
-    (or (package-installed-p name)
-        (package-built-in-p name)
+    (or (package-built-in-p name)
         (when-let* ((path (locate-library (symbol-name name)))
                     (file (expand-file-name path)))
           (or (and (boundp 'user-lisp-directory)
