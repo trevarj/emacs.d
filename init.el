@@ -291,7 +291,7 @@
   (set-face-attribute 'default nil :family "Iosevka JBM" :height 166 :weight 'medium)
   (set-face-attribute 'fixed-pitch nil :family "Iosevka JBM" :height 166)
   (set-face-attribute 'fixed-pitch-serif nil :family "Noto Serif" :height 166)
-  (set-face-attribute 'variable-pitch nil :family "Cantarell" :height 166 :weight 'normal)
+  (set-face-attribute 'variable-pitch nil :family "Cantarell" :weight 'normal)
   ;; https://github.com/ryanoasis/nerd-fonts/wiki/Glyph-Sets-and-Code-Points
   (dolist (code-point
            '((#xE6FA . #xE6B2) (#xE700 . #xE7C5) (#xF000 . #xF2E0) (#xE200 . #xE2A9)
@@ -995,101 +995,27 @@
       (when (yes-or-no-p (format "Mark search [%s] read?" query))
         (notmuch-tag query '("-unread"))
         (notmuch-search-refresh-view))))
-  (defun trev/notmuch--gnu-list-from-headers (headers)
-    "Return a GNU mailing list name from HEADERS."
-    (let* ((text (mapconcat #'identity
-                            (delq nil (list (plist-get headers :List-Id)
-                                            (plist-get headers :To)
-                                            (plist-get headers :From)
-                                            (plist-get headers :Cc)))
-                            " "))
-           (lists '("bug-gnu-emacs" "emacs-devel" "guix-devel" "help-guix")))
-      (seq-find (lambda (list)
-                  (or (string-match-p (regexp-quote (concat list "@gnu.org")) text)
-                      (string-match-p (regexp-quote (concat list ".gnu.org")) text)))
-                lists)))
-  (defun trev/notmuch--archive-months (date)
-    "Return current and previous archive months for message DATE."
-    (pcase-let ((`(,_sec ,_min ,_hour ,_day ,month ,year . ,_)
-                 (decode-time (date-to-time date))))
-      (list (format "%04d-%02d" year month)
-            (format-time-string "%Y-%m" (encode-time 0 0 0 1 (1- month) year)))))
-  (defun trev/notmuch--first-message-props (tree)
-    "Return the first message plist from notmuch show sexp TREE."
-    (cond
-     ((and (listp tree) (plist-get tree :headers))
-      tree)
-     ((consp tree)
-      (or (trev/notmuch--first-message-props (car tree))
-          (trev/notmuch--first-message-props (cdr tree))))))
-  (defun trev/notmuch--message-props-for-query (query)
-    "Return first notmuch message plist matching QUERY without rendering it."
-    (with-temp-buffer
-      (unless (zerop (call-process "notmuch" nil t nil
-                                   "show" "--format=sexp" "--body=false"
-                                   "--entire-thread=false" query))
-        (user-error "Could not inspect notmuch query: %s" query))
-      (goto-char (point-min))
-      (trev/notmuch--first-message-props (read (current-buffer)))))
-  (defun trev/notmuch--archive-context ()
-    "Return GNU list archive context for the current notmuch message."
-    (let* ((props (cond ((derived-mode-p 'notmuch-search-mode)
-                         (unless (notmuch-search-get-result)
-                           (notmuch-search-next-thread))
-                         (trev/notmuch--message-props-for-query
-                          (notmuch-search-find-thread-id)))
-                        ((derived-mode-p 'notmuch-show-mode)
-                         (notmuch-show-get-message-properties))
-                        ((derived-mode-p 'notmuch-tree-mode)
-                         (notmuch-tree-get-message-properties))))
-           (headers (plist-get props :headers))
-           (list (trev/notmuch--gnu-list-from-headers headers))
-           (date (plist-get headers :Date)))
-      (unless (and list date)
-        (user-error "Could not detect GNU list and date for this message"))
-      (list list (trev/notmuch--archive-months date))))
-  (defun trev/notmuch-fetch-gnu-archive ()
-    "Fetch the GNU archive months around the current notmuch message."
-    (interactive)
-    (pcase-let ((`(,list ,months) (trev/notmuch--archive-context))
-                (program "/home/trev/.local/bin/mail-fetch-gnu-archive"))
-      (unless (file-executable-p program)
-        (user-error "Archive fetch helper is not executable: %s" program))
-      (dolist (month months)
-        (let ((output (with-temp-buffer
-                        (let ((status (call-process program nil t nil list month)))
-                          (cons status (buffer-string))))))
-          (unless (zerop (car output))
-            (user-error "Archive fetch failed for %s %s: %s"
-                        list month (cdr output)))))
-      (notmuch-refresh-this-buffer)
-      (message "Fetched GNU archive for %s: %s" list (mapconcat #'identity months ", "))))
   :bind
   (("C-c m" . notmuch)
    :map notmuch-search-mode-map
-   ("M" . trev/notmuch-search-mark-read)
-   ("C-c C-a" . trev/notmuch-fetch-gnu-archive)
-   :map notmuch-show-mode-map
-   ("C-c C-a" . trev/notmuch-fetch-gnu-archive)
-   :map notmuch-tree-mode-map
-   ("C-c C-a" . trev/notmuch-fetch-gnu-archive))
+   ("M" . trev/notmuch-search-mark-read))
   :custom
   (message-send-mail-function 'smtpmail-send-it)
-  (notmuch-archive-tags '("-inbox" "-unread"))
+  (notmuch-archive-tags '("-unread"))
   (notmuch-fcc-dirs nil)
   (notmuch-identities '("tmarjeski@gmail.com"))
   (notmuch-saved-searches
-   '((:name "inbox [i]" :query "path:main/INBOX/** and tag:unread" :key "i")
-     (:name "lists-inbox [I]" :query "path:lists/INBOX/** and tag:unread and not tag:lists" :key "I")
-     (:name "guix-devel [g]" :query "tag:guix-devel and tag:unread" :key "g" :search-type 'tree)
-     (:name "guix-help [h]" :query "tag:guix-help and tag:unread" :key "h" :search-type 'tree)
-     (:name "emacs-devel [e]" :query "tag:emacs-devel and tag:unread" :key "e" :search-type 'tree)
-     (:name "emacs-bugs [b]" :query "tag:emacs-bugs and tag:unread" :key "b" :search-type 'tree)
+   '((:name "inbox [i]" :query "path:main/INBOX/** and not tag:deleted" :key "i")
      (:name "github [G]" :query "tag:github and tag:unread" :key "G")
-     (:name "codeberg [C]" :query "tag:codeberg and tag:unread" :key "C")
+     (:name "guix-devel [g]" :query "tag:guix-devel and tag:unread" :key "g" :search-type tree)
+     (:name "guix-help [h]" :query "tag:guix-help and tag:unread" :key "h" :search-type tree)
+     (:name "emacs-devel [e]" :query "tag:emacs-devel and tag:unread" :key "e" :search-type tree)
+     (:name "emacs-bugs [b]" :query "tag:emacs-bugs and tag:unread" :key "b" :search-type tree)
+     (:name "sent [s]" :query "path:\"main/[Gmail]/Sent Mail/**\"" :key "s")
+     (:name "trash [T]" :query "path:main/[Gmail]/Trash/** or tag:deleted" :key "T")
      (:name "all-mail-6m [a]" :query "tag:account-main and date:6M.." :key "a")))
   (notmuch-hello-sections
-   '(notmuch-hello-insert-header notmuch-hello-insert-saved-searches))
+   '(notmuch-hello-insert-header notmuch-hello-insert-saved-searches notmuch-hello-insert-alltags))
   (notmuch-hello-auto-refresh t)
   (notmuch-hello-indent 0)
   (notmuch-column-control 1.0)
