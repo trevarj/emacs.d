@@ -631,7 +631,9 @@
   (ispell-alternate-dictionary "english.alias"))
 
 (use-package flyspell
-  :hook (message-mode . flyspell-mode))
+  :hook
+  ((message-mode . flyspell-mode)
+   (markdown-ts-mode . flyspell-mode)))
 
 ;; Colorize hex color codes
 (use-package rainbow-mode)
