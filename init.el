@@ -1046,15 +1046,15 @@
 (use-package termbin
   :ensure nil)
 
-;; (use-package guix-lsp-eglot
-;;   :load-path "/home/trev/Workspace/rust-projects/guix-lsp/editors/emacs"
-;;   :commands (guix-lsp-eglot-start guix-lsp-eglot-setup)
-;;   :custom
-;;   (guix-lsp-executable "/home/trev/Workspace/rust-projects/guix-lsp/target/debug/guix-lsp")
-;;   (guix-lsp-extra-roots '("/home/trev/Workspace/guix" "/home/trev/Workspace/trev-guix"))
-;;   (guix-lsp-command-timeout 120)
-;;   :hook
-;;   (guix-scheme-mode . guix-lsp-eglot-start))
+(use-package guix-lsp-eglot
+  :load-path "/home/trev/Workspace/rust-projects/guix-lsp/editors/emacs"
+  :commands (guix-lsp-eglot-ensure guix-lsp-eglot-start guix-lsp-eglot-setup)
+  :custom
+  (guix-lsp-executable "/home/trev/Workspace/rust-projects/guix-lsp/target/debug/guix-lsp")
+  (guix-lsp-extra-roots '("/home/trev/Workspace/guix" "/home/trev/Workspace/trev-guix"))
+  (guix-lsp-command-timeout 120)
+  :hook
+  (guix-scheme-mode . guix-lsp-eglot-ensure))
 
 (provide 'init)
 
