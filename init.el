@@ -990,24 +990,33 @@
 (use-package notmuch
   :defer t
   :preface
-  (defun trev/notmuch-search-mark-read ()
-    "Mark all messages in the current search as read."
+  (defun trev/notmuch-mark-all-read ()
+    "Mark every message in the current notmuch view as read."
     (interactive)
-    (let ((query notmuch-search-query-string))
-      (when (yes-or-no-p (format "Mark search [%s] read?" query))
+    (let ((query (pcase major-mode
+                   ('notmuch-search-mode (notmuch-search-get-query))
+                   ('notmuch-tree-mode   (notmuch-tree-get-query))
+                   ('notmuch-show-mode   (notmuch-show-get-query))
+                   (_ (user-error "Not in a notmuch search/tree/show buffer")))))
+      (when (yes-or-no-p (format "Mark [%s] read?" query))
         (notmuch-tag query '("-unread"))
-        (notmuch-search-refresh-view))))
+        (notmuch-refresh-this-buffer))))
   :bind
   (("C-c m" . notmuch)
    :map notmuch-search-mode-map
-   ("M" . trev/notmuch-search-mark-read))
+   ("M" . trev/notmuch-mark-all-read)
+   :map notmuch-tree-mode-map
+   ("M" . trev/notmuch-mark-all-read)
+   :map notmuch-show-mode-map
+   ("M" . trev/notmuch-mark-all-read))
   :custom
   (message-send-mail-function 'smtpmail-send-it)
   (notmuch-archive-tags '("-unread"))
   (notmuch-fcc-dirs nil)
   (notmuch-identities '("tmarjeski@gmail.com"))
   (notmuch-saved-searches
-   '((:name "inbox [i]" :query "path:main/INBOX/** and not tag:deleted" :key "i")
+   '((:name "unread [u]" :query "path:main/INBOX/** and tag:unread and not tag:deleted" :key "u")
+     (:name "inbox [i]" :query "path:main/INBOX/** and not tag:deleted" :key "i")
      (:name "github [G]" :query "tag:github and tag:unread" :key "G")
      (:name "guix-devel [g]" :query "tag:guix-devel and tag:unread" :key "g" :search-type tree)
      (:name "guix-help [h]" :query "tag:guix-help and tag:unread" :key "h" :search-type tree)
