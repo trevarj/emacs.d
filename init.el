@@ -615,6 +615,7 @@
 
 ;; Formatting
 (use-package apheleia
+  :demand t
   :config
   (apheleia-global-mode)
   (dolist (formatter-cmd
