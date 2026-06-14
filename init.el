@@ -1018,7 +1018,7 @@
   (notmuch-saved-searches
    '((:name "unread [u]" :query "path:main/INBOX/** and tag:unread and not tag:deleted" :key "u")
      (:name "inbox [i]" :query "path:main/INBOX/** and not tag:deleted" :key "i")
-     (:name "github [G]" :query "tag:github and tag:unread" :key "G")
+     (:name "github [G]" :query "tag:github and tag:unread and not tag:deleted" :key "G")
      (:name "guix-devel [g]" :query "tag:guix-devel and tag:unread" :key "g" :search-type tree)
      (:name "guix-help [h]" :query "tag:guix-help and tag:unread" :key "h" :search-type tree)
      (:name "emacs-devel [e]" :query "tag:emacs-devel and tag:unread" :key "e" :search-type tree)
