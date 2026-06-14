@@ -224,7 +224,7 @@
   (column-number-mode)                  ; Column number mode
   (delete-selection-mode)
   (electric-pair-mode)                  ; Pair the pairs
-  (auto-fill-mode)                      ; Autofill mode
+  (refill-mode)
   (put 'suspend-frame 'disabled t)      ; Disable suspend-frame
   (setq auto-fill-function 'do-auto-fill
         auto-save-file-name-transforms '((".*" "~/.cache/emacs/saves/" t))
