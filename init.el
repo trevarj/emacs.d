@@ -766,7 +766,8 @@
 (use-package guix
   :mode
   (("/home/trev/Workspace/trev-guix/.*\\.scm\\'" . guix-scheme-mode)
-   ("/home/trev/Workspace/guix/.*\\.scm\\'" . guix-scheme-mode)))
+   ("/home/trev/Workspace/guix/.*\\.scm\\'" . guix-scheme-mode)
+   ("manifest.scm" . guix-scheme-mode)))
 
 ;; Common Lisp
 (use-package sly :custom (inferior-lisp-program (executable-find "sbcl")))
@@ -901,7 +902,7 @@
   (erc-nicks-colors 'font-lock)
   (erc-nicks-color-adjustments
    '(erc-nicks-invert erc-nicks-add-contrast erc-nicks-cap-contrast
-     erc-nicks-ensaturate))
+		      erc-nicks-ensaturate))
   (erc-nicks-contrast-range '(7.0 . 18.0))
   (erc-nicks-saturation-range '(0.35 . 0.85))
   (erc-port 7777)
@@ -1061,10 +1062,21 @@
   :commands (guix-lsp-eglot-ensure guix-lsp-eglot-start guix-lsp-eglot-setup)
   :custom
   (guix-lsp-executable "/home/trev/Workspace/rust-projects/guix-lsp/target/debug/guix-lsp")
-  (guix-lsp-extra-roots '("/home/trev/Workspace/guix" "/home/trev/Workspace/trev-guix"))
   (guix-lsp-command-timeout 120)
   :hook
   (guix-scheme-mode . guix-lsp-eglot-ensure))
+
+(use-package nostr
+  :load-path "/home/trev/Workspace/nostr.el"
+  :bind (("C-c $" . nostr-open))
+  :commands (nostr-open
+             nostr-open-profile
+             nostr-open-notifications
+             nostr-open-relays
+             nostr-open-id)
+  :custom
+  (nostr-backend-command
+   "/home/trev/Workspace/nostr.el/target/release/nostr-el-backend"))
 
 (provide 'init)
 
