@@ -25,7 +25,33 @@
 
 ;;; Code:
 
-(load-library (expand-file-name "secrets.el.gpg" user-emacs-directory))
+(require 'epa-file)
+
+(defconst my-secrets-file
+  (expand-file-name "secrets.el.gpg" user-emacs-directory)
+  "Encrypted file containing private local configuration.")
+
+(defun my-secrets-file-p (file)
+  "Return non-nil when FILE names `my-secrets-file'."
+  (and file (file-equal-p (expand-file-name file) my-secrets-file)))
+
+(defun my-secrets-protect-buffer ()
+  "Keep encrypted secrets buffers from writing companion state files."
+  (when (my-secrets-file-p buffer-file-name)
+    ;; Let epa-file own the encrypted write; do not create additional encrypted
+    ;; auto-save or backup files for private configuration.
+    (setq-local auto-save-default nil)
+    (setq-local backup-inhibited t)))
+
+(defun my-secrets-edit ()
+  "Open `my-secrets-file' for editing through `epa-file'."
+  (interactive)
+  (find-file my-secrets-file))
+
+(epa-file-enable)
+(add-hook 'find-file-hook #'my-secrets-protect-buffer)
+
+(load my-secrets-file nil t)
 
 (provide 'my-secrets)
 ;;; my-secrets.el ends here
