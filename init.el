@@ -779,21 +779,6 @@
 ;; IRC/ERC
 (use-package erc
   :preface
-  (defvar erc-znc-server)
-
-  (defun erc-connect ()
-    (interactive)
-    (require 'my-secrets)
-    (unless (bound-and-true-p erc-znc-server)
-      (user-error "`erc-znc-server' is not set"))
-    (setq erc-server erc-znc-server)
-    (erc-tls :server erc-server :port erc-port
-             :user erc-nick :full-name erc-user-full-name))
-
-  (defun erc-clear-query-buffer ()
-    (when (erc-query-buffer-p)
-      (erc-send-input-line "*status" (format "clearbuffer %s" (erc-target)))))
-
   (defun erc-toggle-fools ()
     (interactive)
     (message "erc: hidden fools %s"
@@ -818,76 +803,8 @@
                          (readable-foreground-color erc-nicks-bg-color)))))
             (erc-nicks-refresh nil))))))
 
-  (defvar erc--msg-props)
-  (defvar erc-networks--id)
-
-  (defvar my-erc-server-time-watermarks nil
-    "Alist of latest seen ERC server-time stamps by network and target.")
-
-  (defun my-erc-server-time--tag-value (tags name)
-    "Return NAME from ERC message TAGS."
-    (when-let* ((tag (seq-find (lambda (tag)
-                                 (equal (format "%s" (car-safe tag)) name))
-                               tags))
-                (value (cdr tag)))
-      (if (listp value) (car value) value)))
-
-  (defun my-erc-server-time--parsed ()
-    "Return the inserted message's parsed ERC response."
-    (when-let* ((pos (erc-find-parsed-property)))
-      (erc-get-parsed-vector pos)))
-
-  (defun my-erc-server-time--message-time ()
-    "Return the inserted message's IRCv3 server-time value."
-    (when-let* ((parsed (my-erc-server-time--parsed))
-                (stamp (my-erc-server-time--tag-value
-                        (erc-response.tags parsed) "time")))
-      (ignore-errors (date-to-time stamp))))
-
-  (defun my-erc-server-time--target-key ()
-    "Return the watermark key for the current ERC buffer."
-    (let ((network (or (and (boundp 'erc-networks--id)
-                            erc-networks--id
-                            (erc-networks--id-string erc-networks--id))
-                       (erc-with-server-buffer
-                         (or erc-server-announced-name erc-session-server))
-                       erc-session-server))
-          (target (or (erc-default-target) (buffer-name))))
-      (list network target)))
-
-  (defun my-erc-server-time--watermark ()
-    "Return the latest seen server-time for the current ERC buffer."
-    (alist-get (my-erc-server-time--target-key)
-               my-erc-server-time-watermarks nil nil #'equal))
-
-  (defun my-erc-server-time--set-watermark (time)
-    "Record TIME as seen for the current ERC buffer."
-    (let* ((key (my-erc-server-time--target-key))
-           (watermark (alist-get key my-erc-server-time-watermarks
-                                 nil nil #'equal)))
-      (when (or (null watermark) (time-less-p watermark time))
-        (setf (alist-get key my-erc-server-time-watermarks nil nil #'equal)
-              time))))
-
-  (defun my-erc-server-time-apply-message-time ()
-    "Make ERC's displayed timestamp use the IRCv3 time tag."
-    (when-let* ((time (my-erc-server-time--message-time))
-                ((boundp 'erc--msg-props))
-                ((hash-table-p erc--msg-props)))
-      (puthash 'erc--ts time erc--msg-props)))
-
-  (defun my-erc-server-time-track-modified-channels (orig &rest args)
-    "Suppress `erc-track' for messages at or before the seen watermark."
-    (let* ((time (my-erc-server-time--message-time))
-           (watermark (and time (my-erc-server-time--watermark))))
-      (if (and watermark (not (time-less-p watermark time)))
-          nil
-        (prog1 (apply orig args)
-          (when time
-            (my-erc-server-time--set-watermark time))))))
   :bind
-  (("C-c #" . 'erc-connect)
-   :map erc-mode-map
+  (:map erc-mode-map
    ("C-c -" . 'erc-toggle-fools)
    ("C-c g" . 'erc-track-clear))
   :custom
@@ -924,21 +841,6 @@
           (seq-remove
            (lambda (elt) (and (listp elt) (seq-contains-p elt 'erc-default-face)))
            erc-track-faces-priority-list))
-  ;; Fix for restoring query buffers with self-messages
-  (advice-add #'erc-login
-              :before (lambda ()
-                        (erc-server-send "CAP REQ :znc.in/self-message")
-                        (erc-server-send "CAP REQ :server-time")
-                        (erc-server-send "CAP END")))
-  (add-hook 'erc-insert-modify-hook #'my-erc-server-time-apply-message-time -90)
-  (with-eval-after-load 'erc-track
-    (advice-add #'erc-track-modified-channels
-                :around #'my-erc-server-time-track-modified-channels))
-  (with-eval-after-load 'savehist
-    (add-to-list 'savehist-additional-variables
-                 'my-erc-server-time-watermarks))
-  ;; Clear out query bufs when using using `AutoClearQueryBuffer = false`
-  (add-to-list 'erc-kill-buffer-hook 'erc-clear-query-buffer)
   (erc-spelling-mode)
   (erc-scrolltobottom-mode)
   (defun erc-match-directed-at-fool-p (_msg) nil)
@@ -1055,6 +957,11 @@
 
 (use-package termbin
   :ensure nil)
+
+(use-package erc-znc
+  :ensure nil
+  :hook (erc-mode . erc-znc-mode)
+  :bind ("C-c #" . erc-znc-connect))
 
 (use-package erc-links
   :ensure nil
