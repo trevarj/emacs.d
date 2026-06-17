@@ -1056,6 +1056,10 @@
 (use-package termbin
   :ensure nil)
 
+(use-package erc-links
+  :ensure nil
+  :hook (erc-mode . erc-links-mode))
+
 (use-package guix-lsp-eglot
   :load-path "/home/trev/Workspace/rust-projects/guix-lsp/editors/emacs"
   :commands (guix-lsp-eglot-ensure guix-lsp-eglot-start guix-lsp-eglot-setup)
