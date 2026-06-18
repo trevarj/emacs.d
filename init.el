@@ -438,6 +438,8 @@
     (ibuffer-mark-read-only-buffers)
     (ibuffer-change-marks ?> ?D))
   :hook (ibuffer-mode . ibuffer-auto-mode)
+  :custom
+  (ibuffer-human-readable-size t)
   :bind
   (:map ibuffer-mode-map
         ("* D" . #'ibuffer-mark-unimportant-for-delete)))
