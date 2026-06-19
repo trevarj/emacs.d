@@ -24,6 +24,7 @@
 ;;; Code:
 
 (require 'ert)
+(require 'cl-lib)
 (require 'erc-links)
 
 (defun erc-links-tests--title (html)
@@ -258,7 +259,6 @@ and https://systemcrafters.net/community - Daviwil")
                   "ftp://example.com/file and mailto:a@b.c and https://ok.example")
                  '("https://ok.example"))))
 
-
 ;;;; Inline insertion.
 
 (ert-deftest erc-links-test-insert-appends-faced-hint ()
@@ -270,6 +270,68 @@ and https://systemcrafters.net/community - Daviwil")
       (should (equal (buffer-string) "see https://x.example [Example Title]"))
       (let ((pos (1+ (string-search "[" (buffer-string)))))
         (should (eq (get-text-property pos 'face) 'erc-links-face))))))
+
+(ert-deftest erc-links-test-fool-message-skips-hints ()
+  "Messages marked as fool matches do not fetch titles."
+  (let ((erc--msg-props (make-hash-table :test 'eq))
+        (fetched nil))
+    (puthash 'erc--invisible 'erc-match-fool erc--msg-props)
+    (with-temp-buffer
+      (insert "see https://hidden.example\n")
+      (cl-letf (((symbol-function 'derived-mode-p) (lambda (&rest _) t))
+                ((symbol-function 'erc-default-target) (lambda () "#chan"))
+                ((symbol-function 'erc-links--fetch)
+                 (lambda (&rest _) (setq fetched t))))
+        (erc-links-insert-hints))
+      (should-not fetched))))
+
+(ert-deftest erc-links-test-invisible-timestamp-keeps-visible-url ()
+  "Invisible timestamps in playback do not hide visible message links."
+  (let ((erc--msg-props (make-hash-table :test 'eq))
+        fetched)
+    (with-temp-buffer
+      (insert "[10:00] <alice> see https://visible.example\n")
+      (add-text-properties (point-min) 8 '(invisible timestamp))
+      (cl-letf (((symbol-function 'derived-mode-p) (lambda (&rest _) t))
+                ((symbol-function 'erc-default-target) (lambda () "#chan"))
+                ((symbol-function 'erc-links--fetch)
+                 (lambda (url &rest _) (push url fetched))))
+        (erc-links-insert-hints))
+      (should (equal fetched '("https://visible.example"))))))
+
+(ert-deftest erc-links-test-cached-title-inserts-without-fetch ()
+  "Fresh non-empty cached titles are inserted without another fetch."
+  (let ((erc-links--cache (make-hash-table :test 'equal))
+        (erc--msg-props (make-hash-table :test 'eq))
+        fetched)
+    (puthash "https://cached.example" (cons (current-time) "Cached Title")
+             erc-links--cache)
+    (with-temp-buffer
+      (insert "see https://cached.example")
+      (cl-letf (((symbol-function 'derived-mode-p) (lambda (&rest _) t))
+                ((symbol-function 'erc-default-target) (lambda () "#chan"))
+                ((symbol-function 'erc-links--fetch)
+                 (lambda (&rest _) (setq fetched t))))
+        (erc-links-insert-hints))
+      (should-not fetched)
+      (should (equal (buffer-string)
+                     "see https://cached.example [Cached Title]")))))
+
+(ert-deftest erc-links-test-empty-cache-entry-refetches ()
+  "Fresh empty cache entries are retried instead of suppressing hints."
+  (let ((erc-links--cache (make-hash-table :test 'equal))
+        (erc--msg-props (make-hash-table :test 'eq))
+        fetched)
+    (puthash "https://retry.example" (cons (current-time) "")
+             erc-links--cache)
+    (with-temp-buffer
+      (insert "see https://retry.example")
+      (cl-letf (((symbol-function 'derived-mode-p) (lambda (&rest _) t))
+                ((symbol-function 'erc-default-target) (lambda () "#chan"))
+                ((symbol-function 'erc-links--fetch)
+                 (lambda (url &rest _) (setq fetched url))))
+        (erc-links-insert-hints))
+      (should (equal fetched "https://retry.example")))))
 
 (ert-deftest erc-links-test-wrap-fits-on-line ()
   "A hint that fits within the fill column is left on one line."

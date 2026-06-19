@@ -114,6 +114,14 @@ Many sites gate their markup on a browser-like User-Agent."
 (defvar erc-links--save-timer nil
   "Idle timer debouncing writes of the cache to `erc-links-cache-file'.")
 
+(defun erc-links--fool-message-p ()
+  "Return non-nil when the current ERC insertion is from a fool.
+`erc-hide-fools' records fool matches in `erc--msg-props' before ERC
+applies any later hidden-text behavior."
+  (and (boundp 'erc--msg-props)
+       (hash-table-p erc--msg-props)
+       (eq (gethash 'erc--invisible erc--msg-props) 'erc-match-fool)))
+
 (defun erc-links--load-cache ()
   "Populate `erc-links--cache' from `erc-links-cache-file' if present."
   (when (and erc-links-cache-file (file-readable-p erc-links-cache-file))
@@ -311,16 +319,18 @@ available width is left whole rather than split."
   "Append page-title hints after http(s) links in the inserted message.
 Intended for `erc-insert-modify-hook'."
   (when (and (derived-mode-p 'erc-mode)
-             (erc-default-target))
+             (erc-default-target)
+             (not (erc-links--fool-message-p)))
     (dolist (item (erc-links--urls-in-region (point-min) (point-max)))
       (let* ((url (car item))
              (marker (cdr item))
              (cached (gethash url erc-links--cache)))
         (if (and cached
+                 (cdr cached)
+                 (not (string-empty-p (cdr cached)))
                  (<= (float-time (time-subtract nil (car cached)))
                      erc-links-cache-ttl))
-            (when (and (cdr cached) (not (string-empty-p (cdr cached))))
-              (erc-links--insert (current-buffer) marker (cdr cached)))
+            (erc-links--insert (current-buffer) marker (cdr cached))
           (erc-links--fetch url (current-buffer) marker))))))
 
 ;;;###autoload
