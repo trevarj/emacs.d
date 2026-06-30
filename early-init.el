@@ -88,8 +88,7 @@
 (setq bidi-inhibit-bpa t
       redisplay-skip-fontification-on-input t
       read-process-output-max (* 4 1024 1024)
-      highlight-nonselected-windows nil
-      pgtk-wait-for-event-timeout 0.1)
+      highlight-nonselected-windows nil)
 
 (provide 'early-init)
 
