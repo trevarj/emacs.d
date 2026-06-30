@@ -183,24 +183,6 @@
     "Toggles back to previously visited buffer"
     (interactive) (switch-to-buffer nil))
 
-  (defun trev/keyboard-quit-dwim ()
-    "Do-What-I-Mean behavior for `keyboard-quit'."
-    (interactive)
-    (cond
-     ((region-active-p)
-      (keyboard-quit))
-     ((derived-mode-p 'completion-list-mode)
-      (delete-completion-window))
-     ((get-buffer-window "*Completions*" 0)
-      (delete-completion-window))
-     ((active-minibuffer-window)
-      (abort-recursive-edit))
-     ((and (derived-mode-p 'special-mode)
-           (not (one-window-p)))
-      (quit-window))
-     (t
-      (keyboard-quit))))
-
   (define-advice message-make-date
       (:around (orig-fun &rest args) messages-force-utc-tz)
     "Force UTC timezone generation for the message date header."
@@ -306,8 +288,7 @@
    ("C-c b" . 'ibuffer-other-window)
    ("C-'" . 'switch-to-buffer-last)
    ("C-c !" . 'open-user-config)
-   ("M-o" . 'other-window)
-   ("C-g" . 'trev/keyboard-quit-dwim)))
+   ("M-o" . 'other-window)))
 
 (use-package desktop
   :custom
