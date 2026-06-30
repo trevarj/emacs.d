@@ -756,8 +756,7 @@
 (use-package sly :custom (inferior-lisp-program (executable-find "sbcl")))
 
 ;; Secrets
-(use-package my-secrets
-  :ensure nil)
+(use-package my-secrets)
 
 ;; IRC/ERC
 (use-package erc
@@ -777,13 +776,13 @@
           (when (and (derived-mode-p 'erc-mode)
                      (bound-and-true-p erc-nicks-mode))
             (erc-with-server-buffer
-              (setq erc-nicks--bg-luminance nil
-                    erc-nicks--bg-mode-value nil
-                    erc-nicks--fg-rgb
-                    (or (color-name-to-rgb
-                         (face-foreground 'erc-default-face nil 'default))
-                        (color-name-to-rgb
-                         (readable-foreground-color erc-nicks-bg-color)))))
+             (setq erc-nicks--bg-luminance nil
+                   erc-nicks--bg-mode-value nil
+                   erc-nicks--fg-rgb
+                   (or (color-name-to-rgb
+                        (face-foreground 'erc-default-face nil 'default))
+		       (color-name-to-rgb
+                        (readable-foreground-color erc-nicks-bg-color)))))
             (erc-nicks-refresh nil))))))
 
   :bind
@@ -932,22 +931,31 @@
 ;;; Local Packages
 
 (use-package aoc
-  :ensure nil
   :commands (aoc-fetch-input aoc-view-problem aoc-submit-answer)
   :config
   (setopt savehist-additional-variables
           (append savehist-additional-variables '(aoc-year aoc-day-level))))
 
-(use-package termbin
-  :ensure nil)
+(use-package pastes
+  :vc (:url "git@github.com:trevarj/pastes.git"
+       :branch "main"
+       :lisp-dir "elisp"
+       :main-file "pastes.el"
+       :rev :newest)
+  :commands (pastes-setup
+             pastes-region
+             pastes-buffer
+             pastes-file
+             pastes-clipboard-image
+             pastes-delete-url))
+
+(use-package termbin)
 
 (use-package erc-znc
-  :ensure nil
   :hook (erc-mode . erc-znc-mode)
   :bind ("C-c #" . erc-znc-connect))
 
 (use-package erc-links
-  :ensure nil
   :hook (erc-mode . erc-links-mode))
 
 (use-package guix-lsp-eglot

@@ -20,7 +20,6 @@
 ;; Keep startup deterministic and avoid scanning site files.
 (setq inhibit-default-init t
       site-run-file nil
-      user-lisp-auto-scrape nil
       user-lisp-directory (expand-file-name "lisp" user-emacs-directory))
 
 ;; Restrict VC work during early startup.

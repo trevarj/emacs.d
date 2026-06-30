@@ -26,7 +26,6 @@
 ;; global minor mode `erc-znc-mode' to install everything:
 ;;
 ;;     (use-package erc-znc
-;;       :ensure nil
 ;;       :hook (erc-mode . erc-znc-mode))
 ;;
 ;; It provides:

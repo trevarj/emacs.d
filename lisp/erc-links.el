@@ -33,7 +33,6 @@
 ;; init file:
 ;;
 ;;     (use-package erc-links
-;;       :ensure nil
 ;;       :after erc
 ;;       :config (erc-links-mode))
 ;;
