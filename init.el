@@ -628,6 +628,8 @@
   (magit-define-global-key-bindings 'recommended)
   (magit-diff-refine-hunk t)
   (magit-blame-echo-style 'headings)
+  (magit-diff-fontify-hunk t)
+  (magit-diff-use-indicator-faces t)
   :hook (git-commit-setup . git-commit-turn-on-flyspell)
   :config (add-to-list 'magit-git-environment "TZ=UTC"))
 
