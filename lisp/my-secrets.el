@@ -39,9 +39,16 @@
   "Keep encrypted secrets buffers from writing companion state files."
   (when (my-secrets-file-p buffer-file-name)
     ;; Let epa-file own the encrypted write; do not create additional encrypted
-    ;; auto-save or backup files for private configuration.
+    ;; auto-save, backup, or formatter writes for private configuration.
     (setq-local auto-save-default nil)
-    (setq-local backup-inhibited t)))
+    (setq-local backup-inhibited t)
+    (setq-local apheleia-inhibit t)
+    (when (bound-and-true-p auto-revert-mode)
+      (auto-revert-mode -1))
+    (when (and (bound-and-true-p apheleia-mode) (fboundp 'apheleia-mode))
+      (funcall 'apheleia-mode -1))
+    (when (and (bound-and-true-p ws-butler-mode) (fboundp 'ws-butler-mode))
+      (funcall 'ws-butler-mode -1))))
 
 (defun my-secrets-edit ()
   "Open `my-secrets-file' for editing through `epa-file'."
