@@ -778,19 +778,35 @@
           (when (and (derived-mode-p 'erc-mode)
                      (bound-and-true-p erc-nicks-mode))
             (erc-with-server-buffer
-              (setq erc-nicks--bg-luminance nil
-                    erc-nicks--bg-mode-value nil
-                    erc-nicks--fg-rgb
-                    (or (color-name-to-rgb
-                         (face-foreground 'erc-default-face nil 'default))
-			(color-name-to-rgb
-                         (readable-foreground-color erc-nicks-bg-color)))))
+             (setq erc-nicks--bg-luminance nil
+                   erc-nicks--bg-mode-value nil
+                   erc-nicks--fg-rgb
+                   (or (color-name-to-rgb
+                        (face-foreground 'erc-default-face nil 'default))
+		       (color-name-to-rgb
+                        (readable-foreground-color erc-nicks-bg-color)))))
             (erc-nicks-refresh nil))))))
 
+  (defun trev/erc-connect ()
+    "Connect to ERC over TLS"
+    (interactive)
+    (require 'my-secrets)
+    (erc-tls :server erc-server :port erc-port
+	     :user "trev/libera" :full-name erc-user-full-name :id 'libera))
+
+  (defun trev/erc-chathistory-latest-100 ()
+    "Request the latest 100 messages for the current ERC target."
+    (interactive)
+    (let ((target (erc-default-target)))
+      (unless target
+        (user-error "No ERC target in this buffer"))
+      (erc-server-send (format "CHATHISTORY LATEST %s * 100" target))))
   :bind
-  (:map erc-mode-map
-	("C-c -" . 'erc-toggle-fools)
-	("C-c g" . 'erc-track-clear))
+  (("C-c #" . 'trev/erc-connect)
+   :map erc-mode-map
+   ("C-c -" . 'erc-toggle-fools)
+   ("C-c g" . 'erc-track-clear)
+   ("C-c h" . 'trev/erc-chathistory-latest-100))
   :custom
   (erc-current-nick-highlight-type 'all)
   (erc-fill-function 'erc-fill-static)
@@ -806,7 +822,7 @@
 		      erc-nicks-ensaturate))
   (erc-nicks-contrast-range '(7.0 . 18.0))
   (erc-nicks-saturation-range '(0.35 . 0.85))
-  (erc-port 7777)
+  (erc-port "6697")
   (erc-prompt 'erc-prompt-format)
   (erc-prompt-format (propertize "%n:" 'font-lock-face 'erc-input-face))
   (erc-receive-query-display 'bury)
@@ -950,10 +966,6 @@
              pastes-file
              pastes-clipboard-image
              pastes-delete-url))
-
-(use-package erc-znc
-  :hook (erc-mode . erc-znc-mode)
-  :bind ("C-c #" . erc-znc-connect))
 
 (use-package erc-links
   :hook (erc-mode . erc-links-mode))
