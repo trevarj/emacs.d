@@ -794,19 +794,21 @@
     (erc-tls :server erc-server :port erc-port
 	     :user "trev/libera" :full-name erc-user-full-name :id 'libera))
 
-  (defun trev/erc-chathistory-latest-100 ()
-    "Request the latest 100 messages for the current ERC target."
-    (interactive)
-    (let ((target (erc-default-target)))
+  (defun trev/erc-chathistory-latest (count)
+    "Request the latest COUNT messages for the current ERC target.
+Without a prefix argument, request 100 messages."
+    (interactive "P")
+    (let ((target (erc-default-target))
+          (count (if count (prefix-numeric-value count) 100)))
       (unless target
         (user-error "No ERC target in this buffer"))
-      (erc-server-send (format "CHATHISTORY LATEST %s * 100" target))))
+      (erc-server-send (format "CHATHISTORY LATEST %s * %d" target count))))
   :bind
   (("C-c #" . 'trev/erc-connect)
    :map erc-mode-map
    ("C-c -" . 'erc-toggle-fools)
    ("C-c g" . 'erc-track-clear)
-   ("C-c h" . 'trev/erc-chathistory-latest-100))
+   ("C-c h" . 'trev/erc-chathistory-latest))
   :custom
   (erc-current-nick-highlight-type 'all)
   (erc-fill-function 'erc-fill-static)
