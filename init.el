@@ -972,6 +972,8 @@ Without a prefix argument, request 100 messages."
 (use-package erc-links
   :hook (erc-mode . erc-links-mode))
 
+(use-package trev-clatter :demand t)
+
 (use-package guix-lsp-eglot
   :load-path "/home/trev/Workspace/rust-projects/guix-lsp/editors/emacs"
   :commands (guix-lsp-eglot-ensure guix-lsp-eglot-start guix-lsp-eglot-setup)
