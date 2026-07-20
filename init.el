@@ -473,7 +473,7 @@
 
 ;; Completion-at-point helper
 (use-package cape
-  :init (add-to-list 'completion-at-point-functions #'cape-file)
+  :hook ((completion-at-point-functions . cape-file))
   :bind ("C-c p" . cape-prefix-map)
   :custom (text-mode-ispell-word-completion 'cape-dict))
 
@@ -778,13 +778,13 @@
           (when (and (derived-mode-p 'erc-mode)
                      (bound-and-true-p erc-nicks-mode))
             (erc-with-server-buffer
-             (setq erc-nicks--bg-luminance nil
-                   erc-nicks--bg-mode-value nil
-                   erc-nicks--fg-rgb
-                   (or (color-name-to-rgb
-                        (face-foreground 'erc-default-face nil 'default))
-		       (color-name-to-rgb
-                        (readable-foreground-color erc-nicks-bg-color)))))
+              (setq erc-nicks--bg-luminance nil
+                    erc-nicks--bg-mode-value nil
+                    erc-nicks--fg-rgb
+                    (or (color-name-to-rgb
+                         (face-foreground 'erc-default-face nil 'default))
+			(color-name-to-rgb
+                         (readable-foreground-color erc-nicks-bg-color)))))
             (erc-nicks-refresh nil))))))
 
   (defun trev/erc-connect ()
