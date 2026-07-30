@@ -13,10 +13,10 @@
   (("C-c C-SPC" . clatter-track-switch)
    :map clatter-mode-map
    ("C-c h" . (lambda (count)
-                 "Request the latest messages, optionally limited to COUNT."
-                 (interactive "P")
-                 (clatter-chathistory-request
-                  (and count (prefix-numeric-value count)))))
+                "Request the latest messages, optionally limited to COUNT."
+                (interactive "P")
+                (clatter-chathistory-request
+                 (and count (prefix-numeric-value count)))))
    ("C-c g" . clatter-track-clear-all)
    ("C-c n" . clatter-nicklist-toggle)
    ("C-c :" . clatter-track-list)
@@ -50,13 +50,13 @@
   (require 'my-secrets)
   (require 'gnutls)
   (setopt clatter-networks
-          `(("libera"
+          `(("soju"
              :server ,erc-server
              :port 6697
              :tls t
              :bouncer t
              :nick "trev"
-             :username "trev/libera"
+             :username "trev"
              :realname ,user-full-name))
           clatter-fools erc-fools)
 
@@ -68,7 +68,7 @@
 (defun trev/clatter-connect ()
   "Connect Clatter to the Libera bouncer."
   (interactive)
-  (clatter "libera"))
+  (clatter "soju"))
 
 (provide 'trev-clatter)
 ;;; trev-clatter.el ends here
