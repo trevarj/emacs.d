@@ -251,7 +251,7 @@
         read-extended-command-predicate #'command-completion-default-include-p
         ring-bell-function 'ignore
         save-interprogram-paste-before-kill t
-        safe-local-variable-directories '("~/Workspace/guix")
+        safe-local-variable-directories '("~/Workspace/")
         scroll-preserve-screen-position 1
         send-mail-function 'message-send-mail-with-sendmail
         tab-always-indent 'complete
@@ -484,9 +484,7 @@
   (:map yas-minor-mode-map
         ("TAB" . nil)
         ("<tab>" . nil)
-        ("C-c y" . 'yas-insert-snippet))
-  :config
-  (add-to-list 'yas-snippet-dirs "~/Workspace/guix/etc/snippets/yas"))
+        ("C-c y" . 'yas-insert-snippet)))
 
 (use-package yasnippet-snippets
   :after yasnippet)
@@ -602,11 +600,9 @@
   :config
   (apheleia-global-mode)
   (dolist (formatter-cmd
-           '((guix-style . ("guix" "style" "-f" inplace))
-             (shfmt . ("shfmt" "-i" "2" "-ci" "-kp" "-sr"))
+           '((shfmt . ("shfmt" "-i" "2" "-ci" "-kp" "-sr"))
              (rustfmt . ("rustfmt" "--edition" "2024" "--quiet" "--emit" "stdout"))))
-    (add-to-list 'apheleia-formatters formatter-cmd))
-  (add-to-list 'apheleia-mode-alist '(guix-scheme-mode . guix-style)))
+    (add-to-list 'apheleia-formatters formatter-cmd)))
 
 ;; Spelling
 (use-package ispell
@@ -741,18 +737,12 @@
 
 ;; Guile
 (use-package geiser-guile
-  :custom
-  (geiser-repl-per-project-p t)
-  :config
-  ;; (add-to-list 'geiser-guile-load-path "~/Workspace/guix")
-  (add-to-list 'geiser-guile-load-path "~/Workspace/nonguix"))
+  :custom (geiser-repl-per-project-p t))
 
-;; Guix
-(use-package guix
-  :mode
-  (("/home/trev/Workspace/trev-guix/.*\\.scm\\'" . guix-scheme-mode)
-   ("/home/trev/Workspace/guix/.*\\.scm\\'" . guix-scheme-mode)
-   ("manifest.scm" . guix-scheme-mode)))
+;; Keep the retired Guix sources editable without installing Emacs-Guix.
+(use-package scheme
+  :ensure nil
+  :mode (("\\.scm\\'" . scheme-mode)))
 
 ;; Common Lisp
 (use-package sly :custom (inferior-lisp-program (executable-find "sbcl")))
@@ -919,7 +909,7 @@ Without a prefix argument, request 100 messages."
   (message-send-mail-function 'smtpmail-send-it)
   (notmuch-archive-tags '("-unread"))
   (notmuch-fcc-dirs nil)
-  (notmuch-identities '("tmarjeski@gmail.com"))
+  (notmuch-identities '("tmarjeski@gmail.com" "tarjeski@gmail.com"))
   (notmuch-saved-searches
    '((:name "unread [u]" :query "path:main/INBOX/** and tag:unread and not tag:deleted" :key "u")
      (:name "inbox [i]" :query "path:main/INBOX/** and not tag:deleted" :key "i")
@@ -973,15 +963,6 @@ Without a prefix argument, request 100 messages."
   :hook (erc-mode . erc-links-mode))
 
 (use-package trev-clatter :demand t)
-
-(use-package guix-lsp-eglot
-  :load-path "/home/trev/Workspace/rust-projects/guix-lsp/editors/emacs"
-  :commands (guix-lsp-eglot-ensure guix-lsp-eglot-start guix-lsp-eglot-setup)
-  :custom
-  (guix-lsp-executable "/home/trev/Workspace/rust-projects/guix-lsp/target/debug/guix-lsp")
-  (guix-lsp-command-timeout 120)
-  :hook
-  (guix-scheme-mode . guix-lsp-eglot-ensure))
 
 (use-package nostr
   :load-path "/home/trev/Workspace/nostr.el"

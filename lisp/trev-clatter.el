@@ -4,7 +4,7 @@
 ;;; Code:
 
 (use-package clatter
-  :load-path "/home/trev/Workspace/clatter.el"
+  :load-path "~/Workspace/clatter.el"
   :ensure nil
   :commands (clatter clatter-status clatter-disconnect)
   :functions (cape-emoji clatter-chathistory-request clatter-dcc-setup clatter-setup)
