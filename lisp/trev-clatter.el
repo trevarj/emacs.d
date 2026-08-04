@@ -31,6 +31,7 @@
      (dm . "✉")
      (activity . nil)))
   (clatter-url-preview-enable t)
+  (clatter-buffer-name-style 'channel)
   (clatter-compact-system-messages 'compact)
   (clatter-display-on-join nil)
   (clatter-display-on-welcome nil)

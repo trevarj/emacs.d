@@ -270,8 +270,8 @@
         (or (plist-get trev/spacious-padding-widths :right-divider-width) 30))
   (window-divider-mode)                 ; Gap between splits
   ;; Fonts
-  (set-face-attribute 'default nil :family "Iosevka JBM" :height 166 :weight 'medium)
-  (set-face-attribute 'fixed-pitch nil :family "Iosevka JBM" :height 166)
+  (set-face-attribute 'default nil :family "Iosevka" :height 166 :weight 'medium)
+  (set-face-attribute 'fixed-pitch nil :family "Iosevka" :height 166)
   (set-face-attribute 'fixed-pitch-serif nil :family "Noto Serif" :height 166)
   (set-face-attribute 'variable-pitch nil :family "Cantarell" :weight 'normal)
   ;; https://github.com/ryanoasis/nerd-fonts/wiki/Glyph-Sets-and-Code-Points
