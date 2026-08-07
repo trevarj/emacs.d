@@ -273,7 +273,7 @@
   (set-face-attribute 'default nil :family "Iosevka" :height 166 :weight 'medium)
   (set-face-attribute 'fixed-pitch nil :family "Iosevka" :height 166)
   (set-face-attribute 'fixed-pitch-serif nil :family "Noto Serif" :height 166)
-  (set-face-attribute 'variable-pitch nil :family "Cantarell" :weight 'normal)
+  (set-face-attribute 'variable-pitch nil :family "Noto Sans" :weight 'normal)
   ;; https://github.com/ryanoasis/nerd-fonts/wiki/Glyph-Sets-and-Code-Points
   (dolist (code-point
            '((#xE6FA . #xE6B2) (#xE700 . #xE7C5) (#xF000 . #xF2E0) (#xE200 . #xE2A9)
@@ -777,13 +777,13 @@
           (when (and (derived-mode-p 'erc-mode)
                      (bound-and-true-p erc-nicks-mode))
             (erc-with-server-buffer
-              (setq erc-nicks--bg-luminance nil
-                    erc-nicks--bg-mode-value nil
-                    erc-nicks--fg-rgb
-                    (or (color-name-to-rgb
-                         (face-foreground 'erc-default-face nil 'default))
-			(color-name-to-rgb
-                         (readable-foreground-color erc-nicks-bg-color)))))
+             (setq erc-nicks--bg-luminance nil
+                   erc-nicks--bg-mode-value nil
+                   erc-nicks--fg-rgb
+                   (or (color-name-to-rgb
+                        (face-foreground 'erc-default-face nil 'default))
+		       (color-name-to-rgb
+                        (readable-foreground-color erc-nicks-bg-color)))))
             (erc-nicks-refresh nil))))))
 
   (defun trev/erc-connect ()
