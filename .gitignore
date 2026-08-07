@@ -106,3 +106,7 @@ package-quickstart.el
 *.eld
 
 lisp/.user-lisp-autoloads.el
+# nested symlink artifact / runtime state
+.emacs.d
+/clatter/
+/elfeed/
