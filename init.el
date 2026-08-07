@@ -557,6 +557,7 @@
    (treesit-standard-langs
     '(
       bash c cpp css go html jsdoc json python rust toml
+      (nix             "nix-community/tree-sitter-nix")
       ;; custom repo / branch / src-dir
       (dockerfile      "camdencheek/tree-sitter-dockerfile")
       (gomod           "camdencheek/tree-sitter-go-mod")
