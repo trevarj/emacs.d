@@ -601,8 +601,10 @@
   (apheleia-global-mode)
   (dolist (formatter-cmd
            '((shfmt . ("shfmt" "-i" "2" "-ci" "-kp" "-sr"))
-             (rustfmt . ("rustfmt" "--edition" "2024" "--quiet" "--emit" "stdout"))))
-    (add-to-list 'apheleia-formatters formatter-cmd)))
+             (rustfmt . ("rustfmt" "--edition" "2024" "--quiet" "--emit" "stdout"))
+             (nixfmt . ("nixfmt"))))
+    (add-to-list 'apheleia-formatters formatter-cmd))
+  (add-to-list 'apheleia-mode-alist '(nix-ts-mode . nixfmt)))
 
 ;; Spelling
 (use-package ispell
@@ -699,6 +701,7 @@
   (rust-ts-mode . eglot-ensure)
   (typescript-ts-mode . eglot-ensure)
   (python-ts-mode . eglot-ensure)
+  (nix-ts-mode . eglot-ensure)
   :bind
   (:map eglot-mode-map
         :prefix-map eglot-prefix-keymap
@@ -721,7 +724,8 @@
                             (:features "all"))))
           ((c-ts-mode c++-ts-mode) . ("clangd"))
           ((tsx-ts-mode typescript-ts-mode) . ("typescript-language-server" "--stdio"))
-          (python-ts-mode . ("pylsp"))))
+          (python-ts-mode . ("pylsp"))
+          (nix-ts-mode . ("nil"))))
   (defalias 'start-lsp-server #'eglot))
 
 ;; Paredit
@@ -743,6 +747,10 @@
 (use-package scheme
   :ensure nil
   :mode (("\\.scm\\'" . scheme-mode)))
+
+;; Nix
+(use-package nix-ts-mode
+  :mode "\\.nix\\'")
 
 ;; Common Lisp
 (use-package sly :custom (inferior-lisp-program (executable-find "sbcl")))
