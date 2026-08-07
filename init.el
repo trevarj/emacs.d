@@ -776,13 +776,13 @@
           (when (and (derived-mode-p 'erc-mode)
                      (bound-and-true-p erc-nicks-mode))
             (erc-with-server-buffer
-              (setq erc-nicks--bg-luminance nil
-                    erc-nicks--bg-mode-value nil
-                    erc-nicks--fg-rgb
-                    (or (color-name-to-rgb
-                         (face-foreground 'erc-default-face nil 'default))
-			(color-name-to-rgb
-                         (readable-foreground-color erc-nicks-bg-color)))))
+             (setq erc-nicks--bg-luminance nil
+                   erc-nicks--bg-mode-value nil
+                   erc-nicks--fg-rgb
+                   (or (color-name-to-rgb
+                        (face-foreground 'erc-default-face nil 'default))
+		       (color-name-to-rgb
+                        (readable-foreground-color erc-nicks-bg-color)))))
             (erc-nicks-refresh nil))))))
 
   (defun trev/erc-connect ()
@@ -802,7 +802,7 @@ Without a prefix argument, request 100 messages."
         (user-error "No ERC target in this buffer"))
       (erc-server-send (format "CHATHISTORY LATEST %s * %d" target count))))
   :bind
-  (("C-c #" . 'trev/erc-connect)
+  (;;("C-c #" . 'trev/erc-connect)
    :map erc-mode-map
    ("C-c -" . 'erc-toggle-fools)
    ("C-c g" . 'erc-track-clear)

@@ -10,7 +10,8 @@
   :functions (cape-emoji clatter-chathistory-request clatter-dcc-setup clatter-setup)
   :defines (clatter-fools clatter-networks erc-fools erc-server)
   :bind
-  (("C-c C-SPC" . clatter-track-switch)
+  (("C-c #" . trev/clatter-connect)
+   ("C-c C-SPC" . clatter-track-switch)
    :map clatter-mode-map
    ("C-c h" . (lambda (count)
                 "Request the latest messages, optionally limited to COUNT."
