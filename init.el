@@ -610,8 +610,8 @@
 ;; Spelling
 (use-package ispell
   :custom
-  (ispell-local-dictionary "english")
-  (ispell-alternate-dictionary "english.alias"))
+  (ispell-local-dictionary "en")
+  (ispell-alternate-dictionary "en_US"))
 
 (use-package flyspell
   :hook
