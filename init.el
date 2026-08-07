@@ -777,13 +777,13 @@
           (when (and (derived-mode-p 'erc-mode)
                      (bound-and-true-p erc-nicks-mode))
             (erc-with-server-buffer
-             (setq erc-nicks--bg-luminance nil
-                   erc-nicks--bg-mode-value nil
-                   erc-nicks--fg-rgb
-                   (or (color-name-to-rgb
-                        (face-foreground 'erc-default-face nil 'default))
-		       (color-name-to-rgb
-                        (readable-foreground-color erc-nicks-bg-color)))))
+              (setq erc-nicks--bg-luminance nil
+                    erc-nicks--bg-mode-value nil
+                    erc-nicks--fg-rgb
+                    (or (color-name-to-rgb
+                         (face-foreground 'erc-default-face nil 'default))
+			(color-name-to-rgb
+                         (readable-foreground-color erc-nicks-bg-color)))))
             (erc-nicks-refresh nil))))))
 
   (defun trev/erc-connect ()
@@ -920,14 +920,19 @@ Without a prefix argument, request 100 messages."
   (notmuch-fcc-dirs nil)
   (notmuch-identities '("tmarjeski@gmail.com" "tarjeski@gmail.com"))
   (notmuch-saved-searches
-   '((:name "unread [u]" :query "path:main/INBOX/** and tag:unread and not tag:deleted" :key "u")
-     (:name "inbox [i]" :query "path:main/INBOX/** and not tag:deleted" :key "i")
+   ;; Lieer syncs each account into one flat maildir and maps Gmail labels to
+   ;; notmuch tags, so scope by `tag:account-*' (from the post-new hook) and
+   ;; select folders with Gmail's own tags rather than by path.
+   '((:name "unread [u]" :query "tag:inbox and tag:account-main and tag:unread" :key "u")
+     (:name "inbox [i]" :query "tag:inbox and tag:account-main" :key "i")
+     (:name "lists [l]" :query "tag:inbox and tag:account-lists and tag:unread" :key "l" :search-type tree)
      (:name "guix-devel [g]" :query "tag:guix-devel and tag:unread" :key "g" :search-type tree)
      (:name "guix-help [h]" :query "tag:guix-help and tag:unread" :key "h" :search-type tree)
      (:name "emacs-devel [e]" :query "tag:emacs-devel and tag:unread" :key "e" :search-type tree)
      (:name "emacs-bugs [b]" :query "tag:emacs-bugs and tag:unread" :key "b" :search-type tree)
-     (:name "sent [s]" :query "path:\"main/[Gmail]/Sent Mail/**\"" :key "s")
-     (:name "trash [T]" :query "path:main/[Gmail]/Trash/** or tag:deleted" :key "T")
+     (:name "flagged [f]" :query "tag:flagged" :key "f")
+     (:name "sent [s]" :query "tag:sent and tag:account-main" :key "s")
+     (:name "trash [T]" :query "tag:trash or tag:spam" :key "T")
      (:name "all-mail-6m [a]" :query "tag:account-main and date:6M.." :key "a")))
   (notmuch-hello-sections
    '(notmuch-hello-insert-header notmuch-hello-insert-saved-searches notmuch-hello-insert-alltags))
