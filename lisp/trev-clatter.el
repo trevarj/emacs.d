@@ -1,4 +1,4 @@
-;;; trev-clatter.el --- clatter config for the ZNC bouncer -*- lexical-binding: t; -*-
+;;; trev-clatter.el --- clatter config -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 ;;; Code:
@@ -27,6 +27,7 @@
   (clatter-track-count-style 'glyph)
   (clatter-track-in-buffer-mode-line t)
   (clatter-track-exclude-targets '("*server*"))
+  (clatter-track-shorten nil)
   (clatter-track-indicators
    '((mention . nil)
      (dm . "✉")
@@ -36,9 +37,11 @@
   (clatter-compact-system-messages 'compact)
   (clatter-display-on-join nil)
   (clatter-display-on-welcome nil)
+  (clatter-group-messages-by-nick t)
   (clatter-self-echo-mode 'optimistic)
   (clatter-message-order 'oldest-first)
   (clatter-nick-column-width 14)
+  (clatter-nick-column-truncate t)
   (clatter-timestamp-side 'left)
   (clatter-timestamp-only-if-changed t)
   (clatter-prompt-format "%n: ")

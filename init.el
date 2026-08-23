@@ -16,30 +16,10 @@
 
 (use-package use-package
   :preface
-  (defun trev/use-package-trusted-loadable-p (name)
-    "Return non-nil if NAME is available from a trusted local source."
-    (or (package-built-in-p name)
-        (when-let* ((path (locate-library (symbol-name name)))
-                    (file (expand-file-name path)))
-          (or (and (boundp 'user-lisp-directory)
-                   (file-in-directory-p file user-lisp-directory))
-              (and (boundp 'lisp-directory)
-                   (file-in-directory-p file lisp-directory))
-              (string-match-p "/share/emacs/site-lisp/" file)
-              (file-in-directory-p file (expand-file-name "~/Workspace/"))))))
-
   (defun trev/use-package-ensure (name args state &optional no-refresh)
-    "Check installed and loadable packages before checking remote archives."
-    (let ((not-feature (not (featurep name))))
-      (cond
-       ((not not-feature) nil)
-       ((not (equal '(t) args))
-        (use-package-ensure-elpa name args state no-refresh))
-       ((trev/use-package-trusted-loadable-p name)
-        ;; Local, built-in, and site-lisp packages are already in `load-path'.
-        nil)
-       (t
-        (use-package-ensure-elpa name args state no-refresh)))))
+    "Skip remote archives when NAME is already loadable from `load-path'."
+    (unless (or (package-built-in-p name) (locate-library (symbol-name name)))
+      (use-package-ensure-elpa name args state no-refresh)))
   :custom
   (use-package-always-defer t)
   (use-package-always-ensure t)
@@ -48,49 +28,21 @@
 
 (use-package auth-source :ensure nil :custom (auth-sources '("~/.authinfo.gpg")))
 
-(use-package autothemer
-  :disabled t
-  :demand t)
-
 (use-package modus-themes
   :demand t
   :preface
-  (defconst trev/modus-theme-cache-file
-    (expand-file-name
-     "emacs/modus-theme.el"
-     (or (getenv "XDG_CACHE_HOME")
-         (expand-file-name ".cache" "~")))
-    "File where the last selected Modus theme is persisted.")
-
-  (defun trev/modus-theme-valid-p (theme)
-    "Return non-nil when THEME belongs to the Modus themes collection."
-    (and (boundp 'modus-themes-items)
-         (memq theme modus-themes-items)))
-
-  (defun trev/modus-theme-read-cache ()
-    "Return the cached Modus theme, or nil if the cache is invalid."
-    (when (file-readable-p trev/modus-theme-cache-file)
-      (with-temp-buffer
-        (insert-file-contents trev/modus-theme-cache-file)
-        (condition-case nil
-            (let ((theme (read (current-buffer))))
-              (when (trev/modus-theme-valid-p theme)
-                theme))
-          (error nil)))))
+  (defvar trev/modus-theme 'modus-vivendi-deuteranopia
+    "Last selected Modus theme, persisted through `savehist'.")
 
   (defun trev/modus-theme-save-current ()
-    "Persist the active Modus theme."
+    "Remember the active Modus theme for the next session."
     (when-let* ((theme (car custom-enabled-themes))
-                (_ (trev/modus-theme-valid-p theme)))
-      (make-directory (file-name-directory trev/modus-theme-cache-file) t)
-      (with-temp-file trev/modus-theme-cache-file
-        (prin1 theme (current-buffer))
-        (terpri (current-buffer)))))
+                (_ (memq theme modus-themes-items)))
+      (setq trev/modus-theme theme)))
 
   (defun trev/modus-theme-load-startup ()
-    "Load the cached Modus theme, falling back to a dark Modus variant."
-    (modus-themes-load-theme
-     (or (trev/modus-theme-read-cache) 'modus-vivendi-deuteranopia)))
+    "Load the remembered Modus theme."
+    (modus-themes-load-theme trev/modus-theme))
 
   (defun trev/modus-theme-set-extra-faces (&rest _)
     "Apply extra face tweaks after Modus theme changes."
@@ -104,7 +56,9 @@
        `(erc-current-nick-face ((,c :foreground ,red-intense :background ,bg-main))))))
   :hook
   ((modus-themes-after-load-theme . trev/modus-theme-save-current)
-   (modus-themes-after-load-theme . trev/modus-theme-set-extra-faces))
+   (modus-themes-after-load-theme . trev/modus-theme-set-extra-faces)
+   ;; Loaded after init so `savehist' has already restored `trev/modus-theme'.
+   (after-init . trev/modus-theme-load-startup))
   :bind
   (("C-c T" . modus-themes-select)
    ("C-c t" . modus-themes-toggle)
@@ -132,44 +86,19 @@
      (t . (semibold))))
   :config
   (with-eval-after-load 'diff-hl
-    (trev/modus-theme-set-extra-faces))
-  (trev/modus-theme-load-startup))
-
-(use-package standard-themes :demand t)
+    (trev/modus-theme-set-extra-faces)))
 
 (use-package spacious-padding
   :demand t
-  :preface
-  (defvar trev/spacious-padding-faces-enabled nil
-    "Non-nil when spacious face padding is enabled.")
-
-  (defun trev/spacious-padding-toggle-faces ()
-    "Toggle spacious face padding without rewriting frame parameters."
-    (interactive)
-    (if trev/spacious-padding-faces-enabled
-        (progn
-          (spacious-padding-unset-invisible-dividers)
-          (setq trev/spacious-padding-faces-enabled nil))
-      (spacious-padding-set-faces)
-      (setq trev/spacious-padding-faces-enabled t)))
-  :bind ("<f8>" . trev/spacious-padding-toggle-faces)
+  :bind ("<f8>" . spacious-padding-mode)
   :config
   (setq spacious-padding-widths trev/spacious-padding-widths
         spacious-padding-subtle-frame-lines nil)
   (advice-add #'spacious-padding-set-faces :after #'trev/modus-theme-set-extra-faces)
-  (add-hook 'enable-theme-functions #'spacious-padding-set-faces)
-  (spacious-padding-set-faces)
-  (setq trev/spacious-padding-faces-enabled t))
+  (spacious-padding-mode))
 
 (use-package emacs
   :preface
-  (defun display-startup-time ()
-    (message "Emacs loaded in %s with %d garbage collections."
-             (format "%.2f seconds"
-                     (float-time
-                      (time-subtract after-init-time before-init-time)))
-             gcs-done))
-
   (defun header-line-file-path ()
     "Set `header-line-format' if symbol `buffer-file-name' is not nil."
     (when buffer-file-name
@@ -178,10 +107,6 @@
   (defun open-user-config ()
     "Opens user's config file"
     (interactive) (find-file user-init-file))
-
-  (defun switch-to-buffer-last ()
-    "Toggles back to previously visited buffer"
-    (interactive) (switch-to-buffer nil))
 
   (define-advice message-make-date
       (:around (orig-fun &rest args) messages-force-utc-tz)
@@ -193,8 +118,7 @@
         res)))
 
   :hook
-  ((emacs-startup . display-startup-time)
-   (buffer-list-update . header-line-file-path)
+  ((find-file . header-line-file-path)
    ;; (prog-mode . display-line-numbers-mode)
    )
   :init
@@ -206,7 +130,6 @@
   (column-number-mode)                  ; Column number mode
   (delete-selection-mode)
   (electric-pair-mode)                  ; Pair the pairs
-  (refill-mode)
   (put 'suspend-frame 'disabled t)      ; Disable suspend-frame
   (setq auto-fill-function 'do-auto-fill
         auto-save-file-name-transforms '((".*" "~/.cache/emacs/saves/" t))
@@ -267,11 +190,11 @@
         warning-minimum-level :error
         window-combination-resize t
         window-divider-default-right-width
-        (or (plist-get trev/spacious-padding-widths :right-divider-width) 30))
+        (plist-get trev/spacious-padding-widths :right-divider-width))
   (window-divider-mode)                 ; Gap between splits
   ;; Fonts
   (set-face-attribute 'default nil :family "Iosevka" :height 166 :weight 'medium)
-  (set-face-attribute 'fixed-pitch nil :family "Iosevka" :height 166)
+  (set-face-attribute 'fixed-pitch nil :family "Iosevka Fixed" :height 166)
   (set-face-attribute 'fixed-pitch-serif nil :family "Noto Serif" :height 166)
   (set-face-attribute 'variable-pitch nil :family "Noto Sans" :weight 'normal)
   ;; https://github.com/ryanoasis/nerd-fonts/wiki/Glyph-Sets-and-Code-Points
@@ -286,7 +209,7 @@
   :bind
   (("C-x K" . 'kill-current-buffer)
    ("C-c b" . 'ibuffer-other-window)
-   ("C-'" . 'switch-to-buffer-last)
+   ("C-'" . 'mode-line-other-buffer)
    ("C-c !" . 'open-user-config)
    ("M-o" . 'other-window)))
 
@@ -381,7 +304,6 @@
   (which-key-sort-order 'which-key-description-order))
 
 (use-package repeat
-  :defer 1
   :hook (after-init . repeat-mode)
   :bind ("M-RET" . repeat))
 
@@ -442,7 +364,11 @@
   (completion-styles '(orderless basic)))
 
 ;; Save minibuffer history between restarts
-(use-package savehist :init (savehist-mode))
+(use-package savehist
+  :demand t
+  :config
+  (add-to-list 'savehist-additional-variables 'trev/modus-theme)
+  (savehist-mode))
 
 ;; Minibuffer annotations
 (use-package marginalia :init (marginalia-mode))
@@ -491,11 +417,6 @@
 
 ;; Consult functions
 (use-package consult
-  :preface
-  (defun consult-flymake-project ()
-    "Jump to project Flymake diagnostics."
-    (interactive)
-    (consult-flymake t))
   :custom
   (consult-fd-args '((if (executable-find "fdfind" 'remote) "fdfind" "fd")
                      "--full-path --color=never --hidden --no-ignore-vcs"))
@@ -503,7 +424,6 @@
          ("C-c SPC" . consult-fd)
          ("C-c r" . consult-recent-file)
          ("C-<return>" . consult-line)
-         ("C-c m" . consult-man)
          ("C-c i" . consult-info)
          ([remap Info-search] . consult-info)
          ("C-x b" . consult-buffer)
@@ -512,7 +432,8 @@
          ("C-x p b" . consult-project-buffer)
          ("M-y" . consult-yank-pop)
          ("M-g e" . consult-compile-error)
-         ("M-g f" . consult-flymake-project)
+         ;; `C-u M-g f' widens to the whole project.
+         ("M-g f" . consult-flymake)
          ("M-g M-g" . consult-goto-line))
   :init
   ;; Use Consult to select xref locations with preview
@@ -617,9 +538,6 @@
   :hook
   ((message-mode . flyspell-mode)
    (markdown-ts-mode . flyspell-mode)))
-
-;; Colorize hex color codes
-(use-package rainbow-mode)
 
 ;; Git
 (use-package magit
@@ -726,8 +644,7 @@
           ((c-ts-mode c++-ts-mode) . ("clangd"))
           ((tsx-ts-mode typescript-ts-mode) . ("typescript-language-server" "--stdio"))
           (python-ts-mode . ("pylsp"))
-          (nix-ts-mode . ("nil"))))
-  (defalias 'start-lsp-server #'eglot))
+          (nix-ts-mode . ("nil")))))
 
 ;; Paredit
 (use-package paredit
@@ -744,11 +661,6 @@
 (use-package geiser-guile
   :custom (geiser-repl-per-project-p t))
 
-;; Keep the retired Guix sources editable without installing Emacs-Guix.
-(use-package scheme
-  :ensure nil
-  :mode (("\\.scm\\'" . scheme-mode)))
-
 ;; Nix
 (use-package nix-ts-mode
   :mode "\\.nix\\'")
@@ -757,100 +669,7 @@
 (use-package sly :custom (inferior-lisp-program (executable-find "sbcl")))
 
 ;; Secrets
-(use-package my-secrets)
-
-;; IRC/ERC
-(use-package erc
-  :preface
-  (defun erc-toggle-fools ()
-    (interactive)
-    (message "erc: hidden fools %s"
-             (if (equal '(t) (erc-match-toggle-hidden-fools nil)) "OFF" "ON"))
-    (set-buffer-modified-p t))
-
-  (defun trev/erc-nicks-refresh-buffers ()
-    "Refresh ERC nick colors against the current theme background."
-    (setq erc-nicks-bg-color (face-background 'default nil t))
-    (when (fboundp 'erc-nicks-refresh)
-      (dolist (buffer (buffer-list))
-        (with-current-buffer buffer
-          (when (and (derived-mode-p 'erc-mode)
-                     (bound-and-true-p erc-nicks-mode))
-            (erc-with-server-buffer
-             (setq erc-nicks--bg-luminance nil
-                   erc-nicks--bg-mode-value nil
-                   erc-nicks--fg-rgb
-                   (or (color-name-to-rgb
-                        (face-foreground 'erc-default-face nil 'default))
-		       (color-name-to-rgb
-                        (readable-foreground-color erc-nicks-bg-color)))))
-            (erc-nicks-refresh nil))))))
-
-  (defun trev/erc-connect ()
-    "Connect to ERC over TLS"
-    (interactive)
-    (require 'my-secrets)
-    (erc-tls :server erc-server :port erc-port
-	     :user "trev/libera" :full-name erc-user-full-name :id 'libera))
-
-  (defun trev/erc-chathistory-latest (count)
-    "Request the latest COUNT messages for the current ERC target.
-Without a prefix argument, request 100 messages."
-    (interactive "P")
-    (let ((target (erc-default-target))
-          (count (if count (prefix-numeric-value count) 100)))
-      (unless target
-        (user-error "No ERC target in this buffer"))
-      (erc-server-send (format "CHATHISTORY LATEST %s * %d" target count))))
-  :bind
-  (;;("C-c #" . 'trev/erc-connect)
-   :map erc-mode-map
-   ("C-c -" . 'erc-toggle-fools)
-   ("C-c g" . 'erc-track-clear)
-   ("C-c h" . 'trev/erc-chathistory-latest))
-  :custom
-  (erc-current-nick-highlight-type 'all)
-  (erc-fill-function 'erc-fill-static)
-  (erc-fill-static-center 16)
-  (erc-fool-highlight-type 'all)
-  (erc-hide-list '("JOIN" "NICK" "QUIT" "MODE" "AWAY" "PART" "353" "324" "329"))
-  (erc-insert-timestamp-function 'erc-insert-timestamp-left)
-  (erc-nick "trev")
-  (erc-nicks-track-faces t)
-  (erc-nicks-colors 'font-lock)
-  (erc-nicks-color-adjustments
-   '(erc-nicks-invert erc-nicks-add-contrast erc-nicks-cap-contrast
-		      erc-nicks-ensaturate))
-  (erc-nicks-contrast-range '(7.0 . 18.0))
-  (erc-nicks-saturation-range '(0.35 . 0.85))
-  (erc-port "6697")
-  (erc-prompt 'erc-prompt-format)
-  (erc-prompt-format (propertize "%n:" 'font-lock-face 'erc-input-face))
-  (erc-receive-query-display 'bury)
-  (erc-server-reconnect-function 'erc-server-delayed-check-reconnect)
-  (erc-scrolltobottom-all t)
-  (erc-spelling-dictionaries '(("Libera.Chat" "english")))
-  (erc-timestamp-format "%H:%M")
-  (erc-track-exclude-server-buffer t)
-  (erc-track-exclude-types '("JOIN" "NICK" "QUIT" "MODE" "AWAY" "PART"
-                             "353" "324" "332" "329" "333" "477"))
-  (erc-track-shorten-start 6)
-  (erc-user-full-name user-full-name)
-  :config
-  (setopt erc-modules (seq-union '(nicks scrolltobottom spelling) erc-modules)
-          erc-track-faces-priority-list
-          (seq-remove
-           (lambda (elt) (and (listp elt) (seq-contains-p elt 'erc-default-face)))
-           erc-track-faces-priority-list))
-  (erc-spelling-mode)
-  (erc-scrolltobottom-mode)
-  (defun erc-match-directed-at-fool-p (_msg) nil)
-  :hook
-  (erc-mode . (lambda ()
-                (auto-fill-mode -1)
-                (add-to-list 'completion-at-point-functions 'cape-emoji)))
-  (erc-text-matched . erc-hide-fools)
-  (modus-themes-after-load-theme . trev/erc-nicks-refresh-buffers))
+(use-package my-secrets :ensure nil)
 
 (use-package elfeed
   :preface
@@ -955,6 +774,7 @@ Without a prefix argument, request 100 messages."
 ;;; Local Packages
 
 (use-package aoc
+  :ensure nil
   :commands (aoc-fetch-input aoc-view-problem aoc-submit-answer)
   :config
   (setopt savehist-additional-variables
@@ -973,12 +793,10 @@ Without a prefix argument, request 100 messages."
              pastes-clipboard-image
              pastes-delete-url))
 
-(use-package erc-links
-  :hook (erc-mode . erc-links-mode))
-
-(use-package trev-clatter :demand t)
+(use-package trev-clatter :ensure nil :demand t)
 
 (use-package nostr
+  :ensure nil
   :load-path "/home/trev/Workspace/nostr.el"
   :bind (("C-c $" . nostr-open))
   :commands (nostr-open

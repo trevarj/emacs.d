@@ -45,10 +45,8 @@
     (setq-local apheleia-inhibit t)
     (when (bound-and-true-p auto-revert-mode)
       (auto-revert-mode -1))
-    (when (and (bound-and-true-p apheleia-mode) (fboundp 'apheleia-mode))
-      (funcall 'apheleia-mode -1))
-    (when (and (bound-and-true-p ws-butler-mode) (fboundp 'ws-butler-mode))
-      (funcall 'ws-butler-mode -1))))
+    (when (bound-and-true-p ws-butler-mode)
+      (ws-butler-mode -1))))
 
 (defun my-secrets-edit ()
   "Open `my-secrets-file' for editing through `epa-file'."

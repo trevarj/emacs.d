@@ -51,33 +51,18 @@
      :fringe-width 12)
   "Spacing values shared with `spacious-padding'.")
 
-(defun trev/spacious-padding-frame-parameters ()
-  "Return frame parameters derived from `trev/spacious-padding-widths'."
-  `((internal-border-width
-     . ,(or (plist-get trev/spacious-padding-widths :internal-border-width) 15))
-    (right-divider-width
-     . ,(or (plist-get trev/spacious-padding-widths :right-divider-width) 30))
-    (left-fringe
-     . ,(or (plist-get trev/spacious-padding-widths :left-fringe-width)
-            (plist-get trev/spacious-padding-widths :fringe-width)
-            8))
-    (right-fringe
-     . ,(or (plist-get trev/spacious-padding-widths :right-fringe-width)
-            (plist-get trev/spacious-padding-widths :fringe-width)
-            8))
-    (scroll-bar-width
-     . ,(or (plist-get trev/spacious-padding-widths :scroll-bar-width) 8))))
-
-(dolist (parameter (trev/spacious-padding-frame-parameters))
+;; Later frames are handled by `spacious-padding-mode' itself.
+(dolist (parameter
+         `((internal-border-width
+            . ,(plist-get trev/spacious-padding-widths :internal-border-width))
+           (right-divider-width
+            . ,(plist-get trev/spacious-padding-widths :right-divider-width))
+           (left-fringe . ,(plist-get trev/spacious-padding-widths :fringe-width))
+           (right-fringe . ,(plist-get trev/spacious-padding-widths :fringe-width))
+           (scroll-bar-width
+            . ,(plist-get trev/spacious-padding-widths :scroll-bar-width))))
   (add-to-list 'initial-frame-alist parameter)
   (add-to-list 'default-frame-alist parameter))
-
-(defun trev/spacious-padding-apply-frame-parameters (frame)
-  "Apply spacious frame parameters to FRAME."
-  (modify-frame-parameters frame (trev/spacious-padding-frame-parameters)))
-
-(add-hook 'after-make-frame-functions
-          #'trev/spacious-padding-apply-frame-parameters)
 
 ;;; Responsiveness
 

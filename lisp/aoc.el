@@ -5,7 +5,7 @@
 ;; Author: Trevor Arjeski <tmarjeski@gmail.com>
 ;; Keywords: lisp
 ;; Package-Version: 1.0.0
-;; Package-Requires: ((emacs "29.4") (request "0.3.2"))
+;; Package-Requires: ((emacs "29.4"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -30,13 +30,10 @@
 
 ;;; Code:
 
-;; Built-ins
 (require 'cl-lib)
 (require 'shr)
+(require 'url)
 (require 'url-cookie)
-
-;; External
-(require 'request)
 
 (defgroup aoc nil
   "Customization variables for Advent of Code (aoc.el).")
@@ -70,9 +67,36 @@ Increments on correct solution."
   (when (string-empty-p aoc-session-cookie)
     (user-error "`aoc-session-cookie' is not set")))
 
-(cl-defun aoc--fetch-input-error (&key status &allow-other-keys)
-  "Error STATUS of fetching input file."
-  (message "Could not fetch input file: %s" status))
+(defun aoc--response-body ()
+  "Return the decoded body of the current `url-retrieve' response buffer."
+  (goto-char (point-min))
+  (decode-coding-string
+   (buffer-substring-no-properties
+    (if (re-search-forward "\r?\n\r?\n" nil t) (point) (point-min))
+    (point-max))
+   'utf-8))
+
+(defun aoc--request (url callback &optional form)
+  "Fetch URL with the AoC session cookie, calling CALLBACK with the body.
+With FORM, an alist of string pairs, POST it instead of issuing a GET."
+  (let ((url-request-method (if form "POST" "GET"))
+        (url-request-data
+         (and form (url-build-query-string
+                    (mapcar (lambda (kv) (list (car kv) (cdr kv))) form))))
+        (url-request-extra-headers
+         `(("Cookie" . ,(format "session=%s" aoc-session-cookie))
+           ("User-Agent" . "trevarj/emacs.d/lisp/aoc.el")
+           ,@(and form
+                  '(("Content-Type" . "application/x-www-form-urlencoded"))))))
+    (url-retrieve
+     url
+     (lambda (status)
+       (unwind-protect
+           (if-let* ((err (plist-get status :error)))
+               (message "AoC request failed: %s" err)
+             (funcall callback (aoc--response-body)))
+         (kill-buffer (current-buffer))))
+     nil t)))
 
 (defun aoc--increment-day-level ()
   "Increment the `aoc-day-level' pair."
@@ -93,7 +117,7 @@ Increments on correct solution."
             (shr-insert-document dom)
             (pop-to-buffer (current-buffer))))))))
 
-(cl-defun aoc--check-submit-response (&key data &allow-other-keys)
+(defun aoc--check-submit-response (data)
   "Checks DATA for the success phrase."
   (cond
    ((cl-search "That's not the right answer" data)
@@ -105,10 +129,6 @@ Increments on correct solution."
     (message "Answer submitted successfully."))
    (t (message "Submittion failed.")))
   (aoc--render-data-to-help-buffer data "*aoc submission*"))
-
-(cl-defun aoc--submit-error (&key status &allow-other-keys)
-  "Error STATUS for submitting answer."
-  (message "Could not submit answer: %s" status))
 
 ;;;###autoload
 (defun aoc-fetch-input (year day &optional force)
@@ -124,15 +144,12 @@ Can provide FORCE to overwrite existing file."
         (message "Input file for day %d already exists at %s" day input-file-path)
       (unless (file-directory-p aoc-input-directory)
         (make-directory aoc-input-directory t))
-      (request (format "https://adventofcode.com/%d/day/%d/input" year day)
-        :headers `(("Cookie" . ,(format "session=%s" aoc-session-cookie))
-                   ("User-Agent" . ,(format "trevarj/emacs.d/lisp/aoc.el")))
-        :error #'aoc--fetch-input-error
-        :success (cl-function
-                  (lambda (&key data &allow-other-keys)
-                    (with-temp-file input-file-path
-                      (insert data))
-                    (message "Wrote day %d input file: %s" day input-file-path)))))))
+      (aoc--request
+       (format "https://adventofcode.com/%d/day/%d/input" year day)
+       (lambda (data)
+         (with-temp-file input-file-path
+           (insert data))
+         (message "Wrote day %d input file: %s" day input-file-path))))))
 
 ;;;###autoload
 (defun aoc-view-problem (year day)
@@ -152,20 +169,18 @@ Can provide FORCE to overwrite existing file."
                      (read-number "Level: " (cdr aoc-day-level))
                      (read-string "Answer: ")))
   (aoc--require-session-cookie)
-  (when (when (not (and (eq year aoc-year)
-                        (equal `(,day . ,level) aoc-day-level)))
-          (yes-or-no-p
-           (format "Set current problem to %d, Day %d Level %d?"
-                   year day level)))
+  (when (and (not (and (eq year aoc-year)
+                       (equal `(,day . ,level) aoc-day-level)))
+             (yes-or-no-p
+              (format "Set current problem to %d, Day %d Level %d?"
+                      year day level)))
     (setopt aoc-year year
             aoc-day-level (cons day level)))
-  (request (format "https://adventofcode.com/%d/day/%d/answer" year day)
-    :type "POST"
-    :headers `(("Cookie" . ,(format "session=%s" aoc-session-cookie)))
-    :data `(("level" . ,level) ("answer" . ,answer))
-    :parse 'buffer-string
-    :error #'aoc--submit-error
-    :success #'aoc--check-submit-response))
+  (aoc--request
+   (format "https://adventofcode.com/%d/day/%d/answer" year day)
+   #'aoc--check-submit-response
+   `(("level" . ,(number-to-string level))
+     ("answer" . ,answer))))
 
 (provide 'aoc)
 ;;; aoc.el ends here
