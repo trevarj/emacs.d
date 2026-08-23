@@ -101,7 +101,8 @@ bookmarks.eld
 # package quickstart
 package-quickstart.el
 
-*.sqlite
+# databases, plus their -wal/-shm sidecars
+*.sqlite*
 
 *.eld
 
