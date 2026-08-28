@@ -229,6 +229,13 @@
   (define-fringe-bitmap 'left-curly-arrow
     [0 0 0 0 14 30 60 120 240 243 255 127 63 63 127 127]))
 
+(use-package visual-fill-column
+  :demand t
+  :custom (visual-fill-column-width 80)
+  :config
+  (global-visual-line-mode)
+  (global-visual-fill-column-mode))
+
 ;; Ligatures
 (use-package ligature
   :hook (prog-mode . ligature-mode)
