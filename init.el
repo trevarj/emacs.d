@@ -43,11 +43,16 @@
       (unless (memq theme '(modus-vivendi-deuteranopia
                             modus-operandi-tinted
                             trev-ayu-dark
+                            trev-ayu-mirage
                             trev-ayu-light
                             trev-nord
                             trev-osaka-jade
                             trev-everforest
+                            trev-everforest-light
                             trev-kanagawa
+                            trev-kanagawa-dragon
+                            trev-kanagawa-lotus
+                            trev-flexoki-dark
                             trev-flexoki-light))
         (error "Invalid desktop theme: %s" name))
       (mapc #'disable-theme custom-enabled-themes)
