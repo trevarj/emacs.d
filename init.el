@@ -31,43 +31,55 @@
 (use-package modus-themes
   :demand t
   :preface
-  (defvar trev/modus-theme 'modus-vivendi-deuteranopia
-    "Last selected Modus theme, persisted through `savehist'.")
+  (defun trev/desktop-theme-load ()
+    "Load the theme selected by the shared desktop theme bundle."
+    (interactive)
+    (let* ((bundle (file-truename
+                    (expand-file-name "~/.local/share/trev-themes/current")))
+           (name (with-temp-buffer
+                   (insert-file-contents (expand-file-name "emacs-theme" bundle))
+                   (string-trim (buffer-string))))
+           (theme (intern-soft name)))
+      (unless (memq theme '(modus-vivendi-deuteranopia
+                            modus-operandi-tinted
+                            trev-ayu-dark
+                            trev-ayu-light
+                            trev-nord
+                            trev-osaka-jade
+                            trev-everforest
+                            trev-kanagawa
+                            trev-flexoki-light))
+        (error "Invalid desktop theme: %s" name))
+      (mapc #'disable-theme custom-enabled-themes)
+      (if (memq theme '(modus-vivendi-deuteranopia modus-operandi-tinted))
+          (modus-themes-load-theme theme)
+        (add-to-list 'custom-theme-load-path bundle)
+        (load-theme theme t))
+      (trev/theme-set-extra-faces)))
 
-  (defun trev/modus-theme-save-current ()
-    "Remember the active Modus theme for the next session."
-    (when-let* ((theme (car custom-enabled-themes))
-                (_ (memq theme modus-themes-items)))
-      (setq trev/modus-theme theme)))
-
-  (defun trev/modus-theme-load-startup ()
-    "Load the remembered Modus theme."
-    (modus-themes-load-theme trev/modus-theme))
-
-  (defun trev/modus-theme-set-extra-faces (&rest _)
-    "Apply extra face tweaks after Modus theme changes."
-    (modus-themes-with-colors
+  (defun trev/theme-set-extra-faces (&rest _)
+    "Apply extra face tweaks using the active theme's colors."
+    (let ((background (face-background 'default nil t))
+          (foreground (face-foreground 'default nil t))
+          (green (face-foreground 'success nil 'default))
+          (yellow (face-foreground 'warning nil 'default))
+          (red (face-foreground 'error nil 'default)))
       (custom-set-faces
-       `(margin ((,c :background ,bg-main :foreground ,fg-main)))
-       `(diff-hl-insert ((,c :foreground ,bg-added-fringe :background ,bg-main)))
-       `(diff-hl-change ((,c :foreground ,bg-changed-fringe :background ,bg-main)))
-       `(diff-hl-delete ((,c :foreground ,bg-removed-fringe :background ,bg-main)))
-       `(modus-themes-ui-variable-pitch ((,c :height 0.9)))
-       `(erc-current-nick-face ((,c :foreground ,red-intense :background ,bg-main))))))
+       `(margin ((t :background ,background :foreground ,foreground)))
+       `(diff-hl-insert ((t :foreground ,green :background ,background)))
+       `(diff-hl-change ((t :foreground ,yellow :background ,background)))
+       `(diff-hl-delete ((t :foreground ,red :background ,background)))
+       '(modus-themes-ui-variable-pitch ((t :height 0.9)))
+       `(erc-current-nick-face ((t :foreground ,red :background ,background))))))
   :hook
-  ((modus-themes-after-load-theme . trev/modus-theme-save-current)
-   (modus-themes-after-load-theme . trev/modus-theme-set-extra-faces)
-   ;; Loaded after init so `savehist' has already restored `trev/modus-theme'.
-   (after-init . trev/modus-theme-load-startup))
-  :bind
-  (("C-c T" . modus-themes-select)
-   ("C-c t" . modus-themes-toggle)
-   :repeat-map trev/modus-themes-repeat-map
-   ("t" . modus-themes-toggle))
+  ((modus-themes-after-load-theme . trev/theme-set-extra-faces)
+   (after-init . (lambda ()
+                  (trev/desktop-theme-load)
+                  (require 'server)
+                  (unless (server-running-p)
+                    (server-start)))))
   :custom
   (modus-themes-include-derivatives-mode t)
-  (modus-themes-to-toggle
-   '(modus-vivendi-deuteranopia modus-operandi-tinted))
   (modus-themes-italic-constructs t)
   (modus-themes-bold-constructs t)
   (modus-themes-variable-pitch-ui nil)
@@ -86,7 +98,9 @@
      (t . (semibold))))
   :config
   (with-eval-after-load 'diff-hl
-    (trev/modus-theme-set-extra-faces)))
+    (trev/theme-set-extra-faces)))
+
+(use-package standard-themes :demand t)
 
 (use-package spacious-padding
   :demand t
@@ -94,7 +108,7 @@
   :config
   (setq spacious-padding-widths trev/spacious-padding-widths
         spacious-padding-subtle-frame-lines nil)
-  (advice-add #'spacious-padding-set-faces :after #'trev/modus-theme-set-extra-faces)
+  (advice-add #'spacious-padding-set-faces :after #'trev/theme-set-extra-faces)
   (spacious-padding-mode))
 
 (use-package emacs
@@ -374,7 +388,6 @@
 (use-package savehist
   :demand t
   :config
-  (add-to-list 'savehist-additional-variables 'trev/modus-theme)
   (savehist-mode))
 
 ;; Minibuffer annotations
