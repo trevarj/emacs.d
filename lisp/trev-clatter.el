@@ -24,7 +24,8 @@
    ("C-c -" . clatter-toggle-fools))
   :custom
   (clatter-quit-on-exit nil)
-  (clatter-track-count-style 'glyph)
+  (clatter-track-layout 'strip)
+  (clatter-track-count-style 'parens)
   (clatter-track-in-buffer-mode-line t)
   (clatter-track-exclude-targets '("*server*"))
   (clatter-track-shorten nil)
@@ -66,6 +67,9 @@
              :username "trev"
              :realname ,user-full-name))
           clatter-fools erc-fools)
+
+  (custom-set-faces
+   '(clatter-track-count ((t (:height 0.8)))))
 
   (require 'clatter-dcc)
   (clatter-dcc-setup)
