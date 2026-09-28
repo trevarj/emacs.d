@@ -79,10 +79,10 @@
   :hook
   ((modus-themes-after-load-theme . trev/theme-set-extra-faces)
    (after-init . (lambda ()
-                  (trev/desktop-theme-load)
-                  (require 'server)
-                  (unless (server-running-p)
-                    (server-start)))))
+                   (trev/desktop-theme-load)
+                   (require 'server)
+                   (unless (server-running-p)
+                     (server-start)))))
   :custom
   (modus-themes-include-derivatives-mode t)
   (modus-themes-italic-constructs t)

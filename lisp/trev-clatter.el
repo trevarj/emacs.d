@@ -26,6 +26,7 @@
   (clatter-quit-on-exit nil)
   (clatter-track-layout 'strip)
   (clatter-track-count-style 'parens)
+  (clatter-track-max-width 1.0)
   (clatter-track-in-buffer-mode-line t)
   (clatter-track-exclude-targets '("*server*"))
   (clatter-track-shorten nil)
