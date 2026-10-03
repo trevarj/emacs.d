@@ -31,6 +31,16 @@
 (use-package modus-themes
   :demand t
   :preface
+  (defvar trev/theme--changing nil
+    "Non-nil while replacing or recovering a desktop theme.")
+
+  (defun trev/theme-set-fonts ()
+    "Apply font preferences without overriding theme palette colors."
+    (set-face-attribute 'default nil :family "Iosevka" :height 166 :weight 'medium)
+    (set-face-attribute 'fixed-pitch nil :family "Iosevka Fixed" :height 166)
+    (set-face-attribute 'fixed-pitch-serif nil :family "Noto Serif" :height 166)
+    (set-face-attribute 'variable-pitch nil :family "Noto Sans" :weight 'normal))
+
   (defun trev/desktop-theme-load ()
     "Load the theme selected by the shared desktop theme bundle."
     (interactive)
@@ -60,34 +70,133 @@
                             trev-catppuccin-macchiato
                             trev-catppuccin-mocha))
         (error "Invalid desktop theme: %s" name))
-      (mapc #'disable-theme custom-enabled-themes)
-      (if (memq theme '(modus-vivendi-deuteranopia modus-operandi-tinted))
-          (modus-themes-load-theme theme)
-        (add-to-list 'custom-theme-load-path bundle)
-        (load-theme theme t))
-      (trev/theme-set-extra-faces)))
+      (let ((native (memq theme '(modus-vivendi-deuteranopia
+                                  modus-operandi-tinted))))
+        (unless native
+          (let ((source (expand-file-name (concat name "-theme.el") bundle)))
+            (unless (file-readable-p source)
+              (error "Desktop theme source is not readable: %s" source))))
+        (let ((old-themes (copy-sequence custom-enabled-themes))
+              (old-plist (copy-tree (symbol-plist theme) t))
+              (was-known (custom-theme-p theme)))
+          (unwind-protect
+              (let ((trev/theme--changing t))
+                (condition-case condition
+                    (progn
+                      ;; NO-ENABLE does not protect an already active target.
+                      (when (memq theme custom-enabled-themes)
+                        (disable-theme theme))
+                      (let ((custom-theme-load-path
+                             (if native custom-theme-load-path (list bundle))))
+                        (load-theme theme t t))
+                      (unless (and (get theme 'theme-feature)
+                                   (get theme 'theme-settings))
+                        (error "Desktop theme has no definition: %s" name))
+                      (enable-theme theme)
+                      (dolist (old old-themes)
+                        (unless (eq old theme)
+                          (disable-theme old))))
+                  ((error quit)
+                   ;; Enabling can fail after applying faces but before
+                   ;; registering the target in `custom-enabled-themes'.
+                   ;; Clean its new settings before restoring the old plist.
+                   (when (custom-theme-p theme)
+                     (unless (memq theme custom-enabled-themes)
+                       (push theme custom-enabled-themes))
+                     (disable-theme theme))
+                   (setplist theme old-plist)
+                   (if was-known
+                       (unless (custom-theme-p theme)
+                         (push theme custom-known-themes))
+                     (setq custom-known-themes
+                           (remq theme custom-known-themes)))
+                   (dolist (old (reverse old-themes))
+                     (enable-theme old))
+                   (signal (car condition) (cdr condition)))))
+            (trev/theme-set-extra-faces))))))
 
-  (defun trev/theme-set-extra-faces (&rest _)
-    "Apply extra face tweaks using the active theme's colors."
-    (let ((background (face-background 'default nil t))
-          (foreground (face-foreground 'default nil t))
-          (green (face-foreground 'success nil 'default))
-          (yellow (face-foreground 'warning nil 'default))
-          (red (face-foreground 'error nil 'default)))
-      (custom-set-faces
-       `(margin ((t :background ,background :foreground ,foreground)))
-       `(diff-hl-insert ((t :foreground ,green :background ,background)))
-       `(diff-hl-change ((t :foreground ,yellow :background ,background)))
-       `(diff-hl-delete ((t :foreground ,red :background ,background)))
-       '(modus-themes-ui-variable-pitch ((t :height 0.9)))
-       `(erc-current-nick-face ((t :foreground ,red :background ,background))))))
+  (defun trev/desktop-theme-initialize ()
+    "Load shared state at startup, warning and falling back when necessary."
+    (let* ((current (expand-file-name "~/.local/share/trev-themes/current"))
+           (has-state (or (file-exists-p current) (file-symlink-p current))))
+      (when has-state
+        (condition-case condition
+            (trev/desktop-theme-load)
+          ((error quit)
+           (display-warning 'desktop-theme (error-message-string condition)
+                            :warning))))
+      (when (or (not has-state) (not custom-enabled-themes))
+        (condition-case condition
+            (load-theme 'modus-vivendi-deuteranopia t)
+          ((error quit)
+           (display-warning 'desktop-theme (error-message-string condition)
+                            :warning))))))
+
+  (defun trev/desktop-theme-start-server ()
+    "Start the default server independently of desktop theme initialization."
+    (condition-case condition
+        (progn
+          (require 'server)
+          (unless (server-running-p)
+            (server-start)))
+      ((error quit)
+       (display-warning 'desktop-theme (error-message-string condition)
+                        :warning))))
+
+  (defun trev/desktop-theme-select ()
+    "Select a shared desktop theme without blocking emacsclient callbacks."
+    (interactive)
+    (let ((program (executable-find "theme-switch")))
+      (unless program
+        (user-error "theme-switch is not available"))
+      (make-process
+       :name "desktop-theme-picker"
+       :buffer "*Desktop theme picker*"
+       :command (list program)
+       :noquery t
+       :sentinel
+       (lambda (process event)
+         (when (and (memq (process-status process) '(exit signal))
+                    (not (zerop (process-exit-status process))))
+           (message "Theme picker failed (%s); see *Desktop theme picker*"
+                    (string-trim event)))))))
+
+  (defun trev/theme-set-extra-faces (&optional theme)
+    "Refresh local faces after THEME changes, outside intermediate reloads."
+    (unless (or trev/theme--changing (memq theme '(user spacious-padding)))
+      (let* ((background (face-background 'default nil t))
+             (foreground (face-foreground 'default nil t))
+             (nick (face-foreground 'error nil 'default))
+             (modus (and custom-enabled-themes
+                         (eq (car custom-enabled-themes)
+                             (modus-themes-get-current-theme))))
+             (insert (if modus
+                         (modus-themes-get-color-value 'bg-added-fringe t)
+                       (face-foreground 'diff-added nil 'default)))
+             (change (if modus
+                         (modus-themes-get-color-value 'bg-changed-fringe t)
+                       (face-foreground 'diff-changed nil 'default)))
+             (delete (if modus
+                         (modus-themes-get-color-value 'bg-removed-fringe t)
+                       (face-foreground 'diff-removed nil 'default))))
+        (custom-set-faces
+         `(margin ((t :background ,background :foreground ,foreground)))
+         `(diff-hl-insert ((t :foreground ,insert :background ,background)))
+         `(diff-hl-change ((t :foreground ,change :background ,background)))
+         `(diff-hl-delete ((t :foreground ,delete :background ,background)))
+         '(modus-themes-ui-variable-pitch ((t :height 0.9)))
+         `(erc-current-nick-face ((t :foreground ,nick :background ,background))))
+        ;; Reapply only fonts after faces, leaving the palette's colors intact.
+        (trev/theme-set-fonts))))
+
+  (defun trev/theme-set-frame-faces (frame)
+    "Refresh local faces using FRAME's active colors."
+    (with-selected-frame frame
+      (trev/theme-set-extra-faces)))
+  :bind ("C-c T" . trev/desktop-theme-select)
   :hook
-  ((modus-themes-after-load-theme . trev/theme-set-extra-faces)
-   (after-init . (lambda ()
-                   (trev/desktop-theme-load)
-                   (require 'server)
-                   (unless (server-running-p)
-                     (server-start)))))
+  ((after-init . trev/desktop-theme-initialize)
+   (after-init . trev/desktop-theme-start-server))
   :custom
   (modus-themes-include-derivatives-mode t)
   (modus-themes-italic-constructs t)
@@ -107,8 +216,11 @@
      (7 . (semibold 1.05))
      (t . (semibold))))
   :config
-  (with-eval-after-load 'diff-hl
-    (trev/theme-set-extra-faces)))
+  (require 'diff-mode)
+  (add-hook 'enable-theme-functions #'trev/theme-set-extra-faces 90)
+  (add-hook 'disable-theme-functions #'trev/theme-set-extra-faces 90)
+  (add-hook 'spacious-padding-mode-hook #'trev/theme-set-extra-faces)
+  (add-hook 'after-make-frame-functions #'trev/theme-set-frame-faces 90))
 
 (use-package standard-themes :demand t)
 
@@ -118,7 +230,6 @@
   :config
   (setq spacious-padding-widths trev/spacious-padding-widths
         spacious-padding-subtle-frame-lines nil)
-  (advice-add #'spacious-padding-set-faces :after #'trev/theme-set-extra-faces)
   (spacious-padding-mode))
 
 (use-package emacs
@@ -216,11 +327,7 @@
         window-divider-default-right-width
         (plist-get trev/spacious-padding-widths :right-divider-width))
   (window-divider-mode)                 ; Gap between splits
-  ;; Fonts
-  (set-face-attribute 'default nil :family "Iosevka" :height 166 :weight 'medium)
-  (set-face-attribute 'fixed-pitch nil :family "Iosevka Fixed" :height 166)
-  (set-face-attribute 'fixed-pitch-serif nil :family "Noto Serif" :height 166)
-  (set-face-attribute 'variable-pitch nil :family "Noto Sans" :weight 'normal)
+  (trev/theme-set-fonts)
   ;; https://github.com/ryanoasis/nerd-fonts/wiki/Glyph-Sets-and-Code-Points
   (dolist (code-point
            '((#xE6FA . #xE6B2) (#xE700 . #xE7C5) (#xF000 . #xF2E0) (#xE200 . #xE2A9)
