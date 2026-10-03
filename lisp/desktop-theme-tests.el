@@ -184,6 +184,27 @@
         (should (equal (file-symlink-p "~/.local/share/trev-themes/current")
                        (expand-file-name "missing-bundle" "~/")))))))
 
+(desktop-theme-test desktop-theme-native-catalog-ignores-bundle-source
+  (let ((poison (expand-file-name "native-poison-executed" "~/")))
+    ;; Traverse both ways to cover light/dark switches, reloading each symbol.
+    (dolist (theme (append modus-themes-items (reverse modus-themes-items)))
+      (ert-info ((format "Native desktop theme: %s" theme))
+        (let ((bundle (desktop-theme-test--bundle
+                       (symbol-name theme) theme "#abcdef")))
+          (desktop-theme-test--write
+           (expand-file-name (format "%s-theme.el" theme) bundle)
+           (format "(with-temp-file %S (insert \"executed\"))\n(error \"Bundle source shadowed native theme\")\n"
+                   poison))
+          (desktop-theme-test--select bundle)
+          (dotimes (_ 2)
+            (trev/desktop-theme-load)
+            (should (equal custom-enabled-themes (list theme)))
+            (should (equal (face-background 'default nil t)
+                           (modus-themes-get-color-value 'bg-main t theme)))
+            (should (equal (face-foreground 'default nil t)
+                           (modus-themes-get-color-value 'fg-main t theme)))
+            (should-not (file-exists-p poison))))))))
+
 (desktop-theme-test desktop-theme-invalid-loads-preserve-precedence
   (let* ((low (desktop-theme-test--bundle "low" 'trev-ayu-dark "#102030"))
          (high (desktop-theme-test--bundle "high" 'trev-nord "#304050"))

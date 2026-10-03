@@ -52,6 +52,12 @@
            (theme (intern-soft name)))
       (unless (memq theme '(modus-vivendi-deuteranopia
                             modus-operandi-tinted
+                            modus-operandi
+                            modus-operandi-deuteranopia
+                            modus-operandi-tritanopia
+                            modus-vivendi
+                            modus-vivendi-tinted
+                            modus-vivendi-tritanopia
                             trev-ayu-dark
                             trev-ayu-mirage
                             trev-ayu-light
@@ -71,7 +77,13 @@
                             trev-catppuccin-mocha))
         (error "Invalid desktop theme: %s" name))
       (let ((native (memq theme '(modus-vivendi-deuteranopia
-                                  modus-operandi-tinted))))
+                                  modus-operandi-tinted
+                                  modus-operandi
+                                  modus-operandi-deuteranopia
+                                  modus-operandi-tritanopia
+                                  modus-vivendi
+                                  modus-vivendi-tinted
+                                  modus-vivendi-tritanopia))))
         (unless native
           (let ((source (expand-file-name (concat name "-theme.el") bundle)))
             (unless (file-readable-p source)
