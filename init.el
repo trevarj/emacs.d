@@ -46,6 +46,7 @@
                             trev-ayu-mirage
                             trev-ayu-light
                             trev-nord
+                            trev-nord-light
                             trev-osaka-jade
                             trev-everforest
                             trev-everforest-light
@@ -53,7 +54,11 @@
                             trev-kanagawa-dragon
                             trev-kanagawa-lotus
                             trev-flexoki-dark
-                            trev-flexoki-light))
+                            trev-flexoki-light
+                            trev-catppuccin-latte
+                            trev-catppuccin-frappe
+                            trev-catppuccin-macchiato
+                            trev-catppuccin-mocha))
         (error "Invalid desktop theme: %s" name))
       (mapc #'disable-theme custom-enabled-themes)
       (if (memq theme '(modus-vivendi-deuteranopia modus-operandi-tinted))
