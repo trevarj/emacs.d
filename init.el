@@ -295,7 +295,7 @@
           ("\\*\\(Help\\|helpful\\|Customize\\|info\\|Ibuffer\\|.*eshell\\).*\\*"
            (display-buffer-reuse-window display-buffer-in-side-window)
            (side . right) (slot . 0) (window-width . .5))
-          ("\\*\\(xref\\|Occur\\|.*diagnostics\\|.*ghostel\\).*\\*"
+          ("\\*\\(xref\\|Occur\\|.*diagnostics\\).*\\*"
            (display-buffer-below-selected display-buffer-at-bottom)
            (window-height . .2)))
         display-line-numbers-grow-only t
@@ -403,11 +403,8 @@
      (project-find-matching-buffer "Matching buffer" ?B)
      (magit-project-status "Magit" ?m)
      (project-eshell "Eshell" ?e)
-     (ghostel-project "Ghostel" ?t)
      (herdr-project "Herdr" ?h)
-     (project-any-command "Other" ?o)))
-  :config
-  (add-to-list 'project-kill-buffer-conditions '(major-mode . ghostel-mode)))
+     (project-any-command "Other" ?o))))
 
 (use-package dired
   :custom
@@ -730,23 +727,6 @@
   :config
   (global-diff-hl-mode)
   (diff-hl-flydiff-mode))
-
-(use-package ghostel
-  :ensure nil
-  :load-path (lambda () (bound-and-true-p trev/ghostel-directory))
-  :commands ghostel
-  :bind (:map project-prefix-map
-              ("t" . ghostel-project))
-  :config
-  (setopt ghostel-shell "/etc/profiles/per-user/trev/bin/zsh"
-          ghostel-max-scrollback (* 100 1024 1024))
-  (setf (alist-get "ssh" ghostel-tramp-shells nil nil #'equal)
-        '("ssh" "/run/current-system/sw/bin/bash"))
-  (defun trev/ghostel-refit-after-frame-delete (&rest _)
-    "Refit surviving terminals after a frame stops constraining their size."
-    (dolist (window (ghostel--windows nil t))
-      (ghostel--adjust-size window)))
-  (advice-add 'delete-frame :after #'trev/ghostel-refit-after-frame-delete))
 
 
 (use-package flymake
