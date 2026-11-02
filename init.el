@@ -34,6 +34,19 @@
   (defvar trev/theme--changing nil
     "Non-nil while replacing or recovering a desktop theme.")
 
+  (defun trev/desktop-theme-private-p (path directory)
+    "Whether PATH is an owned, private real DIRECTORY or regular file."
+    (let ((attributes (file-attributes path 'integer)))
+      (and attributes
+           (eq (file-attribute-type attributes) (and directory t))
+           (= (file-attribute-user-id attributes) (user-uid))
+           (zerop (logand (file-modes path) #o077))
+           (equal path (directory-file-name (file-truename path)))
+           (if directory
+               (file-directory-p path)
+             (and (file-regular-p path) (file-readable-p path)
+                  (> (file-attribute-size attributes) 0))))))
+
   (defun trev/theme-set-fonts ()
     "Apply font preferences without overriding theme palette colors."
     (set-face-attribute 'default nil :family "Iosevka" :height 166 :weight 'medium)
@@ -44,12 +57,69 @@
   (defun trev/desktop-theme-load ()
     "Load the theme selected by the shared desktop theme bundle."
     (interactive)
-    (let* ((bundle (file-truename
-                    (expand-file-name "~/.local/share/trev-themes/current")))
-           (name (with-temp-buffer
-                   (insert-file-contents (expand-file-name "emacs-theme" bundle))
-                   (string-trim (buffer-string))))
+    (let* ((case-fold-search nil)
+           (root (expand-file-name "~/.local/share/trev-themes/"))
+           ;; Capture the link once: a publication during loading must not mix
+           ;; metadata from one generation with another generation's Lisp.
+           (active (expand-file-name "active" root))
+           (target (file-symlink-p active))
+           (runtime (and target (file-name-absolute-p target)))
+           (bundle
+            (cond
+             (target
+              (unless (and (not (file-remote-p target))
+                           (or runtime (equal target "current")))
+                (error "Invalid active desktop theme link: %s" target))
+              (file-truename (expand-file-name target root)))
+             ((file-exists-p active)
+              (error "Active desktop theme is not a managed symlink"))
+             ;; Only pre-handoff deployments may lack active.  A dangling or
+             ;; malformed active link is an error, never a reason to use current.
+             (t (file-truename (expand-file-name "current" root)))))
+           (_validated
+            (when runtime
+              (let* ((xdg-runtime (getenv "XDG_RUNTIME_DIR"))
+                     (directory (directory-file-name
+                                 (if (and xdg-runtime
+                                          (not (string-empty-p xdg-runtime)))
+                                     xdg-runtime
+                                   (format "/run/user/%s" (user-uid)))))
+                     (runtime-root (expand-file-name "trev-themes" directory)))
+                (unless (and (file-name-absolute-p directory)
+                             (equal target bundle)
+                             (string-match-p
+                              (concat "\\`" (regexp-quote runtime-root)
+                                      "/noctalia\\.[a-zA-Z0-9]\\{6\\}\\'")
+                              bundle)
+                             (trev/desktop-theme-private-p directory t)
+                             (trev/desktop-theme-private-p runtime-root t)
+                             (trev/desktop-theme-private-p bundle t))
+                  (error "Invalid private desktop theme generation: %s" bundle))
+                (dolist (asset '("kitty.conf" "umbriel.toml" "noctalia-theme.el"
+                                 "emacs-theme" "mode"))
+                  (unless (trev/desktop-theme-private-p
+                           (expand-file-name asset bundle) nil)
+                    (error "Invalid private desktop theme asset: %s" asset)))
+                (unless (with-temp-buffer
+                          (insert-file-contents (expand-file-name "mode" bundle))
+                          (member (buffer-string) '("dark\n" "light\n")))
+                  (error "Invalid Noctalia desktop theme mode"))
+                (unless (with-temp-buffer
+                          (insert-file-contents
+                           (expand-file-name "noctalia-theme.el" bundle))
+                          (and (not (re-search-forward "{{\\|}}" nil t))
+                               (string-match-p
+                                "\n;;; noctalia-theme\\.el ends here\n?\\'"
+                                (buffer-string))))
+                  (error "Incomplete Noctalia desktop theme source")))))
+           (selection (with-temp-buffer
+                        (insert-file-contents (expand-file-name "emacs-theme" bundle))
+                        (buffer-string)))
+           (name (string-trim selection))
            (theme (intern-soft name)))
+      (when runtime
+        (unless (equal selection "noctalia\n")
+          (error "Invalid Noctalia desktop theme selection")))
       (unless (memq theme '(modus-vivendi-deuteranopia
                             modus-operandi-tinted
                             modus-operandi
@@ -74,8 +144,11 @@
                             trev-catppuccin-latte
                             trev-catppuccin-frappe
                             trev-catppuccin-macchiato
-                            trev-catppuccin-mocha))
+                            trev-catppuccin-mocha
+                            noctalia))
         (error "Invalid desktop theme: %s" name))
+      (unless (eq (eq theme 'noctalia) (and runtime t))
+        (error "Noctalia requires a private runtime desktop theme generation"))
       (let ((native (memq theme '(modus-vivendi-deuteranopia
                                   modus-operandi-tinted
                                   modus-operandi
@@ -98,8 +171,23 @@
                       ;; NO-ENABLE does not protect an already active target.
                       (when (memq theme custom-enabled-themes)
                         (disable-theme theme))
+                      ;; Local declarations work without preloading Org, even
+                      ;; when the loader's source form is evaluated on its own.
+                      (defvar org-hide-leading-stars)
+                      (defvar org-startup-indented)
                       (let ((custom-theme-load-path
-                             (if native custom-theme-load-path (list bundle))))
+                             (if native
+                                 (copy-sequence custom-theme-load-path)
+                               (list bundle)))
+                            ;; The unchanged upstream footer must not install
+                            ;; delayed Org work or retain its source directory.
+                            (after-load-alist (copy-tree after-load-alist))
+                            (org-hide-leading-stars
+                             (and (boundp 'org-hide-leading-stars)
+                                  org-hide-leading-stars))
+                            (org-startup-indented
+                             (and (boundp 'org-startup-indented)
+                                  org-startup-indented)))
                         (load-theme theme t t))
                       (unless (and (get theme 'theme-feature)
                                    (get theme 'theme-settings))
@@ -129,8 +217,11 @@
 
   (defun trev/desktop-theme-initialize ()
     "Load shared state at startup, warning and falling back when necessary."
-    (let* ((current (expand-file-name "~/.local/share/trev-themes/current"))
-           (has-state (or (file-exists-p current) (file-symlink-p current))))
+    (trev/desktop-theme-start-server)
+    (let* ((active (expand-file-name "~/.local/share/trev-themes/active"))
+           (current (expand-file-name "~/.local/share/trev-themes/current"))
+           (has-state (or (file-exists-p active) (file-symlink-p active)
+                          (file-exists-p current) (file-symlink-p current))))
       (when has-state
         (condition-case condition
             (trev/desktop-theme-load)
@@ -206,9 +297,7 @@
     (with-selected-frame frame
       (trev/theme-set-extra-faces)))
   :bind ("C-c T" . trev/desktop-theme-select)
-  :hook
-  ((after-init . trev/desktop-theme-initialize)
-   (after-init . trev/desktop-theme-start-server))
+  :hook (after-init . trev/desktop-theme-initialize)
   :custom
   (modus-themes-include-derivatives-mode t)
   (modus-themes-italic-constructs t)

@@ -2,9 +2,9 @@
 
 ;;; Commentary:
 ;; Run: emacs -Q --batch -l lisp/desktop-theme-tests.el -f ert-run-tests-batch-and-exit
-;; Each test gets a fresh Emacs and disposable HOME.  Only the real Modus
-;; :preface/:config are evaluated, never the full init.  The font regression
-;; calls the same font helper as Emacs :init.
+;; Each test gets a fresh Emacs and disposable HOME/runtime/server.  Only the
+;; real Modus :preface/:config/:hook are evaluated, never the full init.
+;; The font regression calls the same font helper as Emacs :init.
 ;; Batch checks face attributes, not new-frame rendering (a GUI smoke check).
 
 ;;; Code:
@@ -26,6 +26,9 @@
           (setenv "XDG_CONFIG_HOME" (expand-file-name ".config" home))
           (setenv "XDG_CACHE_HOME" (expand-file-name ".cache" home))
           (setenv "XDG_DATA_HOME" (expand-file-name ".local/share" home))
+          (setenv "XDG_RUNTIME_DIR" (expand-file-name "runtime" home))
+          (make-directory (getenv "XDG_RUNTIME_DIR"))
+          (set-file-modes (getenv "XDG_RUNTIME_DIR") #o700)
           (setenv "TREV_DESKTOP_THEME_TEST" (symbol-name name))
           (let ((default-directory (file-name-as-directory home)))
             (with-temp-buffer
@@ -63,6 +66,12 @@
   (require 'modus-themes)
   (require 'spacious-padding)
   (require 'diff-mode)
+  (require 'server)
+  (require 'use-package)
+  (setq server-socket-dir (expand-file-name "server" "~/")
+        server-auth-dir (expand-file-name "auth" "~/")
+        server-use-tcp nil
+        after-init-hook nil)
   (with-temp-buffer
     (insert-file-contents (expand-file-name "init.el" desktop-theme-test--root))
     (goto-char (point-min))
@@ -79,8 +88,11 @@
       (dolist (item (cddr form))
         (if (keywordp item)
             (setq section item)
-          (when (memq section '(:preface :config))
-            (eval item t))))))
+          (cond
+           ((memq section '(:preface :config))
+            (eval item t))
+           ((eq section :hook)
+            (eval `(use-package modus-themes :ensure nil :hook ,item) t)))))))
   (defface desktop-theme-test-only
     '((t :foreground "#445566" :background "#223344"))
     "A face not defined by the old theme, used to detect leaked settings."))
@@ -117,6 +129,44 @@
     (when (file-symlink-p current) (delete-file current))
     (make-symbolic-link bundle current)))
 
+(defun desktop-theme-test--active (target)
+  (let ((active (expand-file-name "~/.local/share/trev-themes/active")))
+    (make-directory (file-name-directory active) t)
+    (when (file-symlink-p active) (delete-file active))
+    (make-symbolic-link target active)))
+
+(defun desktop-theme-test--runtime (background &optional mode extra tail)
+  (let* ((root (expand-file-name "trev-themes" (getenv "XDG_RUNTIME_DIR")))
+         (_ (make-directory root t))
+         (bundle (make-temp-file (expand-file-name "noctalia." root) t))
+         (source (expand-file-name "noctalia-theme.el" bundle))
+         (catalog (desktop-theme-test--bundle "runtime-source" 'noctalia
+                                              background extra)))
+    (set-file-modes root #o700)
+    (set-file-modes bundle #o700)
+    (copy-file (expand-file-name "noctalia-theme.el" catalog) source)
+    (with-temp-buffer
+      (insert-file-contents source)
+      (goto-char (point-max))
+      ;; The pinned upstream footer's immediate and delayed side effects.
+      (insert "\n(with-eval-after-load 'org\n"
+              "  (setq org-hide-leading-stars t)\n"
+              "  (setq org-startup-indented t))\n"
+              "(when load-file-name\n"
+              "  (add-to-list 'custom-theme-load-path\n"
+              "    (file-name-as-directory (file-name-directory load-file-name))))\n"
+              (or tail "")
+              "\n;;; noctalia-theme.el ends here\n")
+      (write-region (point-min) (point-max) source nil 'silent))
+    (dolist (asset `(("kitty.conf" . "background #112233\n")
+                     ("umbriel.toml" . "[colors]\nbackground = \"#112233\"\n")
+                     ("emacs-theme" . "noctalia\n")
+                     ("mode" . ,(concat (or mode "dark") "\n"))))
+      (desktop-theme-test--write (expand-file-name (car asset) bundle) (cdr asset)))
+    (dolist (asset (directory-files bundle t directory-files-no-dot-files-regexp))
+      (set-file-modes asset #o600))
+    bundle))
+
 (defun desktop-theme-test--appearance ()
   (mapcar (lambda (face) (cons face (face-all-attributes face)))
           '(default diff-added diff-changed diff-removed error
@@ -144,7 +194,11 @@
   (let (warnings)
     (cl-letf (((symbol-function 'display-warning)
                (lambda (_type message &rest _) (push message warnings))))
-      (trev/desktop-theme-initialize)
+      (run-hooks 'after-init-hook)
+      (should (server-running-p))
+      (let ((started server-process))
+        (trev/desktop-theme-start-server)
+        (should (eq started server-process)))
       (should-not warnings)
       (should (equal custom-enabled-themes '(modus-vivendi-deuteranopia)))
       (should (equal (face-background 'default nil t)
@@ -159,19 +213,6 @@
           (should (equal warnings (list (error-message-string failure)))))
         (should (equal (desktop-theme-test--appearance) appearance))
         (should (equal custom-enabled-themes '(modus-vivendi-deuteranopia)))
-        (require 'server)
-        (let ((server-name "desktop-theme-test")
-              (server-socket-dir (expand-file-name "server" "~/"))
-              (server-auth-dir (expand-file-name "auth" "~/"))
-              (server-use-tcp nil))
-          (unwind-protect
-              (progn
-                (trev/desktop-theme-start-server)
-                (should (server-running-p server-name))
-                (let ((started server-process))
-                  (trev/desktop-theme-start-server)
-                  (should (eq started server-process))))
-            (when (process-live-p server-process) (delete-process server-process))))
         (mapc #'disable-theme (copy-sequence custom-enabled-themes))
         (trev/desktop-theme-initialize)
         (should (equal custom-enabled-themes '(modus-vivendi-deuteranopia)))
@@ -183,6 +224,343 @@
         (should (equal (desktop-theme-test--appearance) appearance))
         (should (equal (file-symlink-p "~/.local/share/trev-themes/current")
                        (expand-file-name "missing-bundle" "~/")))))))
+
+(desktop-theme-test desktop-theme-after-init-orders-server-before-load
+  (let ((bundle (desktop-theme-test--bundle "startup" 'trev-nord "#102030"))
+        (start (symbol-function 'trev/desktop-theme-start-server))
+        (load (symbol-function 'trev/desktop-theme-load))
+        events)
+    (desktop-theme-test--select bundle)
+    (desktop-theme-test--active "current")
+    (cl-letf (((symbol-function 'trev/desktop-theme-start-server)
+               (lambda () (push 'server events) (funcall start)))
+              ((symbol-function 'trev/desktop-theme-load)
+               (lambda ()
+                 (push 'load events)
+                 (should (server-running-p))
+                 (funcall load))))
+      (run-hooks 'after-init-hook))
+    (should (equal (reverse events) '(server load)))
+    (should (equal custom-enabled-themes '(trev-nord)))
+    (dolist (condition '(error quit))
+      (setq events nil)
+      (cl-letf (((symbol-function 'server-running-p) (lambda (&rest _) nil))
+                ((symbol-function 'server-start)
+                 (lambda () (push 'server events)
+                   (signal condition '("disposable server failure"))))
+                ((symbol-function 'trev/desktop-theme-load)
+                 (lambda () (push 'load events) (funcall load))))
+        (run-hooks 'after-init-hook))
+      (should (equal (reverse events) '(server load)))
+      (should (equal custom-enabled-themes '(trev-nord))))))
+
+(desktop-theme-test desktop-theme-active-runtime-dark-light-and-return
+  (let ((catalog (desktop-theme-test--bundle "saved" 'trev-nord "#102030")))
+    ;; Only the initial deployment may omit active.
+    (desktop-theme-test--select catalog)
+    (trev/desktop-theme-load)
+    (should (equal custom-enabled-themes '(trev-nord)))
+    (dolist (revision '(("dark" "#203040") ("light" "#e5e9f0")))
+      (desktop-theme-test--active
+       (desktop-theme-test--runtime (cadr revision) (car revision)))
+      (trev/desktop-theme-load)
+      (should (equal custom-enabled-themes '(noctalia)))
+      (should (equal (face-background 'default nil t) (cadr revision)))
+      (should (equal (file-symlink-p "~/.local/share/trev-themes/current")
+                     catalog)))
+    (desktop-theme-test--active "current")
+    (trev/desktop-theme-load)
+    (should (equal custom-enabled-themes '(trev-nord)))
+    (should (equal (face-background 'default nil t) "#102030"))))
+
+(desktop-theme-test desktop-theme-after-init-loads-runtime-without-current
+  (desktop-theme-test--active (desktop-theme-test--runtime "#203040"))
+  (run-hooks 'after-init-hook)
+  (should (server-running-p))
+  (should (equal custom-enabled-themes '(noctalia)))
+  (should (equal (face-background 'default nil t) "#203040"))
+  (should-not (file-exists-p "~/.local/share/trev-themes/current")))
+
+(desktop-theme-test desktop-theme-active-rejects-unmanaged-and-incomplete-state
+  (let ((catalog (desktop-theme-test--bundle "saved" 'trev-nord "#102030")))
+    (desktop-theme-test--select catalog)
+    (trev/desktop-theme-load)
+    (let ((appearance (desktop-theme-test--appearance)))
+      (dolist (fault '(catalog-noctalia absolute-catalog relative remote dangling
+                      malformed-leaf uppercase-leaf selection mode footer unresolved))
+        (ert-info ((format "Untrusted active state: %s" fault))
+          (let ((bundle (desktop-theme-test--runtime "#abcdef")))
+            (pcase fault
+              ('catalog-noctalia
+               (desktop-theme-test--select
+                (desktop-theme-test--bundle "untrusted" 'noctalia "#abcdef"))
+               (desktop-theme-test--active "current"))
+              ('absolute-catalog (desktop-theme-test--active catalog))
+              ('relative (desktop-theme-test--active "../../bundles/saved"))
+              ('remote (desktop-theme-test--active
+                        "/ssh:invalid.example:/tmp/noctalia.ABC123"))
+              ('dangling
+               (desktop-theme-test--active
+                (expand-file-name "trev-themes/noctalia.ABC123"
+                                  (getenv "XDG_RUNTIME_DIR"))))
+              ('malformed-leaf
+               (let ((bad (concat bundle "-extra")))
+                 (rename-file bundle bad)
+                 (desktop-theme-test--active bad)))
+              ('uppercase-leaf
+               (let ((bad (expand-file-name
+                           (concat "Noctalia." (substring bundle -6))
+                           (file-name-directory bundle))))
+                 (rename-file bundle bad)
+                 (desktop-theme-test--active bad)))
+              (_
+               (desktop-theme-test--write
+                (expand-file-name (pcase fault
+                                    ('selection "emacs-theme")
+                                    ('mode "mode")
+                                    (_ "noctalia-theme.el"))
+                                  bundle)
+                (pcase fault
+                  ('selection "trev-nord\n")
+                  ('mode "sepia\n")
+                  ('footer "(error \"must not execute incomplete source\")\n")
+                  ('unresolved
+                   "{{colors.background.default.hex}}\n;;; noctalia-theme.el ends here\n")))
+               (desktop-theme-test--active bundle)))
+            (should-error (trev/desktop-theme-load))
+            (should (equal custom-enabled-themes '(trev-nord)))
+            (should (equal (desktop-theme-test--appearance) appearance))
+            (desktop-theme-test--select catalog))))
+      (delete-file "~/.local/share/trev-themes/active")
+      (make-directory "~/.local/share/trev-themes/active")
+      (should-error (trev/desktop-theme-load))
+      (should (equal (desktop-theme-test--appearance) appearance)))))
+
+(desktop-theme-test desktop-theme-runtime-requires-private-owned-real-assets
+  (let ((catalog (desktop-theme-test--bundle "saved" 'trev-nord "#102030"))
+        (attributes (symbol-function 'file-attributes)))
+    (desktop-theme-test--select catalog)
+    (trev/desktop-theme-load)
+    (let ((appearance (desktop-theme-test--appearance)))
+      (dolist (asset '("kitty.conf" "umbriel.toml" "noctalia-theme.el"
+                       "emacs-theme" "mode"))
+        (dolist (fault '(missing empty public symlink directory owner))
+          (ert-info ((format "%s asset: %s" fault asset))
+            (let* ((bundle (desktop-theme-test--runtime "#abcdef"))
+                   (file (expand-file-name asset bundle)))
+              (pcase fault
+                ('missing (delete-file file))
+                ('empty (desktop-theme-test--write file ""))
+                ('public (set-file-modes file #o644))
+                ('symlink
+                 (rename-file file (concat file ".real"))
+                 (make-symbolic-link (concat file ".real") file))
+                ('directory (delete-file file) (make-directory file)))
+              (desktop-theme-test--active bundle)
+              (cl-letf (((symbol-function 'file-attributes)
+                         (lambda (path &optional format)
+                           (let ((value (funcall attributes path format)))
+                             (when (and (eq fault 'owner) (equal path file))
+                               (setf (nth 2 value) (1+ (user-uid))))
+                             value))))
+                (should-error (trev/desktop-theme-load)))
+              (should (equal custom-enabled-themes '(trev-nord)))
+              (should (equal (desktop-theme-test--appearance) appearance))))))
+      (dolist (component '(runtime root generation))
+        (dolist (fault '(public symlink owner))
+          (let* ((bundle (desktop-theme-test--runtime "#abcdef"))
+                 (directory (pcase component
+                              ('runtime (getenv "XDG_RUNTIME_DIR"))
+                              ('root (file-name-directory bundle))
+                              (_ bundle)))
+                 (directory (directory-file-name directory))
+                 (real (concat directory ".real")))
+            (desktop-theme-test--active bundle)
+            (unwind-protect
+                (progn
+                  (pcase fault
+                    ('public (set-file-modes directory #o755))
+                    ('symlink
+                     (rename-file directory real)
+                     (make-symbolic-link real directory)))
+                  (cl-letf (((symbol-function 'file-attributes)
+                             (lambda (path &optional format)
+                               (let ((value (funcall attributes path format)))
+                                 (when (and (eq fault 'owner)
+                                            (equal path directory))
+                                   (setf (nth 2 value) (1+ (user-uid))))
+                                 value))))
+                    (should-error (trev/desktop-theme-load)))
+                  (should (equal (desktop-theme-test--appearance) appearance)))
+              (when (eq fault 'symlink)
+                (delete-file directory)
+                (rename-file real directory))
+              (set-file-modes directory #o700))))))))
+
+(desktop-theme-test desktop-theme-noctalia-same-symbol-error-and-quit-rollback
+  (let* ((catalog (desktop-theme-test--bundle "saved" 'trev-nord "#102030"))
+         (original (face-foreground 'desktop-theme-test-only nil t))
+         (a (desktop-theme-test--runtime
+             "#203040" "dark"
+             '((desktop-theme-test-only ((t :foreground "#ff00ff"))))))
+         (b (desktop-theme-test--runtime "#e5e9f0" "light"))
+         (custom-theme-load-path (cons a custom-theme-load-path))
+         (search-path (copy-sequence custom-theme-load-path)))
+    (desktop-theme-test--select catalog)
+    (dolist (revision `((,a "#203040" "#ff00ff")
+                        (,b "#e5e9f0" ,original)
+                        (,a "#203040" "#ff00ff")))
+      (desktop-theme-test--active (car revision))
+      (trev/desktop-theme-load)
+      (should (equal custom-enabled-themes '(noctalia)))
+      (should (equal (face-background 'default nil t) (cadr revision)))
+      (should (equal (face-foreground 'desktop-theme-test-only nil t)
+                     (caddr revision)))
+      (should (equal custom-theme-load-path search-path)))
+    (let ((appearance (desktop-theme-test--appearance))
+          (plist (copy-tree (symbol-plist 'noctalia) t))
+          (after-load (copy-tree after-load-alist)))
+      (dolist (phase '(load enable))
+        (dolist (condition '(error quit))
+          (ert-info ((format "Same Noctalia symbol: %s %s" phase condition))
+            (let* ((bundle
+                    (desktop-theme-test--runtime
+                     "#abcdef" "light"
+                     '((desktop-theme-test-only ((t :foreground "#00ffff"))))
+                     (when (eq phase 'load)
+                       (format "(signal '%s '(\"injected Noctalia failure\"))\n"
+                               condition))))
+                   (recalc (symbol-function 'custom-theme-recalc-face))
+                   caught fired)
+              (desktop-theme-test--active bundle)
+              (cl-letf (((symbol-function 'custom-theme-recalc-face)
+                         (lambda (face)
+                           (funcall recalc face)
+                           (when (and (eq phase 'enable)
+                                      (eq face 'desktop-theme-test-only)
+                                      (equal (face-foreground face nil t) "#00ffff")
+                                      (not fired))
+                             (setq fired t)
+                             (signal condition '("injected Noctalia failure"))))))
+                (condition-case failure
+                    (trev/desktop-theme-load)
+                  ((error quit) (setq caught failure))))
+              (should (equal caught
+                             (list condition "injected Noctalia failure")))
+              (should (equal custom-enabled-themes '(noctalia)))
+              (should (equal (symbol-plist 'noctalia) plist))
+              (should (custom-theme-p 'noctalia))
+              (should (equal (desktop-theme-test--appearance) appearance))
+              (should (equal custom-theme-load-path search-path))
+              (should (equal after-load-alist after-load)))))))
+    (desktop-theme-test--active "current")
+    (trev/desktop-theme-load)
+    (should (equal custom-enabled-themes '(trev-nord)))
+    (should (equal (face-background 'default nil t) "#102030"))))
+
+(desktop-theme-test desktop-theme-noctalia-does-not-defer-org-side-effects
+  (should-not (featurep 'org))
+  (makunbound 'org-hide-leading-stars)
+  (makunbound 'org-startup-indented)
+  (let* ((catalog (desktop-theme-test--bundle "saved" 'trev-nord "#102030"))
+         (bundle (desktop-theme-test--runtime "#203040"))
+         (marker (expand-file-name "legitimate-org-after-load" "~/"))
+         (custom-theme-load-path (cons catalog custom-theme-load-path)))
+    ;; An existing Org registration must survive without receiving the footer's
+    ;; additions through a shared alist entry.
+    (eval-after-load 'org
+      `(with-temp-file ,marker (insert "existing callback ran")))
+    (let ((after-load (copy-tree after-load-alist))
+          (search-path (copy-sequence custom-theme-load-path)))
+      (desktop-theme-test--select catalog)
+      (desktop-theme-test--active bundle)
+      (trev/desktop-theme-load)
+      (should-not (featurep 'org))
+      (should-not (boundp 'org-hide-leading-stars))
+      (should-not (boundp 'org-startup-indented))
+      (should (equal after-load-alist after-load))
+      (should (equal custom-theme-load-path search-path))
+      (desktop-theme-test--active "current")
+      (trev/desktop-theme-load)
+      ;; Preferences chosen after returning to Niri must not be overwritten
+      ;; when Org is loaded later.
+      (set 'org-hide-leading-stars nil)
+      (set 'org-startup-indented nil)
+      (require 'org)
+      (should (file-exists-p marker))
+      (should-not (symbol-value 'org-hide-leading-stars))
+      (should-not (symbol-value 'org-startup-indented))
+      (should (equal custom-theme-load-path search-path)))))
+
+(desktop-theme-test desktop-theme-noctalia-preserves-loaded-org-preferences
+  (require 'org)
+  (let ((catalog (desktop-theme-test--bundle "saved" 'trev-nord "#102030")))
+    (desktop-theme-test--select catalog)
+    (dolist (preferences '((nil nil) (t nil) (nil t)))
+      (set 'org-hide-leading-stars (car preferences))
+      (set 'org-startup-indented (cadr preferences))
+      (let ((after-load (copy-tree after-load-alist))
+            (search-path (copy-sequence custom-theme-load-path)))
+        (desktop-theme-test--active (desktop-theme-test--runtime "#203040"))
+        (trev/desktop-theme-load)
+        (should (equal (symbol-value 'org-hide-leading-stars) (car preferences)))
+        (should (equal (symbol-value 'org-startup-indented) (cadr preferences)))
+        (should (equal after-load-alist after-load))
+        (should (equal custom-theme-load-path search-path))
+        (desktop-theme-test--active "current")
+        (trev/desktop-theme-load)
+        (should (equal (symbol-value 'org-hide-leading-stars) (car preferences)))
+        (should (equal (symbol-value 'org-startup-indented) (cadr preferences)))))))
+
+(desktop-theme-test desktop-theme-noctalia-footer-isolates-error-and-quit
+  (let ((catalog (desktop-theme-test--bundle "saved" 'trev-nord "#102030")))
+    (desktop-theme-test--select catalog)
+    (trev/desktop-theme-load)
+    (dolist (loaded '(nil t))
+      (if loaded
+          (progn
+            (require 'org)
+            (set 'org-hide-leading-stars nil)
+            (set 'org-startup-indented nil))
+        (should-not (featurep 'org))
+        (makunbound 'org-hide-leading-stars)
+        (makunbound 'org-startup-indented))
+      (dolist (condition '(error quit))
+        (let ((after-load (copy-tree after-load-alist))
+              (search-path (copy-sequence custom-theme-load-path))
+              caught)
+          (desktop-theme-test--active
+           (desktop-theme-test--runtime
+            "#abcdef" "dark" nil
+            (format "(signal '%s '(\"footer failure\"))\n" condition)))
+          (condition-case failure
+              (trev/desktop-theme-load)
+            ((error quit) (setq caught failure)))
+          (should (equal caught (list condition "footer failure")))
+          (should (equal custom-enabled-themes '(trev-nord)))
+          (should (equal (face-background 'default nil t) "#102030"))
+          (should (eq (and (boundp 'org-hide-leading-stars) t) loaded))
+          (should (eq (and (boundp 'org-startup-indented) t) loaded))
+          (when loaded
+            (should-not (symbol-value 'org-hide-leading-stars))
+            (should-not (symbol-value 'org-startup-indented)))
+          (should (equal after-load-alist after-load))
+          (should (equal custom-theme-load-path search-path)))))))
+
+(desktop-theme-test desktop-theme-active-resolves-one-runtime-snapshot
+  (let* ((a (desktop-theme-test--runtime "#102030"))
+         (b (desktop-theme-test--runtime "#304050"))
+         (insert-file (symbol-function 'insert-file-contents)))
+    (desktop-theme-test--active a)
+    (cl-letf (((symbol-function 'insert-file-contents)
+               (lambda (file &rest args)
+                 (prog1 (apply insert-file file args)
+                   (when (equal file (expand-file-name "emacs-theme" a))
+                     (desktop-theme-test--active b))))))
+      (trev/desktop-theme-load))
+    (should (equal (face-background 'default nil t) "#102030"))
+    (trev/desktop-theme-load)
+    (should (equal (face-background 'default nil t) "#304050"))))
 
 (desktop-theme-test desktop-theme-native-catalog-ignores-bundle-source
   (let ((poison (expand-file-name "native-poison-executed" "~/")))
@@ -196,6 +574,7 @@
            (format "(with-temp-file %S (insert \"executed\"))\n(error \"Bundle source shadowed native theme\")\n"
                    poison))
           (desktop-theme-test--select bundle)
+          (desktop-theme-test--active "current")
           (dotimes (_ 2)
             (trev/desktop-theme-load)
             (should (equal custom-enabled-themes (list theme)))
@@ -308,6 +687,7 @@
          (b (desktop-theme-test--bundle "b" 'trev-ayu-dark "#304050"))
          (insert-file (symbol-function 'insert-file-contents)))
     (desktop-theme-test--select a)
+    (desktop-theme-test--active "current")
     (cl-letf (((symbol-function 'insert-file-contents)
                (lambda (file &rest args)
                  (prog1 (apply insert-file file args)
@@ -334,13 +714,23 @@
                  "fonts-native" 'modus-vivendi-deuteranopia "#abcdef"))
         (generated (desktop-theme-test--bundle
                     "fonts-generated" 'trev-nord-light "#e5e9f0"))
+        (runtime (desktop-theme-test--runtime
+                  "#304050" "dark"
+                  '((fixed-pitch ((t (:family "monospace"))))
+                    (fixed-pitch-serif ((t (:family "monospace serif"))))
+                    (variable-pitch ((t (:family "sans serif")))))))
         previous-theme previous-background)
     (dolist (selection `((,native modus-vivendi-deuteranopia)
                          (,native modus-vivendi-deuteranopia)
                          (,generated trev-nord-light)
                          (,generated trev-nord-light)
+                         (,runtime noctalia)
+                         (,runtime noctalia)
                          (,native modus-vivendi-deuteranopia)))
-      (desktop-theme-test--select (car selection))
+      (if (eq (cadr selection) 'noctalia)
+          (desktop-theme-test--active (car selection))
+        (desktop-theme-test--select (car selection))
+        (desktop-theme-test--active "current"))
       (trev/desktop-theme-load)
       (should (equal custom-enabled-themes (list (cadr selection))))
       (dolist (font baseline)
@@ -349,9 +739,10 @@
             (should (equal (face-attribute face attribute nil) value)))))
       (let ((background (face-background 'default nil t)))
         (should (equal background
-                       (if (eq (cadr selection) 'trev-nord-light)
-                           "#e5e9f0"
-                         (modus-themes-get-color-value 'bg-main t))))
+                       (pcase (cadr selection)
+                         ('trev-nord-light "#e5e9f0")
+                         ('noctalia "#304050")
+                         (_ (modus-themes-get-color-value 'bg-main t)))))
         (when previous-theme
           (if (eq previous-theme (cadr selection))
               (should (equal background previous-background))
