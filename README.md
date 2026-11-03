@@ -31,7 +31,11 @@ link are individually atomic, not a cross-file transaction.
 Dark palettes use installed native `modus-vivendi`; light palettes use
 `modus-operandi`. Theme-local in-memory overrides map terminal colors to real
 UI, syntax, ANSI and semantic roles, including normal/bright intensities and
-colored surfaces. The existing common search-color preference is retained;
+colored surfaces. For both dark and light Noctalia palettes, the active mode-line
+background blends 8% main foreground with 92% editor background; the inactive
+background is the editor background. Active text uses the main foreground and
+inactive text uses `color8`; selection/completion colors and named themes are
+unchanged. The existing common search-color preference is retained;
 Iosevka/Noto font preferences and local semantic faces are reapplied. Noctalia
 never supplies executable Lisp to Emacs. Keep its independent native Emacs
 template/hook disabled. Kitty's native template/hook still owns Kitty separately;
@@ -73,8 +77,9 @@ provides ERT, use-package, server and diff-mode. Each test runs in a fresh batch
 subprocess with disposable HOME, XDG cache/runtime and server directories.
 It reads the real Modus `:preface`, `:config` and `:hook` source forms, never the
 full init or a live server. Regressions cover dark/light native palette and
-semantic colors, cold-process cache restoration without a shell/server, unsafe
-or corrupt state, error/quit rollback, native/generated source isolation,
+semantic colors, subtle-neutral mode-lines, cold-process cache restoration
+without a shell/server, unsafe or corrupt state, error/quit rollback,
+native/generated source isolation,
 faces/fonts, startup ordering/server failures and the asynchronous picker.
 Batch face checks do not replace real GUI evidence. Once desktop activation is
 separately authorized, restart Emacs with the updated loader, apply Noctalia

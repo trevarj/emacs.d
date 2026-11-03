@@ -116,17 +116,31 @@
             (error "Invalid Noctalia palette cache"))
           (cons mode colors)))))
 
+  (defun trev/desktop-theme--blend (foreground background weight)
+    "Blend RGB hex FOREGROUND over BACKGROUND with foreground WEIGHT."
+    (concat
+     "#"
+     (mapconcat
+      (lambda (offset)
+        (format "%02x"
+                (round
+                 (+ (* weight (string-to-number
+                               (substring foreground offset (+ offset 2)) 16))
+                    (* (- 1 weight)
+                       (string-to-number
+                        (substring background offset (+ offset 2)) 16))))))
+      '(1 3 5) "")))
+
   (defun trev/desktop-theme--palette (colors)
     "Map validated terminal COLORS to native Modus UI and syntax roles."
     (require 'cl-lib)
     (let (palette)
       (dolist (mapping
                '((background bg-main bg-dim bg-inactive bg-hl-line bg-popup bg-tab-bar
-                             bg-tab-current bg-tab-other)
+                             bg-tab-current bg-tab-other bg-mode-line-inactive)
                  (foreground fg-main fg-mode-line-active)
                  (cursor cursor)
-                 (selection_background bg-active bg-region bg-completion
-                                       bg-mode-line-active bg-mode-line-inactive)
+                 (selection_background bg-active bg-region bg-completion)
                  (selection_foreground fg-region)
                  (color8 fg-dim border comment border-mode-line-active
                          border-mode-line-inactive fg-mode-line-inactive)
@@ -140,6 +154,11 @@
                  (color11 constant number)))
         (dolist (role (cdr mapping))
           (push (list role (cdr (assoc (symbol-name (car mapping)) colors))) palette)))
+      (push (list 'bg-mode-line-active
+                  (trev/desktop-theme--blend
+                   (cdr (assoc "foreground" colors))
+                   (cdr (assoc "background" colors)) 0.08))
+            palette)
       (dolist (mapping
                '(("color1" "color9" red-warmer red-cooler red-faint red-intense
                   bg-red-nuanced bg-red-subtle bg-red-intense)
@@ -163,20 +182,8 @@
           (cl-mapc
            (lambda (role weight)
              (push
-              (list role
-                    (concat
-                     "#"
-                     (mapconcat
-                      (lambda (offset)
-                        (format "%02x"
-                                (round
-                                 (+ (* weight (string-to-number
-                                               (substring normal offset (+ offset 2)) 16))
-                                    (* (- 1 weight)
-                                       (string-to-number
-                                        (substring (cdr (assoc "background" colors))
-                                                   offset (+ offset 2)) 16))))))
-                      '(1 3 5) "")))
+              (list role (trev/desktop-theme--blend
+                          normal (cdr (assoc "background" colors)) weight))
               palette))
            (seq-drop roles 4) '(0.1 0.2 0.4))))
       (dolist (mapping '((olive green) (slate cyan) (indigo blue)

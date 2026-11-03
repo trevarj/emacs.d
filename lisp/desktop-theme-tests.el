@@ -311,6 +311,38 @@
     (should (equal custom-enabled-themes '(trev-nord)))
     (should (equal (face-background 'default nil t) "#102030"))))
 
+(desktop-theme-test desktop-theme-noctalia-subtle-neutral-mode-lines
+  (dolist (revision '(("dark" "#203040" modus-vivendi "#2e3d4c")
+                      ("light" "#e5e9f0" modus-operandi "#e3e7ee")))
+    (let* ((mode (car revision))
+           (background (cadr revision))
+           (theme (nth 2 revision))
+           (faces '(mode-line mode-line-active mode-line-inactive))
+           (appearance
+            (lambda ()
+              (mapcar (lambda (face)
+                        (list (face-background face nil t)
+                              (face-foreground face nil t)))
+                      faces))))
+      (desktop-theme-test--select
+       (desktop-theme-test--bundle mode theme "#abcdef"))
+      (desktop-theme-test--active "current")
+      (trev/desktop-theme-load)
+      (let ((named (funcall appearance)))
+        (desktop-theme-test--active
+         (desktop-theme-test--runtime background mode))
+        (trev/desktop-theme-load)
+        (dolist (face '(mode-line mode-line-active))
+          (should (equal (face-background face nil t) (nth 3 revision)))
+          (should (equal (face-foreground face nil t) "#d0d1d2")))
+        (should (equal (face-background 'mode-line-inactive nil t) background))
+        (should (equal (face-foreground 'mode-line-inactive nil t) "#78797a"))
+        (dolist (face '(region modus-themes-completion-selected))
+          (should (equal (face-background face nil t) "#445566")))
+        (desktop-theme-test--active "current")
+        (trev/desktop-theme-load)
+        (should (equal (funcall appearance) named))))))
+
 (desktop-theme-test desktop-theme-restarts-from-cache-without-shell-or-server
   (desktop-theme-test--active (desktop-theme-test--runtime "#203040"))
   ;; No selected catalog, live Kitty output, shell program or reachable server
@@ -596,7 +628,7 @@
          (poison (expand-file-name "runtime-lisp-executed" "~/")))
     (desktop-theme-test--write
      (expand-file-name "trev-ayu-dark-theme.el" generated)
-     "(require 'modus-themes)\n(defvar trev-ayu-dark-palette-overrides nil)\n(setq trev-ayu-dark-palette-overrides '((bg-main \"#405060\") (keyword \"#ff1234\")))\n(modus-themes-theme 'trev-ayu-dark 'trev-desktop \"Test\" 'dark 'modus-themes-vivendi-palette nil 'trev-ayu-dark-palette-overrides)\n")
+     "(require 'modus-themes)\n(defvar trev-ayu-dark-palette-overrides nil)\n(setq trev-ayu-dark-palette-overrides '((bg-main \"#405060\") (keyword \"#ff1234\") (bg-mode-line-active \"#345678\") (bg-mode-line-inactive \"#456789\")))\n(modus-themes-theme 'trev-ayu-dark 'trev-desktop \"Test\" 'dark 'modus-themes-vivendi-palette nil 'trev-ayu-dark-palette-overrides)\n")
     ;; Obsolete runtime Lisp is neither read nor executed, even if present.
     (desktop-theme-test--write
      (expand-file-name "noctalia-theme.el" runtime)
@@ -613,7 +645,10 @@
       (when (eq selection 'native)
         (should (equal (face-foreground 'font-lock-function-name-face nil t) "#123abc")))
       (when (eq selection 'generated)
-        (should (equal (face-foreground 'font-lock-keyword-face nil t) "#ff1234")))
+        (should (equal (face-foreground 'font-lock-keyword-face nil t) "#ff1234"))
+        (dolist (face '(mode-line mode-line-active))
+          (should (equal (face-background face nil t) "#345678")))
+        (should (equal (face-background 'mode-line-inactive nil t) "#456789")))
       (unless (eq selection 'noctalia)
         (should (equal (trev/desktop-theme--override-state) originals))
         (should-not trev/desktop-theme--original-overrides))
