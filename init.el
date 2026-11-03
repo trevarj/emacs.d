@@ -95,7 +95,7 @@
                              (trev/desktop-theme-private-p runtime-root t)
                              (trev/desktop-theme-private-p bundle t))
                   (error "Invalid private desktop theme generation: %s" bundle))
-                (dolist (asset '("kitty.conf" "umbriel.toml" "noctalia-theme.el"
+                (dolist (asset '("umbriel.toml" "noctalia-theme.el"
                                  "emacs-theme" "mode"))
                   (unless (trev/desktop-theme-private-p
                            (expand-file-name asset bundle) nil)
