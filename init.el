@@ -31,8 +31,174 @@
 (use-package modus-themes
   :demand t
   :preface
+  ;; Declare native options special before user code can bind them lexically.
+  (defvar modus-vivendi-palette-overrides nil)
+  (defvar modus-operandi-palette-overrides nil)
+
   (defvar trev/theme--changing nil
     "Non-nil while replacing or recovering a desktop theme.")
+
+  (defvar trev/desktop-theme--original-overrides nil
+    "Native palette preferences saved while Noctalia owns desktop colors.")
+
+  (defun trev/desktop-theme--override-state ()
+    "Snapshot the two native palette variables, including unbound values."
+    (mapcar (lambda (variable)
+              (list variable (boundp variable)
+                    (and (boundp variable) (copy-tree (symbol-value variable)))))
+            '(modus-vivendi-palette-overrides modus-operandi-palette-overrides)))
+
+  (defun trev/desktop-theme--restore-overrides (state)
+    "Restore native palette variables from STATE."
+    (dolist (entry state)
+      (if (cadr entry)
+          (set (car entry) (copy-tree (caddr entry)))
+        (makunbound (car entry)))))
+
+  (defun trev/desktop-theme-cache ()
+    "Read one strictly validated data-only Noctalia palette snapshot."
+    (require 'json)
+    (let* ((xdg-cache (getenv "XDG_CACHE_HOME"))
+           (directory (directory-file-name
+                       (if (and xdg-cache (not (string-empty-p xdg-cache)))
+                           xdg-cache
+                         (expand-file-name "~/.cache"))))
+           (parent (expand-file-name "noctalia" directory))
+           (file (expand-file-name "emacs-palette.json" parent))
+           (keys '("background" "foreground" "cursor" "cursor_text_color"
+                   "selection_background" "selection_foreground"
+                   "color0" "color1" "color2" "color3" "color4" "color5"
+                   "color6" "color7" "color8" "color9" "color10" "color11"
+                   "color12" "color13" "color14" "color15")))
+      (unless (and (file-name-absolute-p directory)
+                   (not (file-remote-p directory)))
+        (error "Invalid Noctalia cache directory: %s" directory))
+      (dolist (path (list directory parent))
+        (let ((attributes (file-attributes path 'integer)))
+          (unless (and attributes
+                       (eq (file-attribute-type attributes) t)
+                       (= (file-attribute-user-id attributes) (user-uid))
+                       (zerop (logand (file-modes path) #o022))
+                       (equal path (directory-file-name (file-truename path))))
+            (error "Unsafe Noctalia cache directory: %s" path))))
+      (unless (and (trev/desktop-theme-private-p file nil)
+                   (<= (file-attribute-size (file-attributes file)) 16384))
+        (error "Missing or unsafe Noctalia palette cache: %s" file))
+      (with-temp-buffer
+        (insert-file-contents file nil 0 16385)
+        (when (> (buffer-size) 16384)
+          (error "Noctalia palette cache is too large"))
+        ;; String keys and alists avoid interning input and retain duplicates.
+        (let* ((json-object-type 'alist)
+               (json-array-type 'vector)
+               (json-key-type 'string)
+               (json-false :false)
+               (json-null :null)
+               (data (json-read))
+               (mode (cdr (assoc "mode" data)))
+               (colors (cdr (assoc "colors" data))))
+          (skip-chars-forward " \t\r\n")
+          (unless (and (eobp)
+                       (listp data) (= (length data) 2)
+                       (equal (sort (mapcar #'car data) #'string<)
+                              '("colors" "mode"))
+                       (member mode '("dark" "light"))
+                       (listp colors) (= (length colors) (length keys))
+                       (equal (sort (mapcar #'car colors) #'string<)
+                              (sort (copy-sequence keys) #'string<))
+                       (let ((case-fold-search nil))
+                         (seq-every-p
+                          (lambda (entry)
+                            (and (stringp (cdr entry))
+                                 (string-match-p "\\`#[0-9a-fA-F]\\{6\\}\\'"
+                                                 (cdr entry))))
+                          colors)))
+            (error "Invalid Noctalia palette cache"))
+          (cons mode colors)))))
+
+  (defun trev/desktop-theme--palette (colors)
+    "Map validated terminal COLORS to native Modus UI and syntax roles."
+    (require 'cl-lib)
+    (let (palette)
+      (dolist (mapping
+               '((background bg-main bg-dim bg-inactive bg-hl-line bg-popup bg-tab-bar
+                             bg-tab-current bg-tab-other)
+                 (foreground fg-main fg-mode-line-active)
+                 (cursor cursor)
+                 (selection_background bg-active bg-region bg-completion
+                                       bg-mode-line-active bg-mode-line-inactive)
+                 (selection_foreground fg-region)
+                 (color8 fg-dim border comment border-mode-line-active
+                         border-mode-line-inactive fg-mode-line-inactive)
+                 (color7 fg-alt)
+                 (color1 red rust variable err bg-removed-fringe)
+                 (color2 green string info bg-added-fringe)
+                 (color3 yellow gold type)
+                 (color4 blue fnname)
+                 (color5 magenta keyword bg-changed-fringe)
+                 (color6 cyan)
+                 (color11 constant number)))
+        (dolist (role (cdr mapping))
+          (push (list role (cdr (assoc (symbol-name (car mapping)) colors))) palette)))
+      (dolist (mapping
+               '(("color1" "color9" red-warmer red-cooler red-faint red-intense
+                  bg-red-nuanced bg-red-subtle bg-red-intense)
+                 ("color2" "color10" green-warmer green-cooler green-faint green-intense
+                  bg-green-nuanced bg-green-subtle bg-green-intense)
+                 ("color3" "color11" yellow-warmer yellow-cooler yellow-faint yellow-intense
+                  bg-yellow-nuanced bg-yellow-subtle bg-yellow-intense)
+                 ("color4" "color12" blue-warmer blue-cooler blue-faint blue-intense
+                  bg-blue-nuanced bg-blue-subtle bg-blue-intense)
+                 ("color5" "color13" magenta-warmer magenta-cooler magenta-faint magenta-intense
+                  bg-magenta-nuanced bg-magenta-subtle bg-magenta-intense)
+                 ("color6" "color14" cyan-warmer cyan-cooler cyan-faint cyan-intense
+                  bg-cyan-nuanced bg-cyan-subtle bg-cyan-intense)))
+        (let ((normal (cdr (assoc (car mapping) colors)))
+              (bright (cdr (assoc (cadr mapping) colors)))
+              (roles (cddr mapping)))
+          (dolist (role (seq-take roles 3))
+            (push (list role normal) palette))
+          (push (list (nth 3 roles) bright) palette)
+          ;; Blend colored surfaces with the actual background, not stock Modus hues.
+          (cl-mapc
+           (lambda (role weight)
+             (push
+              (list role
+                    (concat
+                     "#"
+                     (mapconcat
+                      (lambda (offset)
+                        (format "%02x"
+                                (round
+                                 (+ (* weight (string-to-number
+                                               (substring normal offset (+ offset 2)) 16))
+                                    (* (- 1 weight)
+                                       (string-to-number
+                                        (substring (cdr (assoc "background" colors))
+                                                   offset (+ offset 2)) 16))))))
+                      '(1 3 5) "")))
+              palette))
+           (seq-drop roles 4) '(0.1 0.2 0.4))))
+      (dolist (mapping '((olive green) (slate cyan) (indigo blue)
+                         (maroon magenta) (pink magenta)
+                         (warning yellow) (bg-added-fringe green)
+                         (bg-changed-fringe magenta) (bg-removed-fringe red)))
+        (push mapping palette))
+      (cl-mapc
+       (lambda (key roles)
+         (dolist (role roles)
+           (push (list role (cdr (assoc key colors))) palette)))
+       '("color0" "color1" "color2" "color3" "color4" "color5" "color6" "color7"
+         "color8" "color9" "color10" "color11" "color12" "color13" "color14" "color15")
+       '((fg-term-black bg-term-black) (fg-term-red bg-term-red)
+         (fg-term-green bg-term-green) (fg-term-yellow bg-term-yellow)
+         (fg-term-blue bg-term-blue) (fg-term-magenta bg-term-magenta)
+         (fg-term-cyan bg-term-cyan) (fg-term-white bg-term-white)
+         (fg-term-black-bright bg-term-black-bright) (fg-term-red-bright bg-term-red-bright)
+         (fg-term-green-bright bg-term-green-bright) (fg-term-yellow-bright bg-term-yellow-bright)
+         (fg-term-blue-bright bg-term-blue-bright) (fg-term-magenta-bright bg-term-magenta-bright)
+         (fg-term-cyan-bright bg-term-cyan-bright) (fg-term-white-bright bg-term-white-bright)))
+      palette))
 
   (defun trev/desktop-theme-private-p (path directory)
     "Whether PATH is an owned, private real DIRECTORY or regular file."
@@ -54,13 +220,12 @@
     (set-face-attribute 'fixed-pitch-serif nil :family "Noto Serif" :height 166)
     (set-face-attribute 'variable-pitch nil :family "Noto Sans" :weight 'normal))
 
-  (defun trev/desktop-theme-load ()
-    "Load the theme selected by the shared desktop theme bundle."
-    (interactive)
+  (defun trev/desktop-theme-selection ()
+    "Return (THEME DIRECTORY COLORS) from one validated desktop snapshot.
+DIRECTORY is nil for native Modus; COLORS is non-nil only for Noctalia."
     (let* ((case-fold-search nil)
            (root (expand-file-name "~/.local/share/trev-themes/"))
-           ;; Capture the link once: a publication during loading must not mix
-           ;; metadata from one generation with another generation's Lisp.
+           ;; Resolve once so a publication cannot mix metadata and source.
            (active (expand-file-name "active" root))
            (target (file-symlink-p active))
            (runtime (and target (file-name-absolute-p target)))
@@ -73,147 +238,133 @@
               (file-truename (expand-file-name target root)))
              ((file-exists-p active)
               (error "Active desktop theme is not a managed symlink"))
-             ;; Only pre-handoff deployments may lack active.  A dangling or
-             ;; malformed active link is an error, never a reason to use current.
-             (t (file-truename (expand-file-name "current" root)))))
-           (_validated
-            (when runtime
-              (let* ((xdg-runtime (getenv "XDG_RUNTIME_DIR"))
-                     (directory (directory-file-name
-                                 (if (and xdg-runtime
-                                          (not (string-empty-p xdg-runtime)))
-                                     xdg-runtime
-                                   (format "/run/user/%s" (user-uid)))))
-                     (runtime-root (expand-file-name "trev-themes" directory)))
-                (unless (and (file-name-absolute-p directory)
-                             (equal target bundle)
-                             (string-match-p
-                              (concat "\\`" (regexp-quote runtime-root)
-                                      "/noctalia\\.[a-zA-Z0-9]\\{6\\}\\'")
-                              bundle)
-                             (trev/desktop-theme-private-p directory t)
-                             (trev/desktop-theme-private-p runtime-root t)
-                             (trev/desktop-theme-private-p bundle t))
-                  (error "Invalid private desktop theme generation: %s" bundle))
-                (dolist (asset '("umbriel.toml" "noctalia-theme.el"
-                                 "emacs-theme" "mode"))
-                  (unless (trev/desktop-theme-private-p
-                           (expand-file-name asset bundle) nil)
-                    (error "Invalid private desktop theme asset: %s" asset)))
-                (unless (with-temp-buffer
-                          (insert-file-contents (expand-file-name "mode" bundle))
-                          (member (buffer-string) '("dark\n" "light\n")))
-                  (error "Invalid Noctalia desktop theme mode"))
-                (unless (with-temp-buffer
-                          (insert-file-contents
-                           (expand-file-name "noctalia-theme.el" bundle))
-                          (and (not (re-search-forward "{{\\|}}" nil t))
-                               (string-match-p
-                                "\n;;; noctalia-theme\\.el ends here\n?\\'"
-                                (buffer-string))))
-                  (error "Incomplete Noctalia desktop theme source")))))
-           (selection (with-temp-buffer
-                        (insert-file-contents (expand-file-name "emacs-theme" bundle))
-                        (buffer-string)))
-           (name (string-trim selection))
-           (theme (intern-soft name)))
-      (when runtime
-        (unless (equal selection "noctalia\n")
-          (error "Invalid Noctalia desktop theme selection")))
-      (unless (memq theme '(modus-vivendi-deuteranopia
-                            modus-operandi-tinted
-                            modus-operandi
-                            modus-operandi-deuteranopia
-                            modus-operandi-tritanopia
-                            modus-vivendi
-                            modus-vivendi-tinted
-                            modus-vivendi-tritanopia
-                            trev-ayu-dark
-                            trev-ayu-mirage
-                            trev-ayu-light
-                            trev-nord
-                            trev-nord-light
-                            trev-osaka-jade
-                            trev-everforest
-                            trev-everforest-light
-                            trev-kanagawa
-                            trev-kanagawa-dragon
-                            trev-kanagawa-lotus
-                            trev-flexoki-dark
-                            trev-flexoki-light
-                            trev-catppuccin-latte
-                            trev-catppuccin-frappe
-                            trev-catppuccin-macchiato
-                            trev-catppuccin-mocha
-                            noctalia))
-        (error "Invalid desktop theme: %s" name))
-      (unless (eq (eq theme 'noctalia) (and runtime t))
-        (error "Noctalia requires a private runtime desktop theme generation"))
-      (let ((native (memq theme '(modus-vivendi-deuteranopia
-                                  modus-operandi-tinted
-                                  modus-operandi
-                                  modus-operandi-deuteranopia
-                                  modus-operandi-tritanopia
-                                  modus-vivendi
-                                  modus-vivendi-tinted
-                                  modus-vivendi-tritanopia))))
-        (unless native
-          (let ((source (expand-file-name (concat name "-theme.el") bundle)))
-            (unless (file-readable-p source)
-              (error "Desktop theme source is not readable: %s" source))))
-        (let ((old-themes (copy-sequence custom-enabled-themes))
-              (old-plist (copy-tree (symbol-plist theme) t))
-              (was-known (custom-theme-p theme)))
-          (unwind-protect
-              (let ((trev/theme--changing t))
-                (condition-case condition
-                    (progn
-                      ;; NO-ENABLE does not protect an already active target.
-                      (when (memq theme custom-enabled-themes)
-                        (disable-theme theme))
-                      ;; Local declarations work without preloading Org, even
-                      ;; when the loader's source form is evaluated on its own.
-                      (defvar org-hide-leading-stars)
-                      (defvar org-startup-indented)
-                      (let ((custom-theme-load-path
-                             (if native
-                                 (copy-sequence custom-theme-load-path)
-                               (list bundle)))
-                            ;; The unchanged upstream footer must not install
-                            ;; delayed Org work or retain its source directory.
-                            (after-load-alist (copy-tree after-load-alist))
-                            (org-hide-leading-stars
-                             (and (boundp 'org-hide-leading-stars)
-                                  org-hide-leading-stars))
-                            (org-startup-indented
-                             (and (boundp 'org-startup-indented)
-                                  org-startup-indented)))
-                        (load-theme theme t t))
-                      (unless (and (get theme 'theme-feature)
-                                   (get theme 'theme-settings))
-                        (error "Desktop theme has no definition: %s" name))
-                      (enable-theme theme)
-                      (dolist (old old-themes)
-                        (unless (eq old theme)
-                          (disable-theme old))))
-                  ((error quit)
-                   ;; Enabling can fail after applying faces but before
-                   ;; registering the target in `custom-enabled-themes'.
-                   ;; Clean its new settings before restoring the old plist.
-                   (when (custom-theme-p theme)
-                     (unless (memq theme custom-enabled-themes)
-                       (push theme custom-enabled-themes))
-                     (disable-theme theme))
-                   (setplist theme old-plist)
-                   (if was-known
-                       (unless (custom-theme-p theme)
-                         (push theme custom-known-themes))
-                     (setq custom-known-themes
-                           (remq theme custom-known-themes)))
-                   (dolist (old (reverse old-themes))
-                     (enable-theme old))
-                   (signal (car condition) (cdr condition)))))
-            (trev/theme-set-extra-faces))))))
+             ;; A dangling or malformed active link must not fall back.
+             (t (file-truename (expand-file-name "current" root))))))
+      (if runtime
+          (let* ((xdg-runtime (getenv "XDG_RUNTIME_DIR"))
+                 (directory (directory-file-name
+                             (if (and xdg-runtime
+                                      (not (string-empty-p xdg-runtime)))
+                                 xdg-runtime
+                               (format "/run/user/%s" (user-uid)))))
+                 (runtime-root (expand-file-name "trev-themes" directory)))
+            (unless (and (file-name-absolute-p directory)
+                         (equal target bundle)
+                         (string-match-p
+                          (concat "\\`" (regexp-quote runtime-root)
+                                  "/noctalia\\.[a-zA-Z0-9]\\{6\\}\\'")
+                          bundle)
+                         (trev/desktop-theme-private-p directory t)
+                         (trev/desktop-theme-private-p runtime-root t)
+                         (trev/desktop-theme-private-p bundle t)
+                         (trev/desktop-theme-private-p
+                          (expand-file-name "umbriel.toml" bundle) nil))
+              (error "Invalid private desktop theme generation: %s" bundle))
+            (let ((cache (trev/desktop-theme-cache)))
+              (list (if (equal (car cache) "dark") 'modus-vivendi 'modus-operandi)
+                    nil (cdr cache))))
+        (let* ((selection (with-temp-buffer
+                            (insert-file-contents
+                             (expand-file-name "emacs-theme" bundle))
+                            (buffer-string)))
+               (name (string-trim selection))
+               (theme (intern-soft name)))
+          (unless (memq theme '(modus-vivendi-deuteranopia
+                                modus-operandi-tinted
+                                modus-operandi
+                                modus-operandi-deuteranopia
+                                modus-operandi-tritanopia
+                                modus-vivendi
+                                modus-vivendi-tinted
+                                modus-vivendi-tritanopia
+                                trev-ayu-dark
+                                trev-ayu-mirage
+                                trev-ayu-light
+                                trev-nord
+                                trev-nord-light
+                                trev-osaka-jade
+                                trev-everforest
+                                trev-everforest-light
+                                trev-kanagawa
+                                trev-kanagawa-dragon
+                                trev-kanagawa-lotus
+                                trev-flexoki-dark
+                                trev-flexoki-light
+                                trev-catppuccin-latte
+                                trev-catppuccin-frappe
+                                trev-catppuccin-macchiato
+                                trev-catppuccin-mocha))
+            (error "Invalid desktop theme: %s" name))
+          (if (memq theme modus-themes-items)
+              (list theme nil nil)
+            (unless (file-readable-p
+                     (expand-file-name (concat name "-theme.el") bundle))
+              (error "Desktop theme source is not readable: %s" name))
+            (list theme bundle nil))))))
+
+  (defun trev/desktop-theme-load ()
+    "Apply a named theme or cached native Modus palette transactionally."
+    (interactive)
+    (let* ((selection (trev/desktop-theme-selection))
+           (theme (car selection))
+           (directory (nth 1 selection))
+           (colors (nth 2 selection))
+           (old-overrides (trev/desktop-theme--override-state))
+           (old-originals (copy-tree trev/desktop-theme--original-overrides))
+           (old-themes (copy-sequence custom-enabled-themes))
+           (old-plist (copy-tree (symbol-plist theme) t))
+           (was-known (custom-theme-p theme)))
+      (unwind-protect
+          (let ((trev/theme--changing t))
+            (condition-case condition
+                (progn
+                  (when trev/desktop-theme--original-overrides
+                    (trev/desktop-theme--restore-overrides
+                     trev/desktop-theme--original-overrides))
+                  (if colors
+                      (let ((variable (if (eq theme 'modus-vivendi)
+                                          'modus-vivendi-palette-overrides
+                                        'modus-operandi-palette-overrides)))
+                        (unless trev/desktop-theme--original-overrides
+                          (setq trev/desktop-theme--original-overrides
+                                (trev/desktop-theme--override-state)))
+                        (set variable
+                             (append (trev/desktop-theme--palette colors)
+                                     (and (boundp variable) (symbol-value variable)))))
+                    (setq trev/desktop-theme--original-overrides nil))
+                  ;; NO-ENABLE does not protect an already active target.
+                  (when (memq theme custom-enabled-themes)
+                    (disable-theme theme))
+                  (let ((custom-theme-load-path
+                         (if directory
+                             (list directory)
+                           (copy-sequence custom-theme-load-path))))
+                    (load-theme theme t t))
+                  (unless (and (get theme 'theme-feature)
+                               (get theme 'theme-settings))
+                    (error "Desktop theme has no definition: %s" theme))
+                  (enable-theme theme)
+                  (dolist (old old-themes)
+                    (unless (eq old theme)
+                      (disable-theme old))))
+              ((error quit)
+               ;; Enabling can fail before registering the target.  Remove its
+               ;; new settings before restoring the old definition and order.
+               (when (custom-theme-p theme)
+                 (unless (memq theme custom-enabled-themes)
+                   (push theme custom-enabled-themes))
+                 (disable-theme theme))
+               (trev/desktop-theme--restore-overrides old-overrides)
+               (setq trev/desktop-theme--original-overrides old-originals)
+               (setplist theme old-plist)
+               (if was-known
+                   (unless (custom-theme-p theme)
+                     (push theme custom-known-themes))
+                 (setq custom-known-themes (remq theme custom-known-themes)))
+               (dolist (old (reverse old-themes))
+                 (enable-theme old))
+               (signal (car condition) (cdr condition)))))
+        (trev/theme-set-extra-faces))))
 
   (defun trev/desktop-theme-initialize ()
     "Load shared state at startup, warning and falling back when necessary."
