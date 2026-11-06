@@ -116,95 +116,174 @@
             (error "Invalid Noctalia palette cache"))
           (cons mode colors)))))
 
-  (defun trev/desktop-theme--blend (foreground background weight)
-    "Blend RGB hex FOREGROUND over BACKGROUND with foreground WEIGHT."
-    (concat
-     "#"
-     (mapconcat
-      (lambda (offset)
-        (format "%02x"
-                (round
-                 (+ (* weight (string-to-number
-                               (substring foreground offset (+ offset 2)) 16))
-                    (* (- 1 weight)
-                       (string-to-number
-                        (substring background offset (+ offset 2)) 16))))))
-      '(1 3 5) "")))
+  (defun trev/desktop-theme--contrast-color (color backgrounds target endpoint)
+    "Move COLOR minimally toward ENDPOINT to reach TARGET on BACKGROUNDS.
+Use Modus's contrast measurement and a bounded RGB interpolation; keep
+already readable colors exactly.  ENDPOINT must satisfy every background."
+    (let ((readable
+           (lambda (candidate)
+             (seq-every-p
+              (lambda (background)
+                (>= (modus-themes-contrast candidate background) target))
+              backgrounds))))
+      (cond
+       ((funcall readable color) color)
+       ((not (funcall readable endpoint))
+        (error "No readable Noctalia color endpoint"))
+       (t
+        (let ((low 0.0) (high 1.0) (result endpoint))
+          ;; ponytail: twelve steps exceed six-digit RGB precision.
+          (dotimes (_ 12)
+            (let* ((weight (/ (+ low high) 2))
+                   (candidate
+                    (concat
+                     "#"
+                     (mapconcat
+                      (lambda (offset)
+                        (format "%02x"
+                                (round
+                                 (+ (* (- 1 weight)
+                                       (string-to-number
+                                        (substring color offset (+ offset 2)) 16))
+                                    (* weight
+                                       (string-to-number
+                                        (substring endpoint offset (+ offset 2)) 16))))))
+                      '(1 3 5) ""))))
+              (if (funcall readable candidate)
+                  (setq high weight result candidate)
+                (setq low weight))))
+          result)))))
 
-  (defun trev/desktop-theme--palette (colors)
-    "Map validated terminal COLORS to native Modus UI and syntax roles."
+  (defun trev/desktop-theme--palette (colors theme)
+    "Adapt validated Noctalia COLORS to readable native Modus THEME roles.
+Keep terminal ANSI data separate from adjusted editor colors.  Native
+paired surfaces retain their semantic hues, rather than importing ANSI
+backgrounds.  This covers the editor surfaces below, not arbitrary faces."
     (require 'cl-lib)
-    (let (palette)
-      (dolist (mapping
-               '((background bg-main bg-dim bg-inactive bg-hl-line bg-popup bg-tab-bar
-                             bg-tab-current bg-tab-other bg-mode-line-inactive)
-                 (foreground fg-main fg-mode-line-active)
-                 (cursor cursor)
-                 (selection_background bg-active bg-region bg-completion)
-                 (selection_foreground fg-region)
-                 (color8 fg-dim border comment border-mode-line-active
-                         border-mode-line-inactive fg-mode-line-inactive)
-                 (color7 fg-alt)
-                 (color1 red rust variable err bg-removed-fringe)
-                 (color2 green string info bg-added-fringe)
-                 (color3 yellow gold type)
-                 (color4 blue fnname)
-                 (color5 magenta keyword bg-changed-fringe)
-                 (color6 cyan)
-                 (color11 constant number)))
-        (dolist (role (cdr mapping))
-          (push (list role (cdr (assoc (symbol-name (car mapping)) colors))) palette)))
-      (push (list 'bg-mode-line-active
-                  (trev/desktop-theme--blend
-                   (cdr (assoc "foreground" colors))
-                   (cdr (assoc "background" colors)) 0.08))
-            palette)
-      (dolist (mapping
-               '(("color1" "color9" red-warmer red-cooler red-faint red-intense
-                  bg-red-nuanced bg-red-subtle bg-red-intense)
-                 ("color2" "color10" green-warmer green-cooler green-faint green-intense
-                  bg-green-nuanced bg-green-subtle bg-green-intense)
-                 ("color3" "color11" yellow-warmer yellow-cooler yellow-faint yellow-intense
-                  bg-yellow-nuanced bg-yellow-subtle bg-yellow-intense)
-                 ("color4" "color12" blue-warmer blue-cooler blue-faint blue-intense
-                  bg-blue-nuanced bg-blue-subtle bg-blue-intense)
-                 ("color5" "color13" magenta-warmer magenta-cooler magenta-faint magenta-intense
-                  bg-magenta-nuanced bg-magenta-subtle bg-magenta-intense)
-                 ("color6" "color14" cyan-warmer cyan-cooler cyan-faint cyan-intense
-                  bg-cyan-nuanced bg-cyan-subtle bg-cyan-intense)))
-        (let ((normal (cdr (assoc (car mapping) colors)))
-              (bright (cdr (assoc (cadr mapping) colors)))
-              (roles (cddr mapping)))
-          (dolist (role (seq-take roles 3))
-            (push (list role normal) palette))
-          (push (list (nth 3 roles) bright) palette)
-          ;; Blend colored surfaces with the actual background, not stock Modus hues.
-          (cl-mapc
-           (lambda (role weight)
-             (push
-              (list role (trev/desktop-theme--blend
-                          normal (cdr (assoc "background" colors)) weight))
-              palette))
-           (seq-drop roles 4) '(0.1 0.2 0.4))))
-      (dolist (mapping '((olive green) (slate cyan) (indigo blue)
-                         (maroon magenta) (pink magenta)
-                         (warning yellow) (bg-added-fringe green)
-                         (bg-changed-fringe magenta) (bg-removed-fringe red)))
-        (push mapping palette))
-      (cl-mapc
-       (lambda (key roles)
-         (dolist (role roles)
-           (push (list role (cdr (assoc key colors))) palette)))
-       '("color0" "color1" "color2" "color3" "color4" "color5" "color6" "color7"
-         "color8" "color9" "color10" "color11" "color12" "color13" "color14" "color15")
-       '((fg-term-black bg-term-black) (fg-term-red bg-term-red)
-         (fg-term-green bg-term-green) (fg-term-yellow bg-term-yellow)
-         (fg-term-blue bg-term-blue) (fg-term-magenta bg-term-magenta)
-         (fg-term-cyan bg-term-cyan) (fg-term-white bg-term-white)
-         (fg-term-black-bright bg-term-black-bright) (fg-term-red-bright bg-term-red-bright)
-         (fg-term-green-bright bg-term-green-bright) (fg-term-yellow-bright bg-term-yellow-bright)
-         (fg-term-blue-bright bg-term-blue-bright) (fg-term-magenta-bright bg-term-magenta-bright)
-         (fg-term-cyan-bright bg-term-cyan-bright) (fg-term-white-bright bg-term-white-bright)))
+    (let* ((dark (eq theme 'modus-vivendi))
+           (text-end (if dark "#ffffff" "#000000"))
+           (bg-end (if dark "#000000" "#ffffff"))
+           (native (append modus-themes-common-palette-overrides
+                           (if dark modus-themes-vivendi-palette
+                             modus-themes-operandi-palette)))
+           ;; Reserve contrast headroom for highlighted rows and colored text.
+           (background
+            (trev/desktop-theme--contrast-color
+             (cdr (assoc "background" colors)) (list text-end) 10 bg-end))
+           (contrast (modus-themes-contrast background text-end))
+           (dim (trev/desktop-theme--contrast-color
+                 text-end (list text-end) (- contrast 0.5) background))
+           (inactive (trev/desktop-theme--contrast-color
+                      text-end (list text-end) (- contrast 1) background))
+           (active (trev/desktop-theme--contrast-color
+                    text-end (list text-end) (- contrast 2) background))
+           (surfaces (list background dim inactive active))
+           palette)
+      (cl-labels
+          ((put (role color) (push (list role color) palette))
+           (value (role) (modus-themes-retrieve-palette-value role native))
+           (text (color)
+             (trev/desktop-theme--contrast-color color surfaces 7 text-end))
+           (pair (foreground backgrounds)
+             (let ((source (append palette native)) resolved)
+               (dolist (role backgrounds)
+                 (let* ((original (modus-themes-retrieve-palette-value role source))
+                        (color (trev/desktop-theme--contrast-color
+                                original (list text-end) 7 bg-end)))
+                   ;; Keep semantic background aliases when no repair is needed.
+                   (unless (equal original color) (put role color))
+                   (push color resolved)))
+               (put foreground
+                    (trev/desktop-theme--contrast-color
+                     (value foreground) resolved 7 text-end)))))
+        (dolist (mapping
+                 `((,background bg-main bg-tab-current)
+                   (,dim bg-dim bg-popup bg-mode-line-inactive bg-diff-context)
+                   (,inactive bg-inactive bg-tab-bar bg-hl-line)
+                   (,active bg-active bg-completion bg-mode-line-active
+                            bg-tab-other bg-hover bg-hover-secondary
+                            bg-paren-expression)))
+          (dolist (role (cdr mapping)) (put role (car mapping))))
+        ;; Keep native warmer/cooler/faint distinctions, repairing their text
+        ;; against inherited completion/hl-line backgrounds as well as default.
+        (dolist (mapping '((red . "color1") (green . "color2") (yellow . "color3")
+                           (blue . "color4") (magenta . "color5") (cyan . "color6")))
+          (dolist (suffix '("" "-warmer" "-cooler" "-faint" "-intense"))
+            (let ((role (intern (concat (symbol-name (car mapping)) suffix))))
+              (put role (text (if (string-empty-p suffix)
+                                  (cdr (assoc (cdr mapping) colors))
+                                (value role)))))))
+        (dolist (role '(rust gold olive slate indigo maroon pink
+                       modeline-err modeline-warning modeline-info))
+          (put role (text (value role))))
+        (dolist (mapping
+                 '(("foreground" fg-main fg-mode-line-active)
+                   ("color8" fg-dim comment fg-mode-line-inactive)
+                   ("color7" fg-alt)
+                   ("color1" variable err bg-removed-fringe)
+                   ("color2" string info bg-added-fringe)
+                   ("color3" type warning)
+                   ("color4" fnname)
+                   ("color5" keyword bg-changed-fringe)
+                   ("color11" constant number)))
+          (let ((color (text (cdr (assoc (car mapping) colors)))))
+            (dolist (role (cdr mapping)) (put role color))))
+        ;; Ad-hoc highlights use fg-main on these shared native accent surfaces.
+        ;; Repair the surfaces, preserving readable main text and semantic aliases.
+        (let ((foreground (car (alist-get 'fg-main palette))))
+          (dolist (hue '(red green yellow blue magenta cyan))
+            (dolist (suffix '(nuanced subtle intense))
+              (let ((role (intern (format "bg-%s-%s" hue suffix))))
+                (put role (trev/desktop-theme--contrast-color
+                           (value role) (list foreground) 7 bg-end))))))
+        (put 'cursor
+             (trev/desktop-theme--contrast-color
+              (cdr (assoc "cursor" colors)) (list background) 7 text-end))
+        ;; Region has its own foreground, unlike completion and hl-line.
+        (let* ((region (cdr (assoc "selection_background" colors)))
+               (endpoint (if (> (modus-themes-contrast region "#ffffff")
+                                (modus-themes-contrast region "#000000"))
+                             "#ffffff" "#000000"))
+               (region (trev/desktop-theme--contrast-color
+                        region (list endpoint) 7
+                        (if (equal endpoint "#ffffff") "#000000" "#ffffff"))))
+          (put 'bg-region region)
+          (put 'fg-region
+               (trev/desktop-theme--contrast-color
+                (cdr (assoc "selection_foreground" colors))
+                (list region) 7 endpoint)))
+        ;; These surfaces explicitly replace text colors: repair native pairs,
+        ;; not the global syntax palette, so their semantic hues stay distinct.
+        (dolist (name '(current lazy static replace rx-group-0 rx-group-1
+                               rx-group-2 rx-group-3))
+          (pair (intern (format "fg-search-%s" name))
+                (list (intern (format "bg-search-%s" name)))))
+        (dolist (name '(added changed removed))
+          (let ((backgrounds
+                 (mapcar (lambda (suffix)
+                           (intern (format "bg-%s%s" name suffix)))
+                         '("" "-faint" "-refine"))))
+            (pair (intern (format "fg-%s" name)) backgrounds)
+            (pair (intern (format "fg-%s-intense" name)) backgrounds)))
+        (dolist (name '(mark-delete mark-select mark-other prominent-err
+                                   prominent-warning prominent-note
+                                   active-argument active-value paren-match
+                                   clay ochre lavender sage))
+          (pair (intern (format "fg-%s" name))
+                (list (intern (format "bg-%s" name)))))
+        (cl-mapc
+         (lambda (key roles)
+           (dolist (role roles) (put role (cdr (assoc key colors)))))
+         '("color0" "color1" "color2" "color3" "color4" "color5" "color6" "color7"
+           "color8" "color9" "color10" "color11" "color12" "color13" "color14" "color15")
+         '((fg-term-black bg-term-black) (fg-term-red bg-term-red)
+           (fg-term-green bg-term-green) (fg-term-yellow bg-term-yellow)
+           (fg-term-blue bg-term-blue) (fg-term-magenta bg-term-magenta)
+           (fg-term-cyan bg-term-cyan) (fg-term-white bg-term-white)
+           (fg-term-black-bright bg-term-black-bright) (fg-term-red-bright bg-term-red-bright)
+           (fg-term-green-bright bg-term-green-bright) (fg-term-yellow-bright bg-term-yellow-bright)
+           (fg-term-blue-bright bg-term-blue-bright) (fg-term-magenta-bright bg-term-magenta-bright)
+           (fg-term-cyan-bright bg-term-cyan-bright) (fg-term-white-bright bg-term-white-bright))))
       palette))
 
   (defun trev/desktop-theme-private-p (path directory)
@@ -336,7 +415,7 @@ DIRECTORY is nil for native Modus; COLORS is non-nil only for Noctalia."
                           (setq trev/desktop-theme--original-overrides
                                 (trev/desktop-theme--override-state)))
                         (set variable
-                             (append (trev/desktop-theme--palette colors)
+                             (append (trev/desktop-theme--palette colors theme)
                                      (and (boundp variable) (symbol-value variable)))))
                     (setq trev/desktop-theme--original-overrides nil))
                   ;; NO-ENABLE does not protect an already active target.

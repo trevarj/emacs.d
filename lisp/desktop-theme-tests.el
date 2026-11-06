@@ -146,7 +146,7 @@
                           "#7799fa" "#ea88fb" "#66eaff" "#e7e8e9")
             for index from 0 collect (cons (format "color%d" index) color))))
 
-(defun desktop-theme-test--cache (background &optional mode)
+(defun desktop-theme-test--cache (background &optional mode colors)
   (require 'json)
   (let* ((xdg-cache (getenv "XDG_CACHE_HOME"))
          (base (if (and xdg-cache (not (string-empty-p xdg-cache)))
@@ -155,7 +155,7 @@
          (file (expand-file-name "emacs-palette.json" parent)))
     (desktop-theme-test--write
      file (json-encode `(("mode" . ,(or mode "dark"))
-                         ("colors" . ,(desktop-theme-test--colors background)))))
+                         ("colors" . ,(or colors (desktop-theme-test--colors background))))))
     (set-file-modes base #o755)
     (set-file-modes parent #o755)
     (set-file-modes file #o600)
@@ -193,6 +193,60 @@
                  (face-foreground 'default nil t)))
   (should (equal (face-background 'margin nil t)
                  (face-background 'default nil t))))
+
+(defun desktop-theme-test--contrast (foreground background)
+  (ert-info ((format "%s on %s" foreground background))
+    (should (>= (modus-themes-contrast foreground background) 7))))
+
+(defun desktop-theme-test--legible ()
+  "Check effective native consumers, including inherited highlighted text."
+  (require 'diff-hl)
+  (require 'hl-line)
+  (require 'hi-lock)
+  (require 'paren)
+  (let ((backgrounds
+         (mapcar (lambda (face) (face-background face nil t))
+                 '(default hl-line modus-themes-completion-selected)))
+        (text-faces
+         '(default shadow font-lock-comment-face font-lock-comment-delimiter-face
+           font-lock-doc-face font-lock-builtin-face font-lock-constant-face
+           font-lock-function-name-face font-lock-function-call-face
+           font-lock-keyword-face font-lock-string-face font-lock-type-face
+           font-lock-variable-name-face font-lock-variable-use-face
+           font-lock-preprocessor-face font-lock-property-name-face
+           font-lock-number-face font-lock-operator-face font-lock-punctuation-face
+           error warning success completions-annotations completions-common-part
+           modus-themes-completion-match-0 modus-themes-completion-match-1
+           modus-themes-completion-match-2 modus-themes-completion-match-3)))
+    (dolist (face text-faces)
+      (dolist (background backgrounds)
+        (ert-info ((format "%s, inherited background %s" face background))
+          (desktop-theme-test--contrast
+           (face-foreground face nil 'default) background))))
+    (dolist (face
+             '(region mode-line mode-line-active mode-line-inactive
+               modus-themes-search-current modus-themes-search-lazy
+               modus-themes-search-static modus-themes-search-replace
+               modus-themes-search-rx-group-0 modus-themes-search-rx-group-1
+               modus-themes-search-rx-group-2 modus-themes-search-rx-group-3
+               diff-added diff-changed diff-removed
+               diff-refine-added diff-refine-changed diff-refine-removed
+               diff-indicator-added diff-indicator-changed diff-indicator-removed
+               modus-themes-mark-delete modus-themes-mark-select
+               modus-themes-mark-other show-paren-match
+               diff-hl-insert diff-hl-change diff-hl-delete
+               hi-aquamarine hi-black-b hi-black-hb hi-blue hi-blue-b
+               hi-green hi-green-b hi-pink hi-red-b hi-salmon hi-yellow))
+      (ert-info ((format "Paired face %s" face))
+        (desktop-theme-test--contrast
+         (face-foreground face nil 'default) (face-background face nil 'default))))
+    (desktop-theme-test--contrast
+     (face-background 'cursor nil t) (face-background 'default nil t))
+    (dolist (role '(modeline-err modeline-warning modeline-info))
+      (dolist (face '(mode-line-active mode-line-inactive))
+        (desktop-theme-test--contrast
+         (modus-themes-get-color-value role t)
+         (face-background face nil t))))))
 
 (desktop-theme-test desktop-theme-startup-and-independent-server
   (let (warnings)
@@ -276,20 +330,7 @@
       (require 'erc)
       (require 'erc-match)
       (should (equal custom-enabled-themes (list (nth 2 revision))))
-      (should (equal (face-background 'default nil t) (cadr revision)))
-      (should (equal (face-foreground 'default nil t) "#d0d1d2"))
-      (should (equal (face-background 'cursor nil t) "#abcdef"))
-      (should (equal (face-background 'region nil t) "#445566"))
-      (should (equal (face-foreground 'region nil t) "#f0f1f2"))
-      (cl-mapc
-       (lambda (face key)
-         (should (equal (face-foreground face nil t)
-                        (cdr (assoc key (desktop-theme-test--colors (cadr revision)))))))
-       '(font-lock-comment-face font-lock-constant-face font-lock-function-name-face
-         font-lock-keyword-face font-lock-string-face font-lock-type-face
-         font-lock-variable-name-face error warning)
-       '("color8" "color11" "color4" "color5" "color2" "color3" "color1"
-         "color1" "color3"))
+      (desktop-theme-test--legible)
       (cl-mapc
        (lambda (name color)
          (should (equal (face-foreground name nil t) color))
@@ -300,48 +341,112 @@
          ansi-color-bright-yellow ansi-color-bright-blue ansi-color-bright-magenta
          ansi-color-bright-cyan ansi-color-bright-white)
        (mapcar #'cdr (nthcdr 6 (desktop-theme-test--colors (cadr revision)))))
-      (should (equal (modus-themes-get-color-value 'red-intense t) "#f16677"))
-      (should (equal (modus-themes-get-color-value 'bg-main t) (cadr revision)))
-      (should (equal (modus-themes-get-color-value 'bg-search-current t)
-                     (modus-themes-get-color-value 'bg-yellow-intense t)))
-      (desktop-theme-test--markers '("#22b344" "#a644b7" "#b12233"))
+      (desktop-theme-test--markers
+       (mapcar (lambda (role) (modus-themes-get-color-value role t))
+               '(bg-added-fringe bg-changed-fringe bg-removed-fringe)))
       (should (equal (file-symlink-p "~/.local/share/trev-themes/current") catalog)))
     (desktop-theme-test--active "current")
     (trev/desktop-theme-load)
     (should (equal custom-enabled-themes '(trev-nord)))
     (should (equal (face-background 'default nil t) "#102030"))))
 
-(desktop-theme-test desktop-theme-noctalia-subtle-neutral-mode-lines
-  (dolist (revision '(("dark" "#203040" modus-vivendi "#2e3d4c")
-                      ("light" "#e5e9f0" modus-operandi "#e3e7ee")))
-    (let* ((mode (car revision))
-           (background (cadr revision))
-           (theme (nth 2 revision))
-           (faces '(mode-line mode-line-active mode-line-inactive))
-           (appearance
-            (lambda ()
-              (mapcar (lambda (face)
-                        (list (face-background face nil t)
-                              (face-foreground face nil t)))
-                      faces))))
-      (desktop-theme-test--select
-       (desktop-theme-test--bundle mode theme "#abcdef"))
-      (desktop-theme-test--active "current")
-      (trev/desktop-theme-load)
-      (let ((named (funcall appearance)))
-        (desktop-theme-test--active
-         (desktop-theme-test--runtime background mode))
-        (trev/desktop-theme-load)
-        (dolist (face '(mode-line mode-line-active))
-          (should (equal (face-background face nil t) (nth 3 revision)))
-          (should (equal (face-foreground face nil t) "#d0d1d2")))
-        (should (equal (face-background 'mode-line-inactive nil t) background))
-        (should (equal (face-foreground 'mode-line-inactive nil t) "#78797a"))
-        (dolist (face '(region modus-themes-completion-selected))
-          (should (equal (face-background face nil t) "#445566")))
+(desktop-theme-test desktop-theme-noctalia-contrast-boundaries-and-restoration
+  (let ((modus-themes-common-palette-overrides
+         '((bg-search-current bg-yellow-intense))))
+    (dolist (mode '("dark" "light"))
+      (let* ((dark (equal mode "dark"))
+             (theme (if dark 'modus-vivendi 'modus-operandi))
+             (background (if dark "#17212b" "#f3eee8"))
+             (foreground (if dark "#d8e4ef" "#17212b"))
+             (native (desktop-theme-test--bundle mode theme "#abcdef")))
+        (let* ((endpoint (if dark "#ffffff" "#000000"))
+               (surface (if dark "#000000" "#ffffff"))
+               (readable (if dark "#959595" "#595959"))
+               (unreadable (if dark "#949494" "#5a5a5a"))
+               (adjusted (trev/desktop-theme--contrast-color
+                          unreadable (list surface) 7 endpoint)))
+          (desktop-theme-test--contrast readable surface)
+          (should (< (modus-themes-contrast unreadable surface) 7))
+          (should (equal (trev/desktop-theme--contrast-color
+                          readable (list surface) 7 endpoint) readable))
+          (desktop-theme-test--contrast adjusted surface)
+          (should-not (equal adjusted endpoint)))
+        (desktop-theme-test--select native)
         (desktop-theme-test--active "current")
         (trev/desktop-theme-load)
-        (should (equal (funcall appearance) named))))))
+        (let ((named (desktop-theme-test--appearance))
+              (overrides (trev/desktop-theme--override-state)))
+          (desktop-theme-test--active
+           (desktop-theme-test--runtime background mode))
+          (dolist (low-contrast '(nil t))
+            (let ((colors (desktop-theme-test--colors background)))
+              (setcdr (assoc "foreground" colors)
+                      (if low-contrast background foreground))
+              (when low-contrast
+                ;; Also challenge polarity and inherited selection foregrounds.
+                (setcdr (assoc "background" colors) "#777777")
+                (setcdr (assoc "selection_background" colors) "#777777")
+                (setcdr (assoc "selection_foreground" colors) "#777777")
+                (dolist (key '("color7" "color8"))
+                  (setcdr (assoc key colors) "#777777")))
+              (desktop-theme-test--cache background mode colors)
+              (trev/desktop-theme-load)
+              (desktop-theme-test--legible)
+              (unless low-contrast
+                ;; Readable source colors need no luminance repair.
+                (should (equal (face-foreground 'default nil t) foreground))
+                (should (equal (face-background 'default nil t) background)))
+              (let* ((main (face-background 'default nil t))
+                     (dim (modus-themes-get-color-value 'bg-dim t))
+                     (active (face-background 'mode-line-active nil t))
+                     (endpoint (if dark "#ffffff" "#000000")))
+                (should (> (modus-themes-contrast main endpoint)
+                           (modus-themes-contrast dim endpoint)))
+                (should (> (modus-themes-contrast dim endpoint)
+                           (modus-themes-contrast active endpoint))))
+              ;; Repairs must not collapse syntax or native hue variants.
+              (should (= 6 (length
+                            (delete-dups
+                             (mapcar (lambda (face) (face-foreground face nil t))
+                                     '(font-lock-variable-name-face
+                                       font-lock-string-face font-lock-type-face
+                                       font-lock-function-name-face
+                                       font-lock-keyword-face font-lock-constant-face))))))
+              (should-not (equal (modus-themes-get-color-value 'blue-warmer t)
+                                 (modus-themes-get-color-value 'blue-cooler t)))))
+          (desktop-theme-test--active "current")
+          (trev/desktop-theme-load)
+          (should (equal (desktop-theme-test--appearance) named))
+          (should (equal (trev/desktop-theme--override-state) overrides)))))))
+
+(desktop-theme-test desktop-theme-noctalia-cursor-and-accent-surface-contrast
+  (require 'ansi-color)
+  (let ((modus-themes-common-palette-overrides
+         '((bg-search-current bg-yellow-intense))))
+    (dolist (mode '("dark" "light"))
+      (dolist (case '(cursor accent))
+        (let* ((dark (equal mode "dark"))
+               (background
+                (if (eq case 'cursor)
+                    (if dark "#ffffff" "#000000")
+                  (if dark "#000000" "#ffffff")))
+               (colors (desktop-theme-test--colors background)))
+          (setcdr (assoc "foreground" colors)
+                  (if (eq case 'accent)
+                      (if dark "#9d9d9d" "#595959")
+                    (if dark "#ffffff" "#000000")))
+          (setcdr (assoc "cursor" colors) (if dark "#424242" "#b4b4b4"))
+          (setcdr (assoc "color3" colors) (if dark "#000000" "#ffffff"))
+          (desktop-theme-test--active
+           (desktop-theme-test--runtime background mode))
+          (desktop-theme-test--cache background mode colors)
+          (trev/desktop-theme-load)
+          (desktop-theme-test--legible)
+          (should (equal (modus-themes-get-color-value 'bg-search-current t)
+                         (modus-themes-get-color-value 'bg-yellow-intense t)))
+          ;; Editor repair must not recolor the terminal's deliberate ANSI value.
+          (should (equal (face-foreground 'ansi-color-yellow nil t)
+                         (cdr (assoc "color3" colors)))))))))
 
 (desktop-theme-test desktop-theme-restarts-from-cache-without-shell-or-server
   (desktop-theme-test--active (desktop-theme-test--runtime "#203040"))
@@ -372,7 +477,9 @@
                                  (equal (face-background 'default nil t) expected-background)
                                  (equal (modus-themes-get-color-value 'bg-main t)
                                         expected-background)
-                                 (equal (face-foreground 'font-lock-keyword-face nil t) "#a644b7"))
+                                 (>= (modus-themes-contrast
+                                      (face-foreground 'font-lock-keyword-face nil t)
+                                      (face-background 'default nil t)) 7))
                       (error "Cached palette was not restored in fresh Emacs"))))))))
         (unless (equal status 0) (ert-fail (buffer-string))))))
   (should-not (file-exists-p "~/.local/share/trev-themes/current")))
@@ -554,7 +661,6 @@
                 (should (equal custom-enabled-themes '(modus-vivendi)))
                 (should (equal (desktop-theme-test--appearance) appearance))
                 (should (equal (trev/desktop-theme--override-state) overrides))
-                (should (equal (modus-themes-get-color-value 'bg-main t) "#203040"))
                 (should-not (file-exists-p "~/cache-executed")))
             (pcase fault
               ((or 'cache-link 'parent-link)
@@ -570,16 +676,24 @@
       (setenv "XDG_CACHE_HOME" (car entry))
       (desktop-theme-test--cache (cadr entry))
       (trev/desktop-theme-load)
-      (should (equal (face-background 'default nil t) (cadr entry))))))
+      (desktop-theme-test--legible))))
 
 (desktop-theme-test desktop-theme-noctalia-same-native-symbol-error-and-quit-rollback
   (dolist (mode '("dark" "light"))
-    (let ((theme (if (equal mode "dark") 'modus-vivendi 'modus-operandi)))
-      (desktop-theme-test--active (desktop-theme-test--runtime "#203040" mode))
+    (let* ((dark (equal mode "dark"))
+           (theme (if dark 'modus-vivendi 'modus-operandi))
+           (first (if dark "#203040" "#f3eee8"))
+           (second (if dark "#304050" "#e5e9f0")))
+      (desktop-theme-test--active (desktop-theme-test--runtime first mode))
       (trev/desktop-theme-load)
-      (desktop-theme-test--cache "#304050" mode)
-      (trev/desktop-theme-load)
-      (should (equal (face-background 'default nil t) "#304050"))
+      (let ((foreground (face-foreground 'default nil t))
+            (colors (desktop-theme-test--colors second)))
+        ;; Change readable text as well: nearby backgrounds may normalize alike.
+        (setcdr (assoc "foreground" colors) (if dark "#ffffff" "#000000"))
+        (desktop-theme-test--cache second mode colors)
+        (trev/desktop-theme-load)
+        (should-not (equal (face-foreground 'default nil t) foreground)))
+      (desktop-theme-test--legible)
       (let ((appearance (desktop-theme-test--appearance))
             (plist (copy-tree (symbol-plist theme) t))
             (overrides (trev/desktop-theme--override-state))
@@ -591,10 +705,11 @@
               (desktop-theme-test--cache "#abcdef" mode)
               (let ((load (symbol-function 'load-theme))
                     (recalc (symbol-function 'custom-theme-recalc-face))
-                    caught fired)
+                    caught fired loaded)
                 (cl-letf (((symbol-function 'load-theme)
                            (lambda (&rest args)
                              (prog1 (apply load args)
+                               (setq loaded t)
                                (when (and (eq phase 'load) (not fired))
                                  (setq fired t)
                                  (signal condition '("injected palette failure"))))))
@@ -602,7 +717,7 @@
                            (lambda (face)
                              (funcall recalc face)
                              (when (and (eq phase 'enable) (eq face 'default)
-                                        (equal (face-background face nil t) "#abcdef")
+                                        loaded
                                         (not fired))
                                (setq fired t)
                                (signal condition '("injected palette failure"))))))
@@ -614,7 +729,6 @@
                 (should (equal (symbol-plist theme) plist))
                 (should (equal (trev/desktop-theme--override-state) overrides))
                 (should (equal trev/desktop-theme--original-overrides originals))
-                (should (equal (modus-themes-get-color-value 'bg-main t) "#304050"))
                 (should (equal (desktop-theme-test--appearance) appearance))
                 (should (equal custom-theme-load-path search-path))))))))))
 
@@ -742,7 +856,6 @@
              (plist (copy-tree (symbol-plist target) t))
              (known-p (and (custom-theme-p target) t))
              (face (if (eq target 'modus-vivendi) 'default 'desktop-theme-test-only))
-             (expected (if (eq target 'modus-vivendi) "#aabbcc" "#ff00ff"))
              (bundle (if (eq target 'modus-vivendi)
                          (desktop-theme-test--runtime "#aabbcc")
                        (desktop-theme-test--bundle
@@ -770,7 +883,11 @@
               (condition-case failure
                   (trev/desktop-theme-load)
                 ((error quit) (setq caught failure))))
-            (should (equal applied expected))
+            (if (eq face 'default)
+                (progn
+                  (should (stringp applied))
+                  (should-not (equal applied (face-background 'default nil t))))
+              (should (equal applied "#ff00ff")))
             (should-not registered)
             (should (equal caught (list condition "injected enable condition")))
             (should (equal custom-enabled-themes '(trev-nord)))
