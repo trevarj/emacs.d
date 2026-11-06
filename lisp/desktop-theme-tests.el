@@ -57,7 +57,8 @@
        (desktop-theme-test--run ',name))))
 
 (when (getenv "TREV_DESKTOP_THEME_TEST")
-  (dolist (package '("modus-themes" "spacious-padding" "diff-hl"))
+  (dolist (package '("modus-themes" "spacious-padding" "diff-hl"
+                     "vertico" "corfu" "orderless" "marginalia"))
     (dolist (directory
              (directory-files (expand-file-name "elpa" desktop-theme-test--root)
                               t (concat "\\`" package "-[0-9]")))
@@ -194,9 +195,10 @@
   (should (equal (face-background 'margin nil t)
                  (face-background 'default nil t))))
 
-(defun desktop-theme-test--contrast (foreground background)
-  (ert-info ((format "%s on %s" foreground background))
-    (should (>= (modus-themes-contrast foreground background) 7))))
+(defun desktop-theme-test--contrast (foreground background &optional minimum)
+  "Check text at 7:1, or background distinction at explicit MINIMUM."
+  (ert-info ((format "%s on %s, minimum %s" foreground background (or minimum 7)))
+    (should (>= (modus-themes-contrast foreground background) (or minimum 7)))))
 
 (defun desktop-theme-test--legible ()
   "Check effective native consumers, including inherited highlighted text."
@@ -204,6 +206,10 @@
   (require 'hl-line)
   (require 'hi-lock)
   (require 'paren)
+  (require 'vertico)
+  (require 'corfu)
+  (require 'orderless)
+  (require 'marginalia)
   (let ((backgrounds
          (mapcar (lambda (face) (face-background face nil t))
                  '(default hl-line modus-themes-completion-selected)))
@@ -216,6 +222,10 @@
            font-lock-preprocessor-face font-lock-property-name-face
            font-lock-number-face font-lock-operator-face font-lock-punctuation-face
            error warning success completions-annotations completions-common-part
+           corfu-annotations marginalia-documentation marginalia-file-name
+           marginalia-function marginalia-key marginalia-date marginalia-type
+           orderless-match-face-0 orderless-match-face-1
+           orderless-match-face-2 orderless-match-face-3
            modus-themes-completion-match-0 modus-themes-completion-match-1
            modus-themes-completion-match-2 modus-themes-completion-match-3)))
     (dolist (face text-faces)
@@ -223,8 +233,32 @@
         (ert-info ((format "%s, inherited background %s" face background))
           (desktop-theme-test--contrast
            (face-foreground face nil 'default) background))))
+    (let ((main (face-background 'default nil t))
+          (selected (face-background 'modus-themes-completion-selected nil t)))
+      ;; These are background-boundary targets, not AAA text ratios.
+      (dolist (entry '((region . 3) (modus-themes-completion-selected . 2)
+                       (hl-line . 1.25) (highlight . 1.25)
+                       (secondary-selection . 1.25)))
+        (ert-info ((format "Visible background: %s" (car entry)))
+          (desktop-theme-test--contrast
+           (face-background (car entry) nil t) main (cdr entry))))
+      (dolist (role '(bg-dim bg-popup bg-hl-line bg-completion))
+        (desktop-theme-test--contrast
+         (face-background 'region nil t) (modus-themes-get-color-value role t) 3))
+      (desktop-theme-test--contrast
+       selected (modus-themes-get-color-value 'bg-popup t) 1.9)
+      (dolist (face '(vertico-current corfu-current completions-highlight))
+        (should (equal (face-background face nil t) selected))
+        ;; Vertico/Corfu append this face after match/annotation foregrounds.
+        (should (eq (face-attribute face :foreground nil t) 'unspecified)))
+      (dolist (face '(highlight secondary-selection region
+                     modus-themes-search-current))
+        (should-not (equal (face-background face nil t) selected)))
+      (should-not (equal (face-background 'highlight nil t)
+                         (face-background 'secondary-selection nil t))))
     (dolist (face
-             '(region mode-line mode-line-active mode-line-inactive
+             '(region highlight secondary-selection
+               mode-line mode-line-active mode-line-inactive
                modus-themes-search-current modus-themes-search-lazy
                modus-themes-search-static modus-themes-search-replace
                modus-themes-search-rx-group-0 modus-themes-search-rx-group-1
@@ -356,8 +390,9 @@
     (dolist (mode '("dark" "light"))
       (let* ((dark (equal mode "dark"))
              (theme (if dark 'modus-vivendi 'modus-operandi))
-             (background (if dark "#17212b" "#f3eee8"))
-             (foreground (if dark "#d8e4ef" "#17212b"))
+             ;; Current Noctalia cream palette, alongside a synthetic dark mode.
+             (background (if dark "#17212b" "#f2ecbc"))
+             (foreground (if dark "#d8e4ef" "#545464"))
              (native (desktop-theme-test--bundle mode theme "#abcdef")))
         (let* ((endpoint (if dark "#ffffff" "#000000"))
                (surface (if dark "#000000" "#ffffff"))
@@ -382,6 +417,9 @@
             (let ((colors (desktop-theme-test--colors background)))
               (setcdr (assoc "foreground" colors)
                       (if low-contrast background foreground))
+              (unless dark
+                (setcdr (assoc "selection_background" colors) "#c9cbd1")
+                (setcdr (assoc "selection_foreground" colors) "#f2ecbc"))
               (when low-contrast
                 ;; Also challenge polarity and inherited selection foregrounds.
                 (setcdr (assoc "background" colors) "#777777")
@@ -392,10 +430,6 @@
               (desktop-theme-test--cache background mode colors)
               (trev/desktop-theme-load)
               (desktop-theme-test--legible)
-              (unless low-contrast
-                ;; Readable source colors need no luminance repair.
-                (should (equal (face-foreground 'default nil t) foreground))
-                (should (equal (face-background 'default nil t) background)))
               (let* ((main (face-background 'default nil t))
                      (dim (modus-themes-get-color-value 'bg-dim t))
                      (active (face-background 'mode-line-active nil t))
@@ -474,9 +508,11 @@
                     (set-frame-parameter nil 'display-type 'color)
                     (trev/desktop-theme-initialize)
                     (unless (and (equal custom-enabled-themes (list expected-theme))
-                                 (equal (face-background 'default nil t) expected-background)
-                                 (equal (modus-themes-get-color-value 'bg-main t)
+                                 (equal (cdr (assoc "background"
+                                                    (cdr (trev/desktop-theme-cache))))
                                         expected-background)
+                                 (equal (face-background 'default nil t)
+                                        (modus-themes-get-color-value 'bg-main t))
                                  (>= (modus-themes-contrast
                                       (face-foreground 'font-lock-keyword-face nil t)
                                       (face-background 'default nil t)) 7))
@@ -753,9 +789,12 @@
         (_ (desktop-theme-test--select (if (eq selection 'native) native generated))
            (desktop-theme-test--active "current")))
       (trev/desktop-theme-load)
-      (should (equal (face-background 'default nil t)
-                     (pcase selection
-                       ('noctalia "#203040") ('native "#0a0b0c") (_ "#405060"))))
+      (if (eq selection 'noctalia)
+          (progn
+            (should (equal custom-enabled-themes '(modus-vivendi)))
+            (desktop-theme-test--legible))
+        (should (equal (face-background 'default nil t)
+                       (if (eq selection 'native) "#0a0b0c" "#405060"))))
       (when (eq selection 'native)
         (should (equal (face-foreground 'font-lock-function-name-face nil t) "#123abc")))
       (when (eq selection 'generated)
@@ -777,11 +816,11 @@
                (lambda (path &rest args)
                  (prog1 (apply insert-file path args)
                    (when (equal path file)
-                     (desktop-theme-test--cache "#304050"))))))
+                     (desktop-theme-test--cache "#ffffff" "light"))))))
       (trev/desktop-theme-load))
-    (should (equal (face-background 'default nil t) "#102030"))
+    (should (equal custom-enabled-themes '(modus-vivendi)))
     (trev/desktop-theme-load)
-    (should (equal (face-background 'default nil t) "#304050"))))
+    (should (equal custom-enabled-themes '(modus-operandi)))))
 
 (desktop-theme-test desktop-theme-native-catalog-ignores-bundle-source
   (let ((poison (expand-file-name "native-poison-executed" "~/")))
@@ -974,7 +1013,6 @@
         (should (equal background
                        (pcase (cadr selection)
                          ('trev-nord-light "#e5e9f0")
-                         ('modus-vivendi "#304050")
                          (_ (modus-themes-get-color-value 'bg-main t)))))
         (when previous-theme
           (if (eq previous-theme (cadr selection))

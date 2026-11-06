@@ -166,17 +166,17 @@ backgrounds.  This covers the editor surfaces below, not arbitrary faces."
            (native (append modus-themes-common-palette-overrides
                            (if dark modus-themes-vivendi-palette
                              modus-themes-operandi-palette)))
-           ;; Reserve contrast headroom for highlighted rows and colored text.
+           ;; A 2:1 selected row leaves about 8:1 headroom for inherited text.
            (background
             (trev/desktop-theme--contrast-color
-             (cdr (assoc "background" colors)) (list text-end) 10 bg-end))
+             (cdr (assoc "background" colors)) (list text-end) 16 bg-end))
            (contrast (modus-themes-contrast background text-end))
            (dim (trev/desktop-theme--contrast-color
                  text-end (list text-end) (- contrast 0.5) background))
            (inactive (trev/desktop-theme--contrast-color
-                      text-end (list text-end) (- contrast 1) background))
+                      background (list background) 1.25 text-end))
            (active (trev/desktop-theme--contrast-color
-                    text-end (list text-end) (- contrast 2) background))
+                    background (list background) 2 text-end))
            (surfaces (list background dim inactive active))
            palette)
       (cl-labels
@@ -201,8 +201,7 @@ backgrounds.  This covers the editor surfaces below, not arbitrary faces."
                    (,dim bg-dim bg-popup bg-mode-line-inactive bg-diff-context)
                    (,inactive bg-inactive bg-tab-bar bg-hl-line)
                    (,active bg-active bg-completion bg-mode-line-active
-                            bg-tab-other bg-hover bg-hover-secondary
-                            bg-paren-expression)))
+                            bg-tab-other bg-paren-expression)))
           (dolist (role (cdr mapping)) (put role (car mapping))))
         ;; Keep native warmer/cooler/faint distinctions, repairing their text
         ;; against inherited completion/hl-line backgrounds as well as default.
@@ -235,23 +234,29 @@ backgrounds.  This covers the editor surfaces below, not arbitrary faces."
             (dolist (suffix '(nuanced subtle intense))
               (let ((role (intern (format "bg-%s-%s" hue suffix))))
                 (put role (trev/desktop-theme--contrast-color
-                           (value role) (list foreground) 7 bg-end))))))
+                           (value role) (list foreground) 7 bg-end)))))
+          ;; Native mouse highlights have paired fg-main text, not inherited
+          ;; syntax.  Keep their distinct teal/warm hues instead of row gray.
+          (dolist (role '(bg-hover bg-hover-secondary))
+            (let ((surface (trev/desktop-theme--contrast-color
+                            (value role) (list background) 1.25 text-end)))
+              (put role (trev/desktop-theme--contrast-color
+                         surface (list foreground) 7 bg-end)))))
         (put 'cursor
              (trev/desktop-theme--contrast-color
               (cdr (assoc "cursor" colors)) (list background) 7 text-end))
-        ;; Region has its own foreground, unlike completion and hl-line.
-        (let* ((region (cdr (assoc "selection_background" colors)))
-               (endpoint (if (> (modus-themes-contrast region "#ffffff")
-                                (modus-themes-contrast region "#000000"))
-                             "#ffffff" "#000000"))
+        ;; A region can reverse foreground polarity; completion/hl-line cannot.
+        ;; Keep a 3:1 boundary against every shared surface as well as 7:1 text.
+        (let* ((region (trev/desktop-theme--contrast-color
+                        (cdr (assoc "selection_background" colors))
+                        surfaces 3 text-end))
                (region (trev/desktop-theme--contrast-color
-                        region (list endpoint) 7
-                        (if (equal endpoint "#ffffff") "#000000" "#ffffff"))))
+                        region (list bg-end) 7 text-end)))
           (put 'bg-region region)
           (put 'fg-region
                (trev/desktop-theme--contrast-color
                 (cdr (assoc "selection_foreground" colors))
-                (list region) 7 endpoint)))
+                (list region) 7 bg-end)))
         ;; These surfaces explicitly replace text colors: repair native pairs,
         ;; not the global syntax palette, so their semantic hues stay distinct.
         (dolist (name '(current lazy static replace rx-group-0 rx-group-1
